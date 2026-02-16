@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="5120" viewBox="0 0 1920 2560" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="220" y1="160" x2="1708" y2="2414" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4E2D7" />
+      <stop offset="0.5" stop-color="#E4C1BD" />
+      <stop offset="1" stop-color="#CFA8B8" />
+    </linearGradient>
+    <radialGradient id="leaf" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(930 1280) rotate(-8) scale(620 960)">
+      <stop stop-color="#6E8F65" stop-opacity="0.72" />
+      <stop offset="1" stop-color="#6E8F65" stop-opacity="0" />
+    </radialGradient>
+    <filter id="blur" x="0" y="0" width="3840" height="5120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="42" />
+    </filter>
+  </defs>
+  <rect width="3840" height="5120" fill="url(#bg)" />
+  <g filter="url(#blur)">
+    <ellipse cx="930" cy="1275" rx="640" ry="980" fill="url(#leaf)" />
+    <ellipse cx="664" cy="744" rx="292" ry="460" fill="#F3CEAA" fill-opacity="0.38" />
+  </g>
+  <path d="M218 500C532 702 968 510 1244 720C1426 860 1500 1140 1770 1290" stroke="#6A4B4E" stroke-opacity="0.43" stroke-width="5" />
+</svg>

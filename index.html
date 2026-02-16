@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cherry Tree</title>
+    <meta
+      name="description"
+      content="Cherry Tree is an immersive cinematic art-gallery website experience."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/images/generated/prologue-fallback-1920.jpg"
+      imagesrcset="/assets/images/generated/prologue-fallback-1280.jpg 1280w, /assets/images/generated/prologue-fallback-1920.jpg 1920w, /assets/images/generated/prologue-fallback-2560.jpg 2560w, /assets/images/generated/prologue-fallback-3840.jpg 3840w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/images/generated/bloom-wash-1920.jpg"
+      imagesrcset="/assets/images/generated/bloom-wash-1280.jpg 1280w, /assets/images/generated/bloom-wash-1920.jpg 1920w, /assets/images/generated/bloom-wash-2560.jpg 2560w, /assets/images/generated/bloom-wash-3840.jpg 3840w"
+      imagesizes="100vw"
+      fetchpriority="high"
+    />
+    <script>
+      document.documentElement.classList.remove("no-js");
+      document.documentElement.classList.add("js");
+    </script>
+  </head>
+  <body>
+    <div class="film-grain" aria-hidden="true"></div>
+
+    <header class="ui-chrome" aria-label="Site controls">
+      <span class="brand-mark">Cherry Tree</span>
+      <button
+        type="button"
+        class="sound-toggle"
+        data-ct-sound-toggle
+        aria-label="Toggle ambient sound"
+        aria-pressed="false"
+      >
+        <span class="sound-toggle-label">Sound</span>
+        <span class="sound-toggle-state" data-ct-sound-state>Off</span>
+      </button>
+    </header>
+
+    <main id="experience" class="experience" aria-label="Immersive gallery experience">
+      <h1 class="visually-hidden">Cherry Tree</h1>
+
+      <section class="scene scene-prologue" data-ct-scene="prologue-webgl">
+        <canvas id="hero-webgl" class="hero-webgl" aria-hidden="true"></canvas>
+        <div class="scene-layer scene-matte" aria-hidden="true"></div>
+        <div class="scene-layer scene-vignette" aria-hidden="true"></div>
+        <picture class="scene-media scene-media-fallback" data-scene-media>
+          <source
+            type="image/avif"
+            srcset="/assets/images/generated/prologue-fallback-1280.avif 1280w, /assets/images/generated/prologue-fallback-1920.avif 1920w, /assets/images/generated/prologue-fallback-2560.avif 2560w, /assets/images/generated/prologue-fallback-3840.avif 3840w"
+            sizes="100vw"
+          />
+          <source
+            type="image/webp"
+            srcset="/assets/images/generated/prologue-fallback-1280.webp 1280w, /assets/images/generated/prologue-fallback-1920.webp 1920w, /assets/images/generated/prologue-fallback-2560.webp 2560w, /assets/images/generated/prologue-fallback-3840.webp 3840w"
+            sizes="100vw"
+          />
+          <img
+            src="/assets/images/generated/prologue-fallback-1920.jpg"
+            srcset="/assets/images/generated/prologue-fallback-1280.jpg 1280w, /assets/images/generated/prologue-fallback-1920.jpg 1920w, /assets/images/generated/prologue-fallback-2560.jpg 2560w, /assets/images/generated/prologue-fallback-3840.jpg 3840w"
+            sizes="100vw"
+            alt=""
+            loading="eager"
+            fetchpriority="high"
+          />
+        </picture>
+      </section>
+
+      <section class="scene scene-bloom" data-ct-scene="bloom-wash">
+        <div class="scene-layer scene-matte" aria-hidden="true"></div>
+        <picture class="scene-media" data-scene-media>
+          <source
+            type="image/avif"
+            srcset="/assets/images/generated/bloom-wash-1280.avif 1280w, /assets/images/generated/bloom-wash-1920.avif 1920w, /assets/images/generated/bloom-wash-2560.avif 2560w, /assets/images/generated/bloom-wash-3840.avif 3840w"
+            sizes="100vw"
+          />
+          <source
+            type="image/webp"
+            srcset="/assets/images/generated/bloom-wash-1280.webp 1280w, /assets/images/generated/bloom-wash-1920.webp 1920w, /assets/images/generated/bloom-wash-2560.webp 2560w, /assets/images/generated/bloom-wash-3840.webp 3840w"
+            sizes="100vw"
+          />
+          <img
+            src="/assets/images/generated/bloom-wash-1920.jpg"
+            srcset="/assets/images/generated/bloom-wash-1280.jpg 1280w, /assets/images/generated/bloom-wash-1920.jpg 1920w, /assets/images/generated/bloom-wash-2560.jpg 2560w, /assets/images/generated/bloom-wash-3840.jpg 3840w"
+            sizes="100vw"
+            alt=""
+            loading="eager"
+            fetchpriority="high"
+          />
+        </picture>
+      </section>
+
+      <section class="scene scene-triptych" data-ct-scene="triptych">
+        <div class="triptych-stage">
+          <figure class="triptych-panel" data-scene-media>
+            <picture>
+              <source
+                type="image/avif"
+                data-srcset="/assets/images/generated/triptych-a-1280.avif 1280w, /assets/images/generated/triptych-a-1920.avif 1920w, /assets/images/generated/triptych-a-2560.avif 2560w, /assets/images/generated/triptych-a-3840.avif 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <source
+                type="image/webp"
+                data-srcset="/assets/images/generated/triptych-a-1280.webp 1280w, /assets/images/generated/triptych-a-1920.webp 1920w, /assets/images/generated/triptych-a-2560.webp 2560w, /assets/images/generated/triptych-a-3840.webp 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <img
+                src="/assets/images/generated/triptych-a-lqip.jpg"
+                data-src="/assets/images/generated/triptych-a-1920.jpg"
+                data-srcset="/assets/images/generated/triptych-a-1280.jpg 1280w, /assets/images/generated/triptych-a-1920.jpg 1920w, /assets/images/generated/triptych-a-2560.jpg 2560w, /assets/images/generated/triptych-a-3840.jpg 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+                alt=""
+                loading="lazy"
+              />
+            </picture>
+          </figure>
+          <figure class="triptych-panel" data-scene-media>
+            <picture>
+              <source
+                type="image/avif"
+                data-srcset="/assets/images/generated/triptych-b-1280.avif 1280w, /assets/images/generated/triptych-b-1920.avif 1920w, /assets/images/generated/triptych-b-2560.avif 2560w, /assets/images/generated/triptych-b-3840.avif 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <source
+                type="image/webp"
+                data-srcset="/assets/images/generated/triptych-b-1280.webp 1280w, /assets/images/generated/triptych-b-1920.webp 1920w, /assets/images/generated/triptych-b-2560.webp 2560w, /assets/images/generated/triptych-b-3840.webp 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <img
+                src="/assets/images/generated/triptych-b-lqip.jpg"
+                data-src="/assets/images/generated/triptych-b-1920.jpg"
+                data-srcset="/assets/images/generated/triptych-b-1280.jpg 1280w, /assets/images/generated/triptych-b-1920.jpg 1920w, /assets/images/generated/triptych-b-2560.jpg 2560w, /assets/images/generated/triptych-b-3840.jpg 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+                alt=""
+                loading="lazy"
+              />
+            </picture>
+          </figure>
+          <figure class="triptych-panel" data-scene-media>
+            <picture>
+              <source
+                type="image/avif"
+                data-srcset="/assets/images/generated/triptych-c-1280.avif 1280w, /assets/images/generated/triptych-c-1920.avif 1920w, /assets/images/generated/triptych-c-2560.avif 2560w, /assets/images/generated/triptych-c-3840.avif 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <source
+                type="image/webp"
+                data-srcset="/assets/images/generated/triptych-c-1280.webp 1280w, /assets/images/generated/triptych-c-1920.webp 1920w, /assets/images/generated/triptych-c-2560.webp 2560w, /assets/images/generated/triptych-c-3840.webp 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+              />
+              <img
+                src="/assets/images/generated/triptych-c-lqip.jpg"
+                data-src="/assets/images/generated/triptych-c-1920.jpg"
+                data-srcset="/assets/images/generated/triptych-c-1280.jpg 1280w, /assets/images/generated/triptych-c-1920.jpg 1920w, /assets/images/generated/triptych-c-2560.jpg 2560w, /assets/images/generated/triptych-c-3840.jpg 3840w"
+                sizes="(max-width: 760px) 100vw, 33vw"
+                alt=""
+                loading="lazy"
+              />
+            </picture>
+          </figure>
+        </div>
+      </section>
+
+      <section class="scene scene-color" data-ct-scene="color-field">
+        <div class="color-field" data-scene-media>
+          <div class="color-bloom color-bloom-a" aria-hidden="true"></div>
+          <div class="color-bloom color-bloom-b" aria-hidden="true"></div>
+          <div class="color-bloom color-bloom-c" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="scene scene-stillness" data-ct-scene="stillness">
+        <div class="scene-layer scene-matte" aria-hidden="true"></div>
+        <picture class="scene-media" data-scene-media>
+          <source
+            type="image/avif"
+            data-srcset="/assets/images/generated/stillness-1280.avif 1280w, /assets/images/generated/stillness-1920.avif 1920w, /assets/images/generated/stillness-2560.avif 2560w, /assets/images/generated/stillness-3840.avif 3840w"
+            sizes="100vw"
+          />
+          <source
+            type="image/webp"
+            data-srcset="/assets/images/generated/stillness-1280.webp 1280w, /assets/images/generated/stillness-1920.webp 1920w, /assets/images/generated/stillness-2560.webp 2560w, /assets/images/generated/stillness-3840.webp 3840w"
+            sizes="100vw"
+          />
+          <img
+            src="/assets/images/generated/stillness-lqip.jpg"
+            data-src="/assets/images/generated/stillness-1920.jpg"
+            data-srcset="/assets/images/generated/stillness-1280.jpg 1280w, /assets/images/generated/stillness-1920.jpg 1920w, /assets/images/generated/stillness-2560.jpg 2560w, /assets/images/generated/stillness-3840.jpg 3840w"
+            sizes="100vw"
+            alt=""
+            loading="lazy"
+          />
+        </picture>
+      </section>
+
+      <section class="scene scene-epilogue" data-ct-scene="epilogue">
+        <div class="epilogue-lockup" data-scene-media>
+          <p>Cherry Tree</p>
+        </div>
+      </section>
+    </main>
+
+    <noscript>
+      <style>
+        .hero-webgl {
+          display: none;
+        }
+      </style>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
