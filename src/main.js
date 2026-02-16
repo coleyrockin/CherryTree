@@ -3,25 +3,10 @@ import "./styles/scenes.css";
 
 import { sceneManifest } from "./content/sceneManifest";
 import { initAudioController } from "./experience/audioController";
+import { safeStorageGet, safeStorageSet } from "./utils/storage";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
 const HERO_SCENE_SELECTOR = '[data-ct-scene="prologue-webgl"]';
-
-const safeStorageGet = (key) => {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-};
-
-const safeStorageSet = (key, value) => {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Ignore storage failures in restrictive browser modes.
-  }
-};
 
 const getMotionPreference = () => {
   const stored = safeStorageGet(MOTION_STORAGE_KEY);
@@ -31,7 +16,7 @@ const getMotionPreference = () => {
     safeStorageSet(MOTION_STORAGE_KEY, "auto");
   }
 
-  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const prefersReduced = Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   const reduced = mode === "reduced" || (mode === "auto" && prefersReduced);
 
   return { mode, reduced };
@@ -98,13 +83,11 @@ const boot = async () => {
     })
   );
 
-  window.addEventListener(
-    "beforeunload",
-    () => {
-      cleanup.forEach((dispose) => dispose?.());
-    },
-    { once: true }
-  );
+  const runCleanup = () => {
+    cleanup.splice(0).forEach((dispose) => dispose?.());
+  };
+
+  window.addEventListener("pagehide", runCleanup, { once: true });
 };
 
 const handleBootError = (error) => {

@@ -1,20 +1,6 @@
+import { safeStorageGet, safeStorageSet } from "../utils/storage";
+
 const STORAGE_KEY = "cherrytree.audio.enabled";
-
-const safeStorageGet = (key) => {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-};
-
-const safeStorageSet = (key, value) => {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Ignore storage failures in restrictive browser modes.
-  }
-};
 
 const readStoredState = () => safeStorageGet(STORAGE_KEY) === "true";
 
@@ -24,17 +10,34 @@ const writeStoredState = (enabled) => {
 
 const fadeValue = ({ from, to, durationMs, onUpdate, onComplete }) => {
   const start = performance.now();
+  let rafId = 0;
+  let cancelled = false;
+
   const step = (now) => {
+    if (cancelled) {
+      return;
+    }
+
     const progress = Math.min(1, (now - start) / durationMs);
     const eased = 1 - (1 - progress) ** 3;
     onUpdate(from + (to - from) * eased);
+
     if (progress < 1) {
-      requestAnimationFrame(step);
+      rafId = requestAnimationFrame(step);
       return;
     }
+
     onComplete?.();
   };
-  requestAnimationFrame(step);
+
+  rafId = requestAnimationFrame(step);
+
+  return () => {
+    cancelled = true;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+    }
+  };
 };
 
 const setButtonState = (button, stateNode, enabled, sourceLabel = null) => {
@@ -109,13 +112,48 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
   let hasUnlocked = false;
   let pendingEnable = readStoredState();
   let isToggling = false;
+  let cancelFileFade = () => {};
+  let cancelSynthFade = () => {};
 
   const listenerController = new AbortController();
 
-  const disableCurrentAudio = () => {
+  const runFileFade = (config) => {
+    cancelFileFade();
+    cancelFileFade = fadeValue(config);
+  };
+
+  const runSynthFade = (config) => {
+    cancelSynthFade();
+    cancelSynthFade = fadeValue(config);
+  };
+
+  const markUnavailable = () => {
+    pendingEnable = false;
+    isEnabled = false;
+    writeStoredState(false);
+    setButtonState(button, stateNode, false, "N/A");
+  };
+
+  const disableCurrentAudio = ({ immediate = false } = {}) => {
     if (usingSynth && synth) {
       const target = synth;
-      fadeValue({
+      if (immediate) {
+        cancelSynthFade();
+        target.master.gain.value = 0;
+        target.oscillators.forEach((osc) => {
+          try {
+            osc.stop();
+          } catch {
+            // Ignore stop calls on already-stopped oscillators.
+          }
+        });
+        void target.context.close().catch(() => {});
+        synth = null;
+        usingSynth = false;
+        return;
+      }
+
+      runSynthFade({
         from: target.master.gain.value,
         to: 0,
         durationMs: 750,
@@ -133,7 +171,15 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     }
 
     if (!fileAudio.paused) {
-      fadeValue({
+      if (immediate) {
+        cancelFileFade();
+        fileAudio.volume = 0;
+        fileAudio.pause();
+        fileAudio.currentTime = 0;
+        return;
+      }
+
+      runFileFade({
         from: fileAudio.volume,
         to: 0,
         durationMs: 750,
@@ -162,7 +208,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     }
 
     usingSynth = true;
-    fadeValue({
+    runSynthFade({
       from: 0,
       to: 0.1,
       durationMs: 1000,
@@ -179,7 +225,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     fileAudio.volume = 0;
     await fileAudio.play();
 
-    fadeValue({
+    runFileFade({
       from: 0,
       to: 0.55,
       durationMs: 1100,
@@ -193,9 +239,15 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     try {
       await startFileAudio();
       setButtonState(button, stateNode, true);
-    } catch {
-      await startFallbackSynth();
-      setButtonState(button, stateNode, true, "On*");
+    } catch (fileError) {
+      try {
+        await startFallbackSynth();
+        setButtonState(button, stateNode, true, "On*");
+      } catch (fallbackError) {
+        console.error("Audio unavailable for this session.", fileError, fallbackError);
+        markUnavailable();
+        return;
+      }
     }
 
     isEnabled = true;
@@ -259,7 +311,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
 
   return () => {
     listenerController.abort();
-    disableCurrentAudio();
+    disableCurrentAudio({ immediate: true });
     fileAudio.removeAttribute("src");
     fileAudio.load();
   };

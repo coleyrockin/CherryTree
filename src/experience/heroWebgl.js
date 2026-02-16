@@ -54,7 +54,6 @@ const randomBetween = (min, max) => min + Math.random() * (max - min);
 const createPetalField = (THREE) => {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(PETAL_COUNT * 3);
-  const scales = new Float32Array(PETAL_COUNT);
   const phases = new Float32Array(PETAL_COUNT);
   const speeds = new Float32Array(PETAL_COUNT);
 
@@ -63,13 +62,11 @@ const createPetalField = (THREE) => {
     positions[i3] = randomBetween(-WORLD_WIDTH / 2, WORLD_WIDTH / 2);
     positions[i3 + 1] = randomBetween(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2);
     positions[i3 + 2] = randomBetween(-2.8, 1.8);
-    scales[i] = randomBetween(0.11, 0.28);
     phases[i] = randomBetween(0, Math.PI * 2);
     speeds[i] = randomBetween(0.16, 0.46);
   }
 
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute("aScale", new THREE.BufferAttribute(scales, 1));
 
   const texture = createPetalTexture(THREE);
   const material = new THREE.PointsMaterial({
@@ -120,6 +117,8 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
 
   const petalRig = new THREE.Group();
   const field = createPetalField(THREE);
+  const positionAttr = field.geometry.getAttribute("position");
+  const positionArray = positionAttr.array;
   petalRig.add(field.points);
 
   const hazeGeometry = new THREE.PlaneGeometry(14, 10);
@@ -159,17 +158,16 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   let isActive = true;
 
   const updatePetals = (elapsed, deltaSeconds) => {
-    const positionAttr = field.geometry.getAttribute("position");
     for (let i = 0; i < PETAL_COUNT; i += 1) {
       const i3 = i * 3;
       const driftX = Math.sin(elapsed * 0.00035 + field.phases[i]) * 0.2;
-      positionAttr.array[i3] += driftX * deltaSeconds;
-      positionAttr.array[i3 + 1] -= field.speeds[i] * deltaSeconds;
+      positionArray[i3] += driftX * deltaSeconds;
+      positionArray[i3 + 1] -= field.speeds[i] * deltaSeconds;
 
-      if (positionAttr.array[i3 + 1] < -WORLD_HEIGHT / 2 - 0.4) {
-        positionAttr.array[i3] = randomBetween(-WORLD_WIDTH / 2, WORLD_WIDTH / 2);
-        positionAttr.array[i3 + 1] = WORLD_HEIGHT / 2 + 0.4;
-        positionAttr.array[i3 + 2] = randomBetween(-2.8, 1.8);
+      if (positionArray[i3 + 1] < -WORLD_HEIGHT / 2 - 0.4) {
+        positionArray[i3] = randomBetween(-WORLD_WIDTH / 2, WORLD_WIDTH / 2);
+        positionArray[i3 + 1] = WORLD_HEIGHT / 2 + 0.4;
+        positionArray[i3 + 2] = randomBetween(-2.8, 1.8);
       }
     }
 
@@ -225,25 +223,28 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     rafId = 0;
   };
 
-  const visibilityObserver = new IntersectionObserver(
-    ([entry]) => {
-      isActive = !!entry?.isIntersecting;
-      if (isActive) {
-        if (reducedMotion) {
-          renderer.render(scene, camera);
+  let visibilityObserver = null;
+  if ("IntersectionObserver" in window) {
+    visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isActive = !!entry?.isIntersecting;
+        if (isActive) {
+          if (reducedMotion) {
+            renderer.render(scene, camera);
+          } else {
+            startLoop();
+          }
         } else {
-          startLoop();
+          stopLoop();
         }
-      } else {
-        stopLoop();
-      }
-    },
-    { threshold: 0.1 }
-  );
+      },
+      { threshold: 0.1 }
+    );
+  }
 
   window.addEventListener("resize", resize);
   host.addEventListener("pointermove", handlePointerMove, { passive: true });
-  visibilityObserver.observe(host);
+  visibilityObserver?.observe(host);
 
   resize();
 
@@ -257,7 +258,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
 
   return () => {
     stopLoop();
-    visibilityObserver.disconnect();
+    visibilityObserver?.disconnect();
     window.removeEventListener("resize", resize);
     host.removeEventListener("pointermove", handlePointerMove);
 
