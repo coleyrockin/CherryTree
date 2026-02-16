@@ -3,23 +3,47 @@ import "./styles/scenes.css";
 
 import { sceneManifest } from "./content/sceneManifest";
 import { initAudioController } from "./experience/audioController";
-import { initHeroWebgl } from "./experience/heroWebgl";
-import { initLazySceneMedia, initSceneController } from "./experience/sceneController";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
+const HERO_SCENE_SELECTOR = '[data-ct-scene="prologue-webgl"]';
+
+const safeStorageGet = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const safeStorageSet = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures in restrictive browser modes.
+  }
+};
 
 const getMotionPreference = () => {
-  const stored = localStorage.getItem(MOTION_STORAGE_KEY);
+  const stored = safeStorageGet(MOTION_STORAGE_KEY);
   const mode = stored === "reduced" ? "reduced" : "auto";
 
   if (stored !== "auto" && stored !== "reduced") {
-    localStorage.setItem(MOTION_STORAGE_KEY, "auto");
+    safeStorageSet(MOTION_STORAGE_KEY, "auto");
   }
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const reduced = mode === "reduced" || (mode === "auto" && prefersReduced);
 
   return { mode, reduced };
+};
+
+const supportsWebGLContext = () => {
+  try {
+    const canvas = document.createElement("canvas");
+    return !!(canvas.getContext("webgl2") || canvas.getContext("webgl"));
+  } catch {
+    return false;
+  }
 };
 
 const applySceneManifest = (manifest) => {
@@ -36,29 +60,37 @@ const applySceneManifest = (manifest) => {
   });
 };
 
-const boot = () => {
+const boot = async () => {
   const motion = getMotionPreference();
   document.documentElement.dataset.motion = motion.reduced ? "reduced" : "full";
 
   applySceneManifest(sceneManifest);
 
   const cleanup = [];
+  const heroHost = document.querySelector(HERO_SCENE_SELECTOR);
+
+  const { initLazySceneMedia, initSceneController } = await import("./experience/sceneController");
 
   cleanup.push(initLazySceneMedia(sceneManifest));
   cleanup.push(
-    initSceneController({
+    await initSceneController({
       manifest: sceneManifest,
       reducedMotion: motion.reduced
     })
   );
 
-  cleanup.push(
-    initHeroWebgl({
-      canvas: document.getElementById("hero-webgl"),
-      host: document.querySelector('[data-ct-scene="prologue-webgl"]'),
-      reducedMotion: motion.reduced
-    })
-  );
+  if (!motion.reduced && supportsWebGLContext()) {
+    const { initHeroWebgl } = await import("./experience/heroWebgl");
+    cleanup.push(
+      await initHeroWebgl({
+        canvas: document.getElementById("hero-webgl"),
+        host: heroHost,
+        reducedMotion: motion.reduced
+      })
+    );
+  } else {
+    heroHost?.classList.add("is-webgl-fallback");
+  }
 
   cleanup.push(
     initAudioController({
@@ -75,8 +107,18 @@ const boot = () => {
   );
 };
 
+const handleBootError = (error) => {
+  console.error("Cherry Tree failed to initialize:", error);
+};
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", boot, { once: true });
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+      void boot().catch(handleBootError);
+    },
+    { once: true }
+  );
 } else {
-  boot();
+  void boot().catch(handleBootError);
 }

@@ -1,9 +1,3 @@
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Lenis from "lenis";
-
-gsap.registerPlugin(ScrollTrigger);
-
 const hydrateLazyMedia = (root) => {
   root
     .querySelectorAll("source[data-srcset], img[data-src], img[data-srcset]")
@@ -80,7 +74,7 @@ const initPresenceObserver = (scenes) => {
   };
 };
 
-export const initSceneController = ({ manifest, reducedMotion = false }) => {
+export const initSceneController = async ({ manifest, reducedMotion = false }) => {
   const scenes = manifest
     .map((scene) => document.querySelector(`[data-ct-scene="${scene.id}"]`))
     .filter(Boolean);
@@ -101,6 +95,14 @@ export const initSceneController = ({ manifest, reducedMotion = false }) => {
       cleanup.forEach((fn) => fn());
     };
   }
+
+  const [{ gsap }, { ScrollTrigger }, { default: Lenis }] = await Promise.all([
+    import("gsap"),
+    import("gsap/ScrollTrigger"),
+    import("lenis")
+  ]);
+
+  gsap.registerPlugin(ScrollTrigger);
 
   const lenis = new Lenis({
     duration: 1.15,
@@ -123,42 +125,48 @@ export const initSceneController = ({ manifest, reducedMotion = false }) => {
     lenis.destroy();
   });
 
+  const animations = [];
+
   scenes.forEach((scene) => {
     const media = scene.querySelector("[data-scene-media]");
     if (media) {
-      gsap.fromTo(
-        media,
-        { yPercent: 8, scale: 1.08, filter: "saturate(0.85)" },
-        {
-          yPercent: -4,
-          scale: 1,
-          filter: "saturate(1)",
-          ease: "none",
-          scrollTrigger: {
-            trigger: scene,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 0.95
+      animations.push(
+        gsap.fromTo(
+          media,
+          { yPercent: 8, scale: 1.08, filter: "saturate(0.85)" },
+          {
+            yPercent: -4,
+            scale: 1,
+            filter: "saturate(1)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: scene,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.95
+            }
           }
-        }
+        )
       );
     }
 
     const matte = scene.querySelector(".scene-matte");
     if (matte) {
-      gsap.fromTo(
-        matte,
-        { opacity: 0.45 },
-        {
-          opacity: 0.18,
-          ease: "none",
-          scrollTrigger: {
-            trigger: scene,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 0.9
+      animations.push(
+        gsap.fromTo(
+          matte,
+          { opacity: 0.45 },
+          {
+            opacity: 0.18,
+            ease: "none",
+            scrollTrigger: {
+              trigger: scene,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.9
+            }
           }
-        }
+        )
       );
     }
   });
@@ -212,6 +220,8 @@ export const initSceneController = ({ manifest, reducedMotion = false }) => {
         },
         0
       );
+
+      animations.push(timeline);
     }
   }
 
@@ -219,23 +229,25 @@ export const initSceneController = ({ manifest, reducedMotion = false }) => {
   if (colorField) {
     const blooms = colorField.querySelectorAll(".color-bloom");
     blooms.forEach((bloom, index) => {
-      gsap.to(bloom, {
-        scale: 1.25,
-        rotate: index % 2 === 0 ? 16 : -14,
-        duration: 1.5,
-        ease: "none",
-        scrollTrigger: {
-          trigger: colorField,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.2
-        }
-      });
+      animations.push(
+        gsap.to(bloom, {
+          scale: 1.25,
+          rotate: index % 2 === 0 ? 16 : -14,
+          duration: 1.5,
+          ease: "none",
+          scrollTrigger: {
+            trigger: colorField,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2
+          }
+        })
+      );
     });
   }
 
   cleanup.push(() => {
-    ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    animations.forEach((animation) => animation.kill());
   });
 
   return () => {

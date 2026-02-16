@@ -1,8 +1,7 @@
-import * as THREE from "three";
-
 const PETAL_COUNT = 240;
 const WORLD_WIDTH = 6.8;
 const WORLD_HEIGHT = 8;
+let threeModulePromise;
 
 const supportsWebGL = () => {
   try {
@@ -16,7 +15,14 @@ const supportsWebGL = () => {
   }
 };
 
-const createPetalTexture = () => {
+const loadThree = async () => {
+  if (!threeModulePromise) {
+    threeModulePromise = import("three");
+  }
+  return threeModulePromise;
+};
+
+const createPetalTexture = (THREE) => {
   const canvas = document.createElement("canvas");
   canvas.width = 256;
   canvas.height = 256;
@@ -45,7 +51,7 @@ const createPetalTexture = () => {
 
 const randomBetween = (min, max) => min + Math.random() * (max - min);
 
-const createPetalField = () => {
+const createPetalField = (THREE) => {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(PETAL_COUNT * 3);
   const scales = new Float32Array(PETAL_COUNT);
@@ -65,7 +71,7 @@ const createPetalField = () => {
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
   geometry.setAttribute("aScale", new THREE.BufferAttribute(scales, 1));
 
-  const texture = createPetalTexture();
+  const texture = createPetalTexture(THREE);
   const material = new THREE.PointsMaterial({
     color: 0xfdd7e4,
     size: 0.22,
@@ -90,11 +96,13 @@ const createPetalField = () => {
   };
 };
 
-export const initHeroWebgl = ({ canvas, host, reducedMotion = false }) => {
+export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => {
   if (!canvas || !host || !supportsWebGL()) {
     host?.classList.add("is-webgl-fallback");
     return () => {};
   }
+
+  const THREE = await loadThree();
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -111,7 +119,7 @@ export const initHeroWebgl = ({ canvas, host, reducedMotion = false }) => {
   camera.position.set(0, 0, 6.2);
 
   const petalRig = new THREE.Group();
-  const field = createPetalField();
+  const field = createPetalField(THREE);
   petalRig.add(field.points);
 
   const hazeGeometry = new THREE.PlaneGeometry(14, 10);

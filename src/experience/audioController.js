@@ -1,9 +1,25 @@
 const STORAGE_KEY = "cherrytree.audio.enabled";
 
-const readStoredState = () => localStorage.getItem(STORAGE_KEY) === "true";
+const safeStorageGet = (key) => {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+};
+
+const safeStorageSet = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures in restrictive browser modes.
+  }
+};
+
+const readStoredState = () => safeStorageGet(STORAGE_KEY) === "true";
 
 const writeStoredState = (enabled) => {
-  localStorage.setItem(STORAGE_KEY, String(enabled));
+  safeStorageSet(STORAGE_KEY, String(enabled));
 };
 
 const fadeValue = ({ from, to, durationMs, onUpdate, onComplete }) => {
@@ -92,6 +108,9 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
   let isEnabled = false;
   let hasUnlocked = false;
   let pendingEnable = readStoredState();
+  let isToggling = false;
+
+  const listenerController = new AbortController();
 
   const disableCurrentAudio = () => {
     if (usingSynth && synth) {
@@ -191,14 +210,22 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
   };
 
   const onToggle = async () => {
-    if (isEnabled) {
-      disable();
-      pendingEnable = false;
+    if (isToggling) {
       return;
     }
+    isToggling = true;
+    try {
+      if (isEnabled) {
+        disable();
+        pendingEnable = false;
+        return;
+      }
 
-    pendingEnable = true;
-    await enable();
+      pendingEnable = true;
+      await enable();
+    } finally {
+      isToggling = false;
+    }
   };
 
   const unlockAudio = async () => {
@@ -219,12 +246,21 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     setButtonState(button, stateNode, false);
   }
 
-  button.addEventListener("click", onToggle);
-  window.addEventListener("pointerdown", unlockAudio, { once: true, passive: true });
-  window.addEventListener("keydown", unlockAudio, { once: true });
+  button.addEventListener("click", onToggle, { signal: listenerController.signal });
+  window.addEventListener("pointerdown", unlockAudio, {
+    once: true,
+    passive: true,
+    signal: listenerController.signal
+  });
+  window.addEventListener("keydown", unlockAudio, {
+    once: true,
+    signal: listenerController.signal
+  });
 
   return () => {
-    button.removeEventListener("click", onToggle);
+    listenerController.abort();
     disableCurrentAudio();
+    fileAudio.removeAttribute("src");
+    fileAudio.load();
   };
 };
