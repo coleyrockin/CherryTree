@@ -18,6 +18,3 @@ yarn-error.log*
 .DS_Store
 .vscode/
 .idea/
-
-# temporary previews
-cherrytree-preview.png

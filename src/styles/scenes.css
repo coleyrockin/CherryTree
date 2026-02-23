@@ -23,7 +23,7 @@
 }
 
 .scene-prologue.is-webgl-ready .scene-media-fallback {
-  opacity: 0.18;
+  opacity: 0.1;
 }
 
 .scene-bloom {
