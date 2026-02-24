@@ -1,22 +1,104 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="3840" height="5120" viewBox="0 0 1920 2560" fill="none">
   <defs>
-    <linearGradient id="bg" x1="180" y1="90" x2="1800" y2="2410" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F7E7DD" />
-      <stop offset="0.58" stop-color="#EAC7C0" />
-      <stop offset="1" stop-color="#DBA4AF" />
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="2560" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#BDA8C8" />
+      <stop offset="0.28" stop-color="#DEB8CE" />
+      <stop offset="0.58" stop-color="#EEC8B8" />
+      <stop offset="1" stop-color="#E4B8AA" />
     </linearGradient>
-    <radialGradient id="petal" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(930 920) rotate(12) scale(650 840)">
-      <stop stop-color="#D75D87" stop-opacity="0.76" />
-      <stop offset="1" stop-color="#D75D87" stop-opacity="0" />
-    </radialGradient>
-    <filter id="blur" x="0" y="0" width="3840" height="5120" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feGaussianBlur stdDeviation="40" />
+    <filter id="f50" x="0" y="0" width="1920" height="2560" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="50" />
+    </filter>
+    <filter id="f16" x="0" y="0" width="1920" height="2560" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="16" />
+    </filter>
+    <filter id="f5" x="0" y="0" width="1920" height="2560" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="5" />
     </filter>
   </defs>
-  <rect width="3840" height="5120" fill="url(#bg)" />
-  <g filter="url(#blur)">
-    <ellipse cx="936" cy="916" rx="624" ry="892" fill="url(#petal)" />
-    <ellipse cx="1358" cy="1600" rx="366" ry="532" fill="#F0C08F" fill-opacity="0.45" />
+
+  <!-- Sky -->
+  <rect width="1920" height="2560" fill="url(#sky)" />
+
+  <!-- Sun glow -->
+  <ellipse cx="1400" cy="480" rx="600" ry="420" fill="#FFFCF0" opacity="0.65" filter="url(#f50)" />
+
+  <!-- Distant hills -->
+  <path d="M0 1800 Q480 1700 960 1760 Q1440 1820 1920 1740 L1920 2560 L0 2560 Z" fill="#DDB8B2" opacity="0.60" />
+  <path d="M0 2000 Q480 1940 960 1980 Q1440 2020 1920 1960 L1920 2560 L0 2560 Z" fill="#CFA8A0" opacity="0.80" />
+  <!-- Ground -->
+  <path d="M0 2240 Q960 2200 1920 2220 L1920 2560 L0 2560 Z" fill="#C09890" opacity="0.90" />
+
+  <!-- Atmospheric blossom glow -->
+  <g filter="url(#f50)">
+    <ellipse cx="480" cy="800" rx="380" ry="280" fill="#E8A0BC" opacity="0.60" />
+    <ellipse cx="1440" cy="600" rx="440" ry="320" fill="#EDA8C0" opacity="0.56" />
+    <ellipse cx="960" cy="400" rx="400" ry="290" fill="#EAA4BC" opacity="0.52" />
   </g>
-  <path d="M176 1964C508 1746 770 2122 1135 1931C1376 1812 1574 1605 1764 1628" stroke="#6A3E4C" stroke-opacity="0.44" stroke-width="5" />
+
+  <!-- Main trunk (from bottom, curving upward) -->
+  <path d="M720 2560 C720 2460 714 2360 720 2220 C726 2080 738 1960 748 1840 C758 1720 766 1600 778 1480 C790 1360 806 1240 822 1120" stroke="#4A2C38" stroke-width="72" stroke-linecap="round" fill="none" />
+  <path d="M822 1120 C836 1010 852 908 866 810" stroke="#4A2C38" stroke-width="48" stroke-linecap="round" fill="none" />
+
+  <!-- Left branches from trunk -->
+  <path d="M748 1880 C660 1820 584 1768 494 1712 C424 1666 354 1630 274 1594" stroke="#4A2C38" stroke-width="32" stroke-linecap="round" fill="none" />
+  <path d="M758 1700 C672 1640 596 1588 506 1532 C436 1486 364 1450 284 1416" stroke="#4A2C38" stroke-width="26" stroke-linecap="round" fill="none" />
+  <path d="M274 1594 C202 1550 142 1502 80 1448 C34 1406 0 1366 0 1366" stroke="#5A3A44" stroke-width="16" stroke-linecap="round" fill="none" />
+  <path d="M284 1416 C210 1372 148 1326 82 1272 C34 1232 0 1196 0 1196" stroke="#5A3A44" stroke-width="12" stroke-linecap="round" fill="none" />
+
+  <!-- Right branches from trunk -->
+  <path d="M766 1620 C858 1560 944 1514 1048 1462 C1134 1420 1226 1390 1328 1358" stroke="#4A2C38" stroke-width="28" stroke-linecap="round" fill="none" />
+  <path d="M778 1460 C868 1398 956 1350 1062 1298 C1148 1256 1244 1224 1350 1194" stroke="#4A2C38" stroke-width="22" stroke-linecap="round" fill="none" />
+  <path d="M1328 1358 C1420 1318 1510 1284 1608 1248 C1692 1218 1782 1192 1880 1166" stroke="#5A3A44" stroke-width="14" stroke-linecap="round" fill="none" />
+  <path d="M1350 1194 C1446 1156 1538 1124 1640 1090 C1726 1062 1820 1036 1920 1010" stroke="#5A3A44" stroke-width="11" stroke-linecap="round" fill="none" />
+
+  <!-- Upper trunk branches -->
+  <path d="M866 810 C884 724 904 644 924 564" stroke="#4A2C38" stroke-width="38" stroke-linecap="round" fill="none" />
+  <path d="M866 900 C800 836 742 772 680 700 C632 642 590 586 546 524" stroke="#5A3A44" stroke-width="18" stroke-linecap="round" fill="none" />
+  <path d="M866 900 C928 836 984 770 1046 700 C1094 644 1140 586 1192 524" stroke="#5A3A44" stroke-width="18" stroke-linecap="round" fill="none" />
+  <g stroke="#5A3A44" stroke-linecap="round" fill="none">
+    <path d="M924 564 C940 490 960 420 986 352 C1004 302 1028 256 1058 208" stroke-width="22" />
+    <path d="M986 352 C1040 290 1096 238 1160 186" stroke-width="16" />
+    <path d="M546 524 C518 464 494 404 468 342" stroke-width="12" />
+    <path d="M1192 524 C1222 464 1250 402 1282 340" stroke-width="12" />
+  </g>
+
+  <!-- Blossom clusters -->
+  <g filter="url(#f16)" opacity="0.92">
+    <ellipse cx="218" cy="1560" rx="150" ry="108" fill="#F0AEC8" />
+    <ellipse cx="96" cy="1440" rx="130" ry="94" fill="#EDAAC4" />
+    <ellipse cx="190" cy="1282" rx="120" ry="86" fill="#F2B0CA" />
+    <ellipse cx="96" cy="1152" rx="110" ry="80" fill="#EEACC6" />
+    <ellipse cx="1460" cy="1310" rx="160" ry="114" fill="#F0AEC8" />
+    <ellipse cx="1640" cy="1210" rx="148" ry="106" fill="#EDAAC4" />
+    <ellipse cx="1820" cy="1120" rx="136" ry="98" fill="#F2B0CA" />
+    <ellipse cx="1480" cy="1148" rx="150" ry="108" fill="#EFACC6" />
+    <ellipse cx="960" cy="460" rx="170" ry="122" fill="#F0ACC6" />
+    <ellipse cx="780" cy="580" rx="154" ry="110" fill="#EDAAC4" />
+    <ellipse cx="1140" cy="560" rx="162" ry="116" fill="#F2AEC8" />
+    <ellipse cx="700" cy="668" rx="140" ry="100" fill="#EEAAC6" />
+    <ellipse cx="1220" cy="660" rx="148" ry="106" fill="#EDACC4" />
+    <ellipse cx="540" cy="420" rx="132" ry="94" fill="#F0ACC6" />
+    <ellipse cx="1360" cy="420" rx="140" ry="100" fill="#EDAAC4" />
+  </g>
+
+  <!-- Scattered petals -->
+  <g filter="url(#f5)" opacity="0.88">
+    <ellipse cx="400" cy="640" rx="22" ry="13" fill="#F4BED0" transform="rotate(16 400 640)" />
+    <ellipse cx="560" cy="780" rx="19" ry="12" fill="#F2BCD0" transform="rotate(-20 560 780)" />
+    <ellipse cx="720" cy="940" rx="21" ry="13" fill="#F4C0D2" transform="rotate(12 720 940)" />
+    <ellipse cx="880" cy="800" rx="18" ry="11" fill="#F0BED0" transform="rotate(-14 880 800)" />
+    <ellipse cx="1040" cy="880" rx="20" ry="12" fill="#F2BED2" transform="rotate(22 1040 880)" />
+    <ellipse cx="1200" cy="760" rx="22" ry="13" fill="#F4BCD0" transform="rotate(-8 1200 760)" />
+    <ellipse cx="1360" cy="860" rx="19" ry="12" fill="#F0C0D2" transform="rotate(18 1360 860)" />
+    <ellipse cx="1520" cy="740" rx="20" ry="12" fill="#F2BED0" transform="rotate(-24 1520 740)" />
+    <ellipse cx="320" cy="1100" rx="18" ry="11" fill="#F4BCD0" transform="rotate(10 320 1100)" />
+    <ellipse cx="480" cy="1200" rx="20" ry="12" fill="#F2BECE" transform="rotate(-16 480 1200)" />
+    <ellipse cx="1600" cy="1020" rx="22" ry="13" fill="#F4C0D2" transform="rotate(20 1600 1020)" />
+    <ellipse cx="1760" cy="920" rx="19" ry="12" fill="#F0BED0" transform="rotate(-12 1760 920)" />
+    <ellipse cx="240" cy="1380" rx="18" ry="11" fill="#F2BCCE" transform="rotate(24 240 1380)" />
+    <ellipse cx="1680" cy="1380" rx="20" ry="12" fill="#F4BED0" transform="rotate(-18 1680 1380)" />
+    <ellipse cx="860" cy="1280" rx="22" ry="13" fill="#F2BCD0" transform="rotate(14 860 1280)" />
+    <ellipse cx="1100" cy="1360" rx="18" ry="11" fill="#F0C0D2" transform="rotate(-22 1100 1360)" />
+  </g>
 </svg>
