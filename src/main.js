@@ -47,13 +47,16 @@ const applySceneManifest = (manifest) => {
   });
 };
 
-const initMotionToggle = ({ mode, reduced, prefersReduced }) => {
+/* ── Live motion toggle (no reload) ─────────────────────── */
+
+const initMotionToggle = ({ mode, reduced, prefersReduced, onToggle }) => {
   const button = document.querySelector("[data-ct-motion-toggle]");
   if (!button) {
-    return () => {};
+    return () => { };
   }
 
   const stateNode = button.querySelector("[data-ct-motion-state]");
+
   const setState = ({ isReduced, nextMode }) => {
     button.setAttribute("aria-pressed", String(isReduced));
     button.classList.toggle("is-enabled", isReduced);
@@ -74,9 +77,14 @@ const initMotionToggle = ({ mode, reduced, prefersReduced }) => {
 
   const onClick = () => {
     const currentReduced = button.getAttribute("aria-pressed") === "true";
-    const nextMode = currentReduced ? "full" : "reduced";
+    const nextReduced = !currentReduced;
+    const nextMode = nextReduced ? "reduced" : "full";
+
     safeStorageSet(MOTION_STORAGE_KEY, nextMode);
-    window.location.reload();
+    setState({ isReduced: nextReduced, nextMode });
+    document.documentElement.dataset.motion = nextReduced ? "reduced" : "full";
+
+    onToggle(nextReduced);
   };
 
   button.addEventListener("click", onClick);
@@ -85,6 +93,8 @@ const initMotionToggle = ({ mode, reduced, prefersReduced }) => {
     button.removeEventListener("click", onClick);
   };
 };
+
+/* ── WebGL hero initialization ──────────────────────────── */
 
 const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
   if (!heroHost) {
@@ -179,40 +189,78 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
   });
 };
 
+/* ── Boot orchestrator ──────────────────────────────────── */
+
 const boot = async () => {
   const motion = getMotionPreference();
   document.documentElement.dataset.motion = motion.reduced ? "reduced" : "full";
 
   applySceneManifest(sceneManifest);
 
-  const cleanup = [];
   const heroHost = document.querySelector(HERO_SCENE_SELECTOR);
-  cleanup.push(initMotionToggle(motion));
 
-  const { initLazySceneMedia, initSceneController } = await import("./experience/sceneController");
+  // Stable cleanup array for resources that survive motion toggles (audio, toggle listener)
+  const stableCleanup = [];
 
-  cleanup.push(initLazySceneMedia(sceneManifest));
-  cleanup.push(
-    await initSceneController({
-      manifest: sceneManifest,
-      reducedMotion: motion.reduced
+  // Mutable cleanup array for motion-dependent resources (scene controller, WebGL)
+  let motionCleanup = [];
+
+  const initMotionDependentSystems = async (reducedMotion) => {
+    // Tear down previous motion-dependent systems
+    motionCleanup.splice(0).forEach((dispose) => dispose?.());
+
+    // Remove stale state classes from scenes
+    document.querySelectorAll(".scene").forEach((scene) => {
+      scene.classList.remove("is-reduced", "is-in-view");
+      scene.style.opacity = "";
+    });
+
+    // Remove WebGL fallback state so it can re-init
+    heroHost?.classList.remove("is-webgl-fallback", "is-webgl-ready");
+
+    const { initLazySceneMedia, initSceneController } = await import(
+      "./experience/sceneController"
+    );
+
+    motionCleanup.push(initLazySceneMedia(sceneManifest));
+    motionCleanup.push(
+      await initSceneController({
+        manifest: sceneManifest,
+        reducedMotion
+      })
+    );
+
+    initDeferredHeroWebgl({
+      reducedMotion,
+      heroHost,
+      cleanup: motionCleanup
+    });
+  };
+
+  // Initial boot of motion-dependent systems
+  await initMotionDependentSystems(motion.reduced);
+
+  // Motion toggle with live re-init
+  stableCleanup.push(
+    initMotionToggle({
+      ...motion,
+      onToggle: (nextReduced) => {
+        void initMotionDependentSystems(nextReduced).catch((error) => {
+          console.error("Cherry Tree motion toggle failed:", error);
+        });
+      }
     })
   );
 
-  initDeferredHeroWebgl({
-    reducedMotion: motion.reduced,
-    heroHost,
-    cleanup
-  });
-
-  cleanup.push(
+  stableCleanup.push(
     initAudioController({
       selector: "[data-ct-sound-toggle]"
     })
   );
 
   const runCleanup = () => {
-    cleanup.splice(0).forEach((dispose) => dispose?.());
+    motionCleanup.splice(0).forEach((dispose) => dispose?.());
+    stableCleanup.splice(0).forEach((dispose) => dispose?.());
   };
 
   window.addEventListener("pagehide", runCleanup, { once: true });

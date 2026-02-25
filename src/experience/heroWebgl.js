@@ -1,7 +1,13 @@
-const PETAL_COUNT = 240;
+const PETAL_COUNT_DESKTOP = 240;
+const PETAL_COUNT_MOBILE = 120;
+const PETAL_SIZE_DESKTOP = 0.22;
+const PETAL_SIZE_MOBILE = 0.18;
 const WORLD_WIDTH = 6.8;
 const WORLD_HEIGHT = 8;
 let threeModulePromise;
+
+const isMobileDevice = () =>
+  window.matchMedia("(max-width: 760px)").matches || navigator.maxTouchPoints > 1;
 
 const supportsWebGL = () => {
   try {
@@ -51,13 +57,13 @@ const createPetalTexture = (THREE) => {
 
 const randomBetween = (min, max) => min + Math.random() * (max - min);
 
-const createPetalField = (THREE) => {
+const createPetalField = (THREE, { petalCount, petalSize }) => {
   const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(PETAL_COUNT * 3);
-  const phases = new Float32Array(PETAL_COUNT);
-  const speeds = new Float32Array(PETAL_COUNT);
+  const positions = new Float32Array(petalCount * 3);
+  const phases = new Float32Array(petalCount);
+  const speeds = new Float32Array(petalCount);
 
-  for (let i = 0; i < PETAL_COUNT; i += 1) {
+  for (let i = 0; i < petalCount; i += 1) {
     const i3 = i * 3;
     positions[i3] = randomBetween(-WORLD_WIDTH / 2, WORLD_WIDTH / 2);
     positions[i3 + 1] = randomBetween(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2);
@@ -71,7 +77,7 @@ const createPetalField = (THREE) => {
   const texture = createPetalTexture(THREE);
   const material = new THREE.PointsMaterial({
     color: 0xfdd7e4,
-    size: 0.22,
+    size: petalSize,
     map: texture ?? undefined,
     transparent: true,
     opacity: 0.95,
@@ -89,17 +95,22 @@ const createPetalField = (THREE) => {
     texture,
     positions,
     phases,
-    speeds
+    speeds,
+    petalCount
   };
 };
 
 export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => {
   if (!canvas || !host || !supportsWebGL()) {
     host?.classList.add("is-webgl-fallback");
-    return () => {};
+    return () => { };
   }
 
   const THREE = await loadThree();
+
+  const mobile = isMobileDevice();
+  const petalCount = mobile ? PETAL_COUNT_MOBILE : PETAL_COUNT_DESKTOP;
+  const petalSize = mobile ? PETAL_SIZE_MOBILE : PETAL_SIZE_DESKTOP;
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -116,7 +127,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   camera.position.set(0, 0, 6.2);
 
   const petalRig = new THREE.Group();
-  const field = createPetalField(THREE);
+  const field = createPetalField(THREE, { petalCount, petalSize });
   const positionAttr = field.geometry.getAttribute("position");
   const positionArray = positionAttr.array;
   petalRig.add(field.points);
@@ -158,7 +169,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   let isActive = true;
 
   const updatePetals = (elapsed, deltaSeconds) => {
-    for (let i = 0; i < PETAL_COUNT; i += 1) {
+    for (let i = 0; i < field.petalCount; i += 1) {
       const i3 = i * 3;
       const driftX = Math.sin(elapsed * 0.00035 + field.phases[i]) * 0.2;
       positionArray[i3] += driftX * deltaSeconds;

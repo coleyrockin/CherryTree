@@ -177,6 +177,48 @@
   margin-inline: auto;
 }
 
+/* ── Epilogue decorative blooms ─── */
+
+.epilogue-bloom {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  filter: blur(6px);
+  z-index: 1;
+}
+
+.epilogue-bloom-a {
+  width: 55%;
+  height: 65%;
+  left: -5%;
+  top: 12%;
+  background: radial-gradient(circle at 55% 50%,
+      rgba(228, 140, 168, 0.6),
+      rgba(228, 140, 168, 0) 70%);
+}
+
+.epilogue-bloom-b {
+  width: 48%;
+  height: 60%;
+  right: -2%;
+  top: 5%;
+  background: radial-gradient(circle at 45% 45%,
+      rgba(232, 185, 120, 0.5),
+      rgba(232, 185, 120, 0) 68%);
+}
+
+.epilogue-bloom-c {
+  width: 60%;
+  height: 55%;
+  left: 20%;
+  bottom: -8%;
+  background: radial-gradient(circle at 50% 55%,
+      rgba(255, 238, 224, 0.55),
+      rgba(255, 238, 224, 0) 65%);
+}
+
 .epilogue-lockup p {
   margin: 0;
   font-family: "Bodoni Moda", "Times New Roman", serif;
@@ -197,6 +239,7 @@
   from {
     transform: translateY(-4px);
   }
+
   to {
     transform: translateY(7px);
   }
