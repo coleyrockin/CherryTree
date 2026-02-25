@@ -18,6 +18,7 @@ Original prompt: Codebase needs to be perfect, website functional, and perfect w
   - `after: Reduced`
   - screenshots: `/tmp/cherrytree-go-motion-toggle/before-toggle.png` and `/tmp/cherrytree-go-motion-toggle/after-toggle.png`
 - Re-ran `npm run build` after all changes; build passed.
+- Refreshed `cherrytree-preview.png` to reflect latest UI updates (motion + sound controls visible in header).
 
 ## TODO
 
