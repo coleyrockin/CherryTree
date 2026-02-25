@@ -8,6 +8,31 @@
       name="description"
       content="Cherry Tree is an immersive cinematic art-gallery website experience."
     />
+    <meta name="theme-color" content="#f2e2d8" />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://coleyrockin.github.io/CherryTree/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Cherry Tree" />
+    <meta
+      property="og:description"
+      content="A cinematic, scroll-driven art-gallery website experience."
+    />
+    <meta property="og:url" content="https://coleyrockin.github.io/CherryTree/" />
+    <meta
+      property="og:image"
+      content="https://coleyrockin.github.io/CherryTree/cherrytree-preview.png"
+    />
+    <meta property="og:image:alt" content="Cherry Tree hero scene with floating petals." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cherry Tree" />
+    <meta
+      name="twitter:description"
+      content="A cinematic, scroll-driven art-gallery website experience."
+    />
+    <meta
+      name="twitter:image"
+      content="https://coleyrockin.github.io/CherryTree/cherrytree-preview.png"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,14 +47,6 @@
       imagesizes="100vw"
       fetchpriority="high"
     />
-    <link
-      rel="preload"
-      as="image"
-      href="/assets/images/generated/bloom-wash-1920.jpg"
-      imagesrcset="/assets/images/generated/bloom-wash-1280.jpg 1280w, /assets/images/generated/bloom-wash-1920.jpg 1920w, /assets/images/generated/bloom-wash-2560.jpg 2560w, /assets/images/generated/bloom-wash-3840.jpg 3840w"
-      imagesizes="100vw"
-      fetchpriority="high"
-    />
     <script>
       document.documentElement.classList.remove("no-js");
       document.documentElement.classList.add("js");
@@ -40,16 +57,28 @@
 
     <header class="ui-chrome" aria-label="Site controls">
       <span class="brand-mark">Cherry Tree</span>
-      <button
-        type="button"
-        class="sound-toggle"
-        data-ct-sound-toggle
-        aria-label="Toggle ambient sound"
-        aria-pressed="false"
-      >
-        <span class="sound-toggle-label">Sound</span>
-        <span class="sound-toggle-state" data-ct-sound-state>Off</span>
-      </button>
+      <div class="control-stack">
+        <button
+          type="button"
+          class="motion-toggle"
+          data-ct-motion-toggle
+          aria-label="Toggle motion mode"
+          aria-pressed="false"
+        >
+          <span class="motion-toggle-label">Motion</span>
+          <span class="motion-toggle-state" data-ct-motion-state>Full</span>
+        </button>
+        <button
+          type="button"
+          class="sound-toggle"
+          data-ct-sound-toggle
+          aria-label="Toggle ambient sound"
+          aria-pressed="false"
+        >
+          <span class="sound-toggle-label">Sound</span>
+          <span class="sound-toggle-state" data-ct-sound-state>Off</span>
+        </button>
+      </div>
     </header>
 
     <main id="experience" class="experience" aria-label="Immersive gallery experience">
@@ -99,8 +128,7 @@
             srcset="/assets/images/generated/bloom-wash-1280.jpg 1280w, /assets/images/generated/bloom-wash-1920.jpg 1920w, /assets/images/generated/bloom-wash-2560.jpg 2560w, /assets/images/generated/bloom-wash-3840.jpg 3840w"
             sizes="100vw"
             alt=""
-            loading="eager"
-            fetchpriority="high"
+            loading="lazy"
           />
         </picture>
       </section>

@@ -84,7 +84,15 @@ body::before {
   pointer-events: none;
 }
 
-.sound-toggle {
+.control-stack {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sound-toggle,
+.motion-toggle {
   pointer-events: auto;
   border: 1px solid rgba(84, 51, 59, 0.32);
   border-radius: 999px;
@@ -109,26 +117,35 @@ body::before {
     background-color var(--dur-soft) var(--ease-gallery);
 }
 
+.motion-toggle {
+  min-width: 116px;
+}
+
 .sound-toggle:hover,
-.sound-toggle:focus-visible {
+.sound-toggle:focus-visible,
+.motion-toggle:hover,
+.motion-toggle:focus-visible {
   color: var(--ink);
   transform: translateY(-2px);
   border-color: rgba(84, 51, 59, 0.44);
   background: rgba(255, 248, 243, 0.9);
 }
 
-.sound-toggle:focus-visible {
+.sound-toggle:focus-visible,
+.motion-toggle:focus-visible {
   outline: 2px solid rgba(206, 98, 134, 0.38);
   outline-offset: 3px;
 }
 
-.sound-toggle.is-enabled {
+.sound-toggle.is-enabled,
+.motion-toggle.is-enabled {
   background: rgba(220, 103, 137, 0.88);
   color: #fff;
   border-color: rgba(220, 103, 137, 0.9);
 }
 
-.sound-toggle-state {
+.sound-toggle-state,
+.motion-toggle-state {
   font-size: 0.62rem;
   letter-spacing: 0.08em;
   opacity: 0.88;
@@ -225,7 +242,8 @@ html[data-motion="reduced"] * {
     letter-spacing: 0.1em;
   }
 
-  .sound-toggle {
+  .sound-toggle,
+  .motion-toggle {
     min-width: 90px;
     padding: 8px 11px;
   }

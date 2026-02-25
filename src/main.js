@@ -7,19 +7,21 @@ import { safeStorageGet, safeStorageSet } from "./utils/storage";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
 const HERO_SCENE_SELECTOR = '[data-ct-scene="prologue-webgl"]';
+const MOTION_MODES = new Set(["auto", "reduced", "full"]);
 
 const getMotionPreference = () => {
   const stored = safeStorageGet(MOTION_STORAGE_KEY);
-  const mode = stored === "reduced" ? "reduced" : "auto";
+  const mode = MOTION_MODES.has(stored) ? stored : "auto";
 
-  if (stored !== "auto" && stored !== "reduced") {
+  if (!MOTION_MODES.has(stored)) {
     safeStorageSet(MOTION_STORAGE_KEY, "auto");
   }
 
   const prefersReduced = Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
-  const reduced = mode === "reduced" || (mode === "auto" && prefersReduced);
+  const reduced =
+    mode === "reduced" || (mode === "auto" && prefersReduced);
 
-  return { mode, reduced };
+  return { mode, reduced, prefersReduced };
 };
 
 const supportsWebGLContext = () => {
@@ -45,6 +47,138 @@ const applySceneManifest = (manifest) => {
   });
 };
 
+const initMotionToggle = ({ mode, reduced, prefersReduced }) => {
+  const button = document.querySelector("[data-ct-motion-toggle]");
+  if (!button) {
+    return () => {};
+  }
+
+  const stateNode = button.querySelector("[data-ct-motion-state]");
+  const setState = ({ isReduced, nextMode }) => {
+    button.setAttribute("aria-pressed", String(isReduced));
+    button.classList.toggle("is-enabled", isReduced);
+
+    if (!stateNode) {
+      return;
+    }
+
+    if (nextMode === "auto") {
+      stateNode.textContent = prefersReduced ? "Reduced*" : "Full*";
+      return;
+    }
+
+    stateNode.textContent = isReduced ? "Reduced" : "Full";
+  };
+
+  setState({ isReduced: reduced, nextMode: mode });
+
+  const onClick = () => {
+    const currentReduced = button.getAttribute("aria-pressed") === "true";
+    const nextMode = currentReduced ? "full" : "reduced";
+    safeStorageSet(MOTION_STORAGE_KEY, nextMode);
+    window.location.reload();
+  };
+
+  button.addEventListener("click", onClick);
+
+  return () => {
+    button.removeEventListener("click", onClick);
+  };
+};
+
+const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
+  if (!heroHost) {
+    return;
+  }
+
+  if (reducedMotion || !supportsWebGLContext()) {
+    heroHost.classList.add("is-webgl-fallback");
+    return;
+  }
+
+  let started = false;
+  let timeoutId = 0;
+  let idleId = 0;
+  let observer = null;
+
+  const start = async () => {
+    if (started) {
+      return;
+    }
+    started = true;
+
+    try {
+      const { initHeroWebgl } = await import("./experience/heroWebgl");
+      cleanup.push(
+        await initHeroWebgl({
+          canvas: document.getElementById("hero-webgl"),
+          host: heroHost,
+          reducedMotion
+        })
+      );
+    } catch (error) {
+      console.error("Cherry Tree WebGL failed to initialize:", error);
+      heroHost.classList.add("is-webgl-fallback");
+    }
+  };
+
+  const scheduleStart = () => {
+    if (started) {
+      return;
+    }
+
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(
+        () => {
+          void start();
+        },
+        { timeout: 900 }
+      );
+      return;
+    }
+
+    timeoutId = window.setTimeout(() => {
+      void start();
+    }, 220);
+  };
+
+  if ("IntersectionObserver" in window) {
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) {
+          return;
+        }
+
+        observer?.disconnect();
+        scheduleStart();
+      },
+      {
+        rootMargin: "220px 0px",
+        threshold: 0.05
+      }
+    );
+
+    observer.observe(heroHost);
+  } else {
+    scheduleStart();
+  }
+
+  const bounds = heroHost.getBoundingClientRect();
+  if (bounds.top < window.innerHeight + 220) {
+    scheduleStart();
+  }
+
+  cleanup.push(() => {
+    if (timeoutId) {
+      window.clearTimeout(timeoutId);
+    }
+    if (idleId && typeof window.cancelIdleCallback === "function") {
+      window.cancelIdleCallback(idleId);
+    }
+    observer?.disconnect();
+  });
+};
+
 const boot = async () => {
   const motion = getMotionPreference();
   document.documentElement.dataset.motion = motion.reduced ? "reduced" : "full";
@@ -53,6 +187,7 @@ const boot = async () => {
 
   const cleanup = [];
   const heroHost = document.querySelector(HERO_SCENE_SELECTOR);
+  cleanup.push(initMotionToggle(motion));
 
   const { initLazySceneMedia, initSceneController } = await import("./experience/sceneController");
 
@@ -64,18 +199,11 @@ const boot = async () => {
     })
   );
 
-  if (!motion.reduced && supportsWebGLContext()) {
-    const { initHeroWebgl } = await import("./experience/heroWebgl");
-    cleanup.push(
-      await initHeroWebgl({
-        canvas: document.getElementById("hero-webgl"),
-        host: heroHost,
-        reducedMotion: motion.reduced
-      })
-    );
-  } else {
-    heroHost?.classList.add("is-webgl-fallback");
-  }
+  initDeferredHeroWebgl({
+    reducedMotion: motion.reduced,
+    heroHost,
+    cleanup
+  });
 
   cleanup.push(
     initAudioController({
