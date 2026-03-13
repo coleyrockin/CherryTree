@@ -33,10 +33,30 @@
   </script>
 </head>
 
-<body>
+<body class="is-loading">
+  <!-- Preloader -->
+  <div class="preloader" data-ct-preloader aria-live="polite" aria-label="Loading experience">
+    <div class="preloader-brand">Cherry Tree</div>
+    <div class="preloader-bar-track">
+      <div class="preloader-bar" data-ct-preloader-bar></div>
+    </div>
+  </div>
+
+  <!-- Custom cursor -->
+  <div class="cursor-dot" data-ct-cursor-dot aria-hidden="true"></div>
+  <div class="cursor-ring" data-ct-cursor-ring aria-hidden="true"></div>
+
+  <!-- Background blend layer for scene color transitions -->
+  <div class="bg-blend" data-ct-bg-blend aria-hidden="true"></div>
+
   <a href="#experience" class="skip-link">Skip to experience</a>
   <div class="film-grain" aria-hidden="true"></div>
   <div class="scroll-progress" data-ct-scroll-progress aria-hidden="true"></div>
+
+  <!-- Scene navigation dots -->
+  <nav class="scene-nav" data-ct-scene-nav aria-label="Scene navigation">
+    <ul class="scene-nav-list"></ul>
+  </nav>
 
   <header class="ui-chrome" aria-label="Site controls">
     <span class="brand-mark">Cherry Tree</span>
@@ -164,7 +184,9 @@
       <div class="epilogue-bloom epilogue-bloom-b" aria-hidden="true"></div>
       <div class="epilogue-bloom epilogue-bloom-c" aria-hidden="true"></div>
       <div class="epilogue-lockup" data-scene-media>
-        <p>Cherry Tree</p>
+        <p class="epilogue-title">Cherry Tree</p>
+        <hr class="epilogue-rule" aria-hidden="true" />
+        <p class="epilogue-subtitle">An immersive experience</p>
       </div>
     </section>
   </main>
