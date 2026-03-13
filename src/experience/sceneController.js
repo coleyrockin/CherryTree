@@ -1,3 +1,6 @@
+import { splitByChars, splitByWords } from "../utils/splitText";
+import { createVelocityTracker } from "../utils/scrollVelocity";
+
 /* ── Motion-preset configurations ─────────────────────────── */
 
 const MOTION_PRESETS = {
@@ -113,7 +116,6 @@ const initPointerTilt = (scenes, gsap) => {
   const abortController = new AbortController();
 
   scenes.forEach((scene) => {
-    // Skip WebGL hero (has its own pointer system) and triptych (pinned)
     const id = scene.dataset.ctScene;
     if (id === "prologue-webgl" || id === "triptych") {
       return;
@@ -199,6 +201,219 @@ const initScrollProgress = (gsap, ScrollTrigger) => {
   };
 };
 
+/* ── Scene color transitions ────────────────────────────── */
+
+const initColorTransitions = (manifest, gsap, ScrollTrigger) => {
+  const bgBlend = document.querySelector("[data-ct-bg-blend]");
+  if (!bgBlend) {
+    return () => { };
+  }
+
+  const triggers = [];
+
+  // Set initial color
+  bgBlend.style.backgroundColor = manifest[0].bgColor;
+
+  manifest.forEach((scene, index) => {
+    if (index === 0) return;
+
+    const el = document.querySelector(`[data-ct-scene="${scene.id}"]`);
+    if (!el) return;
+
+    const trigger = ScrollTrigger.create({
+      trigger: el,
+      start: "top 70%",
+      end: "top 30%",
+      scrub: 0.6,
+      onUpdate: (self) => {
+        const prevColor = manifest[index - 1].bgColor;
+        const nextColor = scene.bgColor;
+        // Use GSAP interpolation for smooth color blend
+        const interpolated = gsap.utils.interpolate(prevColor, nextColor, self.progress);
+        bgBlend.style.backgroundColor = interpolated;
+      }
+    });
+
+    triggers.push(trigger);
+  });
+
+  return () => {
+    triggers.forEach((t) => t.kill());
+    bgBlend.style.backgroundColor = "";
+  };
+};
+
+/* ── Clip-path image reveals ────────────────────────────── */
+
+const initClipPathReveals = (gsap, ScrollTrigger) => {
+  const animations = [];
+
+  // Bloom-wash: iris-open (circle reveal)
+  const bloomMedia = document.querySelector('[data-ct-scene="bloom-wash"] .scene-media');
+  if (bloomMedia) {
+    animations.push(
+      gsap.fromTo(
+        bloomMedia,
+        { clipPath: "circle(0% at 50% 50%)" },
+        {
+          clipPath: "circle(75% at 50% 50%)",
+          ease: "power2.inOut",
+          scrollTrigger: {
+            trigger: bloomMedia.closest(".scene"),
+            start: "top 80%",
+            end: "top 20%",
+            scrub: 0.8
+          }
+        }
+      )
+    );
+  }
+
+  // Stillness: curtain-open (inset reveal from top)
+  const stillnessMedia = document.querySelector('[data-ct-scene="stillness"] .scene-media');
+  if (stillnessMedia) {
+    animations.push(
+      gsap.fromTo(
+        stillnessMedia,
+        { clipPath: "inset(100% 0 0 0)" },
+        {
+          clipPath: "inset(0% 0 0 0)",
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: stillnessMedia.closest(".scene"),
+            start: "top 85%",
+            end: "top 25%",
+            scrub: 0.8
+          }
+        }
+      )
+    );
+  }
+
+  return () => {
+    animations.forEach((a) => a.kill());
+  };
+};
+
+/* ── Split-text epilogue ────────────────────────────────── */
+
+const initEpilogueAnimations = (gsap, ScrollTrigger) => {
+  const epilogue = document.querySelector('[data-ct-scene="epilogue"]');
+  if (!epilogue) {
+    return () => { };
+  }
+
+  const animations = [];
+  const splitCleanups = [];
+
+  // Epilogue blooms
+  const epilogueBlooms = epilogue.querySelectorAll(".epilogue-bloom");
+  epilogueBlooms.forEach((bloom, index) => {
+    animations.push(
+      gsap.fromTo(
+        bloom,
+        { scale: 0.6, opacity: 0, rotate: index % 2 === 0 ? -12 : 10 },
+        {
+          scale: 1.15,
+          opacity: 0.45,
+          rotate: index % 2 === 0 ? 8 : -6,
+          ease: "elastic.out(1, 0.6)",
+          scrollTrigger: {
+            trigger: epilogue,
+            start: "top 80%",
+            end: "top 15%",
+            scrub: 1
+          }
+        }
+      )
+    );
+  });
+
+  // Split-text title: chars flip up with rotateX
+  const titleEl = epilogue.querySelector(".epilogue-title");
+  if (titleEl) {
+    const titleSplit = splitByChars(titleEl);
+    splitCleanups.push(titleSplit.revert);
+
+    if (titleSplit.chars.length) {
+      gsap.set(titleSplit.chars, {
+        opacity: 0,
+        rotateX: -90,
+        transformOrigin: "bottom center",
+        y: 20
+      });
+
+      animations.push(
+        gsap.to(titleSplit.chars, {
+          opacity: 0.84,
+          rotateX: 0,
+          y: 0,
+          duration: 0.8,
+          stagger: 0.04,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: epilogue,
+            start: "top 65%",
+            end: "top 25%",
+            scrub: 0.8
+          }
+        })
+      );
+    }
+  }
+
+  // Self-drawing horizontal rule
+  const ruleEl = epilogue.querySelector(".epilogue-rule");
+  if (ruleEl) {
+    animations.push(
+      gsap.to(ruleEl, {
+        width: "min(280px, 60vw)",
+        opacity: 0.6,
+        duration: 1,
+        ease: "power2.inOut",
+        scrollTrigger: {
+          trigger: epilogue,
+          start: "top 55%",
+          end: "top 25%",
+          scrub: 0.6
+        }
+      })
+    );
+  }
+
+  // Subtitle word stagger
+  const subtitleEl = epilogue.querySelector(".epilogue-subtitle");
+  if (subtitleEl) {
+    const subtitleSplit = splitByWords(subtitleEl);
+    splitCleanups.push(subtitleSplit.revert);
+
+    if (subtitleSplit.words.length) {
+      gsap.set(subtitleSplit.words, { opacity: 0, y: 14 });
+
+      animations.push(
+        gsap.to(subtitleSplit.words, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.08,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: epilogue,
+            start: "top 50%",
+            end: "top 20%",
+            scrub: 0.6
+          }
+        })
+      );
+    }
+  }
+
+  return () => {
+    animations.forEach((a) => a.kill());
+    splitCleanups.forEach((fn) => fn());
+  };
+};
+
 /* ── Scene controller ───────────────────────────────────── */
 
 export const initSceneController = async ({ manifest, reducedMotion = false }) => {
@@ -207,7 +422,7 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
     .filter(Boolean);
 
   if (!scenes.length) {
-    return () => { };
+    return { dispose: () => { } };
   }
 
   const cleanup = [];
@@ -218,8 +433,10 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
       scene.classList.add("is-reduced");
       scene.classList.add("is-in-view");
     });
-    return () => {
-      cleanup.forEach((fn) => fn());
+    return {
+      dispose: () => {
+        cleanup.forEach((fn) => fn());
+      }
     };
   }
 
@@ -247,22 +464,29 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
 
+  // Create velocity tracker
+  const velocityTracker = createVelocityTracker(lenis);
+  velocityTracker.attachTicker(gsap);
+
   cleanup.push(() => {
+    const tickFn = velocityTracker.destroy();
+    if (tickFn) gsap.ticker.remove(tickFn);
     gsap.ticker.remove(tick);
     lenis.destroy();
   });
 
   const animations = [];
 
+  /* ── Scene color transitions ─── */
+  cleanup.push(initColorTransitions(manifest, gsap, ScrollTrigger));
+
   /* ── Per-scene crossfade (enter/exit) ─── */
   scenes.forEach((scene) => {
-    // Skip the first scene (prologue) — it starts visible
     const id = scene.dataset.ctScene;
     if (id === "prologue-webgl") {
       return;
     }
 
-    // Fade in as scene enters
     animations.push(
       gsap.fromTo(
         scene,
@@ -286,7 +510,6 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
     const preset = MOTION_PRESETS[scene.dataset.motionPreset] || DEFAULT_PRESET;
     const id = scene.dataset.ctScene;
 
-    // Triptych uses its own pinned timeline
     if (id === "triptych") {
       return;
     }
@@ -409,53 +632,11 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
     });
   }
 
-  /* ── Epilogue bloom & text animation ─── */
-  const epilogue = document.querySelector('[data-ct-scene="epilogue"]');
-  if (epilogue) {
-    const epilogueBlooms = epilogue.querySelectorAll(".epilogue-bloom");
-    epilogueBlooms.forEach((bloom, index) => {
-      animations.push(
-        gsap.fromTo(
-          bloom,
-          { scale: 0.6, opacity: 0, rotate: index % 2 === 0 ? -12 : 10 },
-          {
-            scale: 1,
-            opacity: 0.45,
-            rotate: index % 2 === 0 ? 8 : -6,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: epilogue,
-              start: "top 80%",
-              end: "top 15%",
-              scrub: 1
-            }
-          }
-        )
-      );
-    });
+  /* ── Clip-path image reveals ─── */
+  cleanup.push(initClipPathReveals(gsap, ScrollTrigger));
 
-    const lockupText = epilogue.querySelector(".epilogue-lockup p");
-    if (lockupText) {
-      animations.push(
-        gsap.fromTo(
-          lockupText,
-          { letterSpacing: "0.20em", opacity: 0.3, y: 30 },
-          {
-            letterSpacing: "0.12em",
-            opacity: 0.84,
-            y: 0,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: epilogue,
-              start: "top 75%",
-              end: "top 20%",
-              scrub: 0.8
-            }
-          }
-        )
-      );
-    }
-  }
+  /* ── Epilogue animations ─── */
+  cleanup.push(initEpilogueAnimations(gsap, ScrollTrigger));
 
   /* ── Pointer tilt ─── */
   cleanup.push(initPointerTilt(scenes, gsap));
@@ -467,7 +648,13 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
     animations.forEach((animation) => animation.kill());
   });
 
-  return () => {
-    cleanup.forEach((fn) => fn());
+  return {
+    gsap,
+    ScrollTrigger,
+    lenis,
+    velocityTracker,
+    dispose: () => {
+      cleanup.forEach((fn) => fn());
+    }
   };
 };

@@ -1,8 +1,12 @@
 import "./styles/base.css";
 import "./styles/scenes.css";
+import "./styles/preloader.css";
+import "./styles/cursor.css";
+import "./styles/nav.css";
 
 import { sceneManifest } from "./content/sceneManifest";
 import { initAudioController } from "./experience/audioController";
+import { initPreloader } from "./experience/preloader";
 import { safeStorageGet, safeStorageSet } from "./utils/storage";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
@@ -96,13 +100,14 @@ const initMotionToggle = ({ mode, reduced, prefersReduced, onToggle }) => {
 
 /* ── WebGL hero initialization ──────────────────────────── */
 
-const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
+const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress }) => {
   if (!heroHost) {
     return;
   }
 
   if (reducedMotion || !supportsWebGLContext()) {
     heroHost.classList.add("is-webgl-fallback");
+    onProgress?.(1);
     return;
   }
 
@@ -118,7 +123,9 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
     started = true;
 
     try {
+      onProgress?.(0.4);
       const { initHeroWebgl } = await import("./experience/heroWebgl");
+      onProgress?.(0.7);
       cleanup.push(
         await initHeroWebgl({
           canvas: document.getElementById("hero-webgl"),
@@ -126,9 +133,11 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup }) => {
           reducedMotion
         })
       );
+      onProgress?.(1);
     } catch (error) {
       console.error("Cherry Tree WebGL failed to initialize:", error);
       heroHost.classList.add("is-webgl-fallback");
+      onProgress?.(1);
     }
   };
 
@@ -195,19 +204,25 @@ const boot = async () => {
   const motion = getMotionPreference();
   document.documentElement.dataset.motion = motion.reduced ? "reduced" : "full";
 
+  // Start preloader immediately
+  const preloader = initPreloader();
+
   applySceneManifest(sceneManifest);
 
   const heroHost = document.querySelector(HERO_SCENE_SELECTOR);
 
-  // Stable cleanup array for resources that survive motion toggles (audio, toggle listener)
+  // Stable cleanup array for resources that survive motion toggles
   const stableCleanup = [];
 
-  // Mutable cleanup array for motion-dependent resources (scene controller, WebGL)
+  // Mutable cleanup array for motion-dependent resources
   let motionCleanup = [];
 
   const initMotionDependentSystems = async (reducedMotion) => {
     // Tear down previous motion-dependent systems
-    motionCleanup.splice(0).forEach((dispose) => dispose?.());
+    motionCleanup.splice(0).forEach((dispose) => {
+      if (typeof dispose === "function") dispose();
+      else if (dispose && typeof dispose.dispose === "function") dispose.dispose();
+    });
 
     // Remove stale state classes from scenes
     document.querySelectorAll(".scene").forEach((scene) => {
@@ -218,27 +233,69 @@ const boot = async () => {
     // Remove WebGL fallback state so it can re-init
     heroHost?.classList.remove("is-webgl-fallback", "is-webgl-ready");
 
+    preloader.onProgress(0.1);
+
     const { initLazySceneMedia, initSceneController } = await import(
       "./experience/sceneController"
     );
 
+    preloader.onProgress(0.3);
+
     motionCleanup.push(initLazySceneMedia(sceneManifest));
-    motionCleanup.push(
-      await initSceneController({
-        manifest: sceneManifest,
-        reducedMotion
-      })
-    );
+
+    const sceneResult = await initSceneController({
+      manifest: sceneManifest,
+      reducedMotion
+    });
+
+    // sceneResult is { dispose, gsap?, ScrollTrigger?, lenis?, velocityTracker? }
+    motionCleanup.push(sceneResult);
+
+    preloader.onProgress(0.6);
 
     initDeferredHeroWebgl({
       reducedMotion,
       heroHost,
-      cleanup: motionCleanup
+      cleanup: motionCleanup,
+      onProgress: (v) => preloader.onProgress(0.6 + v * 0.3)
     });
+
+    // Wire up motion-dependent enhancement modules
+    if (!reducedMotion && sceneResult.gsap) {
+      const { gsap, ScrollTrigger, lenis, velocityTracker } = sceneResult;
+
+      // Scroll velocity visual effects
+      const { initScrollVelocityFx } = await import("./experience/scrollVelocityFx");
+      motionCleanup.push(initScrollVelocityFx({ velocityTracker, gsap }));
+
+      // Scene navigation dots
+      const { initSceneNav } = await import("./experience/sceneNav");
+      motionCleanup.push(
+        initSceneNav({ manifest: sceneManifest, gsap, ScrollTrigger, lenis })
+      );
+
+      // Magnetic cursor
+      const { initMagneticCursor } = await import("./experience/magneticCursor");
+      motionCleanup.push(initMagneticCursor({ gsap }));
+
+      // Micro-interactions (spring hover)
+      const { initMicroInteractions } = await import("./experience/microInteractions");
+      motionCleanup.push(initMicroInteractions({ gsap }));
+    }
+
+    preloader.onProgress(0.95);
   };
 
   // Initial boot of motion-dependent systems
   await initMotionDependentSystems(motion.reduced);
+
+  // Exit preloader
+  let gsapForPreloader = null;
+  const sceneResult = motionCleanup.find((item) => item && typeof item === "object" && item.gsap);
+  if (sceneResult) {
+    gsapForPreloader = sceneResult.gsap;
+  }
+  await preloader.exit(gsapForPreloader);
 
   // Motion toggle with live re-init
   stableCleanup.push(
@@ -259,7 +316,10 @@ const boot = async () => {
   );
 
   const runCleanup = () => {
-    motionCleanup.splice(0).forEach((dispose) => dispose?.());
+    motionCleanup.splice(0).forEach((dispose) => {
+      if (typeof dispose === "function") dispose();
+      else if (dispose && typeof dispose.dispose === "function") dispose.dispose();
+    });
     stableCleanup.splice(0).forEach((dispose) => dispose?.());
   };
 
@@ -268,6 +328,10 @@ const boot = async () => {
 
 const handleBootError = (error) => {
   console.error("Cherry Tree failed to initialize:", error);
+  // Ensure preloader exits even on error
+  document.body.classList.remove("is-loading");
+  const preloaderEl = document.querySelector("[data-ct-preloader]");
+  if (preloaderEl) preloaderEl.classList.add("is-done");
 };
 
 if (document.readyState === "loading") {

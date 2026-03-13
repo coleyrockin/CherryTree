@@ -1,0 +1,66 @@
+/* Custom cursor — desktop only */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 18;
+  border-radius: 50%;
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.has-custom-cursor .cursor-dot,
+.has-custom-cursor .cursor-ring {
+  opacity: 1;
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--ink);
+}
+
+.cursor-ring {
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border: 1.5px solid var(--rose);
+  opacity: 0;
+  transition: opacity 0.4s ease, width 0.35s cubic-bezier(0.22, 0.65, 0.14, 1), height 0.35s cubic-bezier(0.22, 0.65, 0.14, 1);
+}
+
+.has-custom-cursor .cursor-ring {
+  opacity: 0.5;
+}
+
+/* Magnetic hover state */
+.cursor-ring.is-magnetic {
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border-color: var(--rose-bright);
+  opacity: 0.7;
+}
+
+/* Hide on touch and reduced motion */
+@media (pointer: coarse) {
+  .cursor-dot,
+  .cursor-ring {
+    display: none !important;
+  }
+}
+
+html[data-motion="reduced"] .cursor-dot,
+html[data-motion="reduced"] .cursor-ring {
+  display: none !important;
+}
+
+/* Hide system cursor when custom is active */
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}

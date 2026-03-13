@@ -50,13 +50,32 @@ body::before {
 
 .film-grain {
   position: fixed;
-  inset: 0;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
   z-index: 6;
   pointer-events: none;
-  opacity: 0.22;
+  opacity: calc(0.22 + var(--scroll-grain-boost, 0));
   mix-blend-mode: multiply;
   background-image: radial-gradient(rgba(68, 43, 51, 0.28) 0.75px, transparent 0.85px);
   background-size: 4px 4px;
+  animation: grainDrift 0.8s steps(4) infinite;
+}
+
+@keyframes grainDrift {
+  0%,
+  100% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, -3%); }
+  50% { transform: translate(3%, 1%); }
+  75% { transform: translate(-1%, 4%); }
+}
+
+/* Background blend layer for scene color transitions */
+.bg-blend {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
 }
 
 .ui-chrome {
@@ -183,6 +202,7 @@ body::before {
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: blur(var(--scroll-blur, 0px));
 }
 
 .scene-matte {
@@ -302,4 +322,37 @@ html[data-motion="reduced"] .scene {
   .film-grain {
     opacity: 0.16;
   }
+}
+
+/* Breathing animation for interactive elements */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.sound-toggle,
+.motion-toggle,
+.scene-nav-dot {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+.sound-toggle:hover,
+.motion-toggle:hover,
+.scene-nav-dot:hover {
+  animation: none;
+}
+
+/* Loading state — hide content until preloader exits */
+body.is-loading .experience,
+body.is-loading .ui-chrome,
+body.is-loading .scene-nav,
+body.is-loading .scroll-progress {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Custom cursor override */
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
 }

@@ -1,5 +1,5 @@
-const PETAL_COUNT_DESKTOP = 240;
-const PETAL_COUNT_MOBILE = 120;
+const PETAL_COUNT_DESKTOP = 400;
+const PETAL_COUNT_MOBILE = 200;
 const PETAL_SIZE_DESKTOP = 0.22;
 const PETAL_SIZE_MOBILE = 0.18;
 const WORLD_WIDTH = 6.8;
@@ -57,7 +57,55 @@ const createPetalTexture = (THREE) => {
 
 const randomBetween = (min, max) => min + Math.random() * (max - min);
 
-const createPetalField = (THREE, { petalCount, petalSize }) => {
+/* ── Custom ShaderMaterial for depth-of-field + color shift ── */
+
+const VERTEX_SHADER = `
+  attribute float aPhase;
+  attribute float aSpeed;
+  uniform float uTime;
+  uniform float uSize;
+  varying float vDepth;
+  varying float vPhase;
+
+  void main() {
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    vDepth = clamp(-mvPosition.z / 12.0, 0.0, 1.0);
+    vPhase = aPhase;
+
+    float sizeFactor = uSize * (300.0 / -mvPosition.z);
+    sizeFactor *= mix(1.0, 1.3, vDepth);
+
+    gl_PointSize = sizeFactor;
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`;
+
+const FRAGMENT_SHADER = `
+  uniform sampler2D uMap;
+  uniform float uTime;
+  uniform float uOpacity;
+  varying float vDepth;
+  varying float vPhase;
+
+  void main() {
+    vec4 texColor = texture2D(uMap, gl_PointCoord);
+    if (texColor.a < 0.05) discard;
+
+    float shift = sin(uTime * 0.3 + vPhase * 6.28) * 0.5 + 0.5;
+    vec3 colorA = vec3(0.99, 0.86, 0.89);
+    vec3 colorB = vec3(0.93, 0.69, 0.78);
+    vec3 baseColor = mix(colorA, colorB, shift);
+
+    float depthFade = mix(1.0, 0.35, vDepth);
+    float depthDesaturate = mix(0.0, 0.4, vDepth);
+    vec3 gray = vec3(dot(baseColor, vec3(0.299, 0.587, 0.114)));
+    vec3 finalColor = mix(baseColor, gray, depthDesaturate);
+
+    gl_FragColor = vec4(finalColor * texColor.rgb, texColor.a * uOpacity * depthFade);
+  }
+`;
+
+const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(petalCount * 3);
   const phases = new Float32Array(petalCount);
@@ -75,16 +123,37 @@ const createPetalField = (THREE, { petalCount, petalSize }) => {
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
   const texture = createPetalTexture(THREE);
-  const material = new THREE.PointsMaterial({
-    color: 0xfdd7e4,
-    size: petalSize,
-    map: texture ?? undefined,
-    transparent: true,
-    opacity: 0.95,
-    depthWrite: false,
-    blending: THREE.NormalBlending,
-    sizeAttenuation: true
-  });
+  let material;
+
+  if (useShader && texture) {
+    geometry.setAttribute("aPhase", new THREE.BufferAttribute(phases, 1));
+    geometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+
+    material = new THREE.ShaderMaterial({
+      uniforms: {
+        uMap: { value: texture },
+        uTime: { value: 0 },
+        uSize: { value: petalSize * 100 },
+        uOpacity: { value: 0.95 }
+      },
+      vertexShader: VERTEX_SHADER,
+      fragmentShader: FRAGMENT_SHADER,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.NormalBlending
+    });
+  } else {
+    material = new THREE.PointsMaterial({
+      color: 0xfdd7e4,
+      size: petalSize,
+      map: texture ?? undefined,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+      sizeAttenuation: true
+    });
+  }
 
   const points = new THREE.Points(geometry, material);
 
@@ -96,8 +165,28 @@ const createPetalField = (THREE, { petalCount, petalSize }) => {
     positions,
     phases,
     speeds,
-    petalCount
+    petalCount,
+    isShader: useShader && !!texture
   };
+};
+
+const isWeakGPU = () => {
+  try {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl2") || canvas.getContext("webgl");
+    if (!gl) return true;
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    if (!debugInfo) return false;
+    const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
+    return (
+      renderer.includes("intel") ||
+      renderer.includes("swiftshader") ||
+      renderer.includes("llvmpipe") ||
+      renderer.includes("mesa")
+    );
+  } catch {
+    return false;
+  }
 };
 
 export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => {
@@ -111,6 +200,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   const mobile = isMobileDevice();
   const petalCount = mobile ? PETAL_COUNT_MOBILE : PETAL_COUNT_DESKTOP;
   const petalSize = mobile ? PETAL_SIZE_MOBILE : PETAL_SIZE_DESKTOP;
+  const useShader = !isWeakGPU();
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -127,7 +217,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   camera.position.set(0, 0, 6.2);
 
   const petalRig = new THREE.Group();
-  const field = createPetalField(THREE, { petalCount, petalSize });
+  const field = createPetalField(THREE, { petalCount, petalSize, useShader });
   const positionAttr = field.geometry.getAttribute("position");
   const positionArray = positionAttr.array;
   petalRig.add(field.points);
@@ -211,6 +301,10 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     petalRig.rotation.x = -pointerY * 0.11;
     petalRig.position.x = pointerX * 0.18;
     petalRig.position.y = -pointerY * 0.12;
+
+    if (field.isShader && field.material.uniforms) {
+      field.material.uniforms.uTime.value = time * 0.001;
+    }
 
     updatePetals(time, deltaSeconds);
     renderer.render(scene, camera);

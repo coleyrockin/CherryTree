@@ -1,0 +1,92 @@
+.scene-nav {
+  position: fixed;
+  right: clamp(16px, 2.5vw, 28px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 12;
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-gallery);
+}
+
+.scene-nav.is-visible {
+  opacity: 1;
+}
+
+.scene-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.scene-nav-dot {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.scene-nav-dot::before {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(45, 30, 36, 0.2);
+  transition:
+    background 0.5s var(--ease-gallery),
+    transform 0.5s var(--ease-gallery),
+    box-shadow 0.5s var(--ease-gallery);
+}
+
+.scene-nav-dot[aria-current="step"]::before {
+  background: var(--rose);
+  transform: scale(1.5);
+  box-shadow: 0 0 10px rgba(204, 95, 135, 0.4);
+}
+
+.scene-nav-dot:hover::before {
+  background: var(--rose-bright);
+  transform: scale(1.3);
+}
+
+.scene-nav-dot:focus-visible {
+  outline: 2px solid rgba(206, 98, 134, 0.38);
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
+/* Breathing pulse on active dot */
+.scene-nav-dot[aria-current="step"]::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(204, 95, 135, 0.25);
+  animation: navPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes navPulse {
+  0%, 100% { transform: scale(0.8); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 0; }
+}
+
+/* Hide on small screens */
+@media (max-width: 760px) {
+  .scene-nav {
+    display: none;
+  }
+}
+
+html[data-motion="reduced"] .scene-nav-dot[aria-current="step"]::after {
+  display: none;
+}
