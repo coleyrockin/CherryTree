@@ -232,8 +232,8 @@
 .epilogue-lockup .epilogue-title {
   margin: 0;
   font-family: "Bodoni Moda", "Times New Roman", serif;
-  font-size: clamp(2.8rem, 12vw, 9rem);
-  letter-spacing: 0.12em;
+  font-size: clamp(2.8rem, 9vw, 7rem);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(49, 30, 33, 0.84);
   text-shadow:
