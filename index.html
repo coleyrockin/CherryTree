@@ -51,6 +51,7 @@
 
   <a href="#experience" class="skip-link">Skip to experience</a>
   <div class="film-grain" aria-hidden="true"></div>
+  <div class="cursor-glow" data-ct-cursor-glow aria-hidden="true"></div>
   <div class="scroll-progress" data-ct-scroll-progress aria-hidden="true"></div>
 
   <!-- Scene navigation dots -->
@@ -81,6 +82,10 @@
       <canvas id="hero-webgl" class="hero-webgl" aria-hidden="true"></canvas>
       <div class="scene-layer scene-matte" aria-hidden="true"></div>
       <div class="scene-layer scene-vignette" aria-hidden="true"></div>
+      <div class="scene-text scene-text-hero" data-ct-text="prologue">
+        <h2 class="scene-title" data-ct-split>Cherry Tree</h2>
+        <p class="scene-subtitle" data-ct-subtitle>An immersive gallery</p>
+      </div>
       <picture class="scene-media scene-media-fallback" data-scene-media>
         <source type="image/avif"
           srcset="/assets/images/generated/prologue-fallback-1280.avif 1280w, /assets/images/generated/prologue-fallback-1920.avif 1920w, /assets/images/generated/prologue-fallback-2560.avif 2560w, /assets/images/generated/prologue-fallback-3840.avif 3840w"
@@ -94,8 +99,18 @@
       </picture>
     </section>
 
+    <div class="marquee-ribbon" data-ct-marquee aria-hidden="true">
+      <div class="marquee-track">
+        <span>Petals falling softly</span><span>Light through branches</span><span>A moment suspended</span><span>Petals falling softly</span><span>Light through branches</span><span>A moment suspended</span><span>Petals falling softly</span><span>Light through branches</span>
+      </div>
+    </div>
+
     <section class="scene scene-bloom" data-ct-scene="bloom-wash">
       <div class="scene-layer scene-matte" aria-hidden="true"></div>
+      <div class="scene-text" data-ct-text="bloom">
+        <h2 class="scene-title" data-ct-split>Bloom</h2>
+        <p class="scene-subtitle" data-ct-subtitle>Where petals meet light</p>
+      </div>
       <picture class="scene-media" data-scene-media>
         <source type="image/avif"
           srcset="/assets/images/generated/bloom-wash-1280.avif 1280w, /assets/images/generated/bloom-wash-1920.avif 1920w, /assets/images/generated/bloom-wash-2560.avif 2560w, /assets/images/generated/bloom-wash-3840.avif 3840w"
@@ -109,7 +124,17 @@
       </picture>
     </section>
 
+    <div class="marquee-ribbon marquee-ribbon-reverse" data-ct-marquee aria-hidden="true">
+      <div class="marquee-track">
+        <span>Nature speaks in color</span><span>Seasons turn in silence</span><span>Beauty needs no words</span><span>Nature speaks in color</span><span>Seasons turn in silence</span><span>Beauty needs no words</span><span>Nature speaks in color</span><span>Seasons turn in silence</span>
+      </div>
+    </div>
+
     <section class="scene scene-triptych" data-ct-scene="triptych">
+      <div class="scene-text" data-ct-text="triptych">
+        <h2 class="scene-title" data-ct-split>Triptych</h2>
+        <p class="scene-subtitle" data-ct-subtitle>Three views, one breath</p>
+      </div>
       <div class="triptych-stage">
         <figure class="triptych-panel" data-scene-media>
           <picture>
@@ -157,6 +182,10 @@
     </section>
 
     <section class="scene scene-color" data-ct-scene="color-field">
+      <div class="scene-text" data-ct-text="color-field">
+        <h2 class="scene-title" data-ct-split>Color Field</h2>
+        <p class="scene-subtitle" data-ct-subtitle>Pure chromatic meditation</p>
+      </div>
       <div class="color-field" data-scene-media>
         <div class="color-bloom color-bloom-a" aria-hidden="true"></div>
         <div class="color-bloom color-bloom-b" aria-hidden="true"></div>
@@ -164,8 +193,18 @@
       </div>
     </section>
 
+    <div class="marquee-ribbon" data-ct-marquee aria-hidden="true">
+      <div class="marquee-track">
+        <span>Breathe in stillness</span><span>The world slows down</span><span>Between the moments</span><span>Breathe in stillness</span><span>The world slows down</span><span>Between the moments</span><span>Breathe in stillness</span><span>The world slows down</span>
+      </div>
+    </div>
+
     <section class="scene scene-stillness" data-ct-scene="stillness">
       <div class="scene-layer scene-matte" aria-hidden="true"></div>
+      <div class="scene-text" data-ct-text="stillness">
+        <h2 class="scene-title" data-ct-split>Stillness</h2>
+        <p class="scene-subtitle" data-ct-subtitle>The quiet between</p>
+      </div>
       <picture class="scene-media" data-scene-media>
         <source type="image/avif"
           data-srcset="/assets/images/generated/stillness-1280.avif 1280w, /assets/images/generated/stillness-1920.avif 1920w, /assets/images/generated/stillness-2560.avif 2560w, /assets/images/generated/stillness-3840.avif 3840w"
@@ -184,9 +223,9 @@
       <div class="epilogue-bloom epilogue-bloom-b" aria-hidden="true"></div>
       <div class="epilogue-bloom epilogue-bloom-c" aria-hidden="true"></div>
       <div class="epilogue-lockup" data-scene-media>
-        <p class="epilogue-title">Cherry Tree</p>
+        <p class="epilogue-title" data-ct-split>Cherry Tree</p>
         <hr class="epilogue-rule" aria-hidden="true" />
-        <p class="epilogue-subtitle">An immersive experience</p>
+        <p class="epilogue-subtitle" data-ct-subtitle>A cinematic gallery experience</p>
       </div>
     </section>
   </main>

@@ -229,7 +229,7 @@
       rgba(255, 238, 224, 0) 65%);
 }
 
-.epilogue-title {
+.epilogue-lockup .epilogue-title {
   margin: 0;
   font-family: "Bodoni Moda", "Times New Roman", serif;
   font-size: clamp(2.8rem, 12vw, 9rem);
@@ -319,9 +319,132 @@
   }
 }
 
+/* ── Scene title cards ──────────────── */
+
+.scene-text {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  text-align: center;
+  gap: 0.6em;
+}
+
+.scene-text-hero {
+  z-index: 4;
+}
+
+.scene-title {
+  margin: 0;
+  font-family: "Bodoni Moda", "Times New Roman", serif;
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(49, 30, 33, 0.88);
+  text-shadow:
+    0 4px 30px rgba(247, 233, 224, 0.8),
+    0 1px 0 rgba(255, 249, 243, 0.5);
+  line-height: 1.1;
+}
+
+.scene-text-hero .scene-title {
+  font-size: clamp(2.8rem, 10vw, 8rem);
+  letter-spacing: 0.18em;
+  color: rgba(49, 30, 33, 0.92);
+  text-shadow:
+    0 6px 40px rgba(247, 233, 224, 0.9),
+    0 2px 0 rgba(255, 249, 243, 0.6);
+}
+
+.scene-subtitle {
+  margin: 0;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.1rem);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: rgba(49, 30, 33, 0.54);
+  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.7);
+  line-height: 1.4;
+}
+
+.scene-text-hero .scene-subtitle {
+  font-size: clamp(0.9rem, 2vw, 1.25rem);
+  letter-spacing: 0.1em;
+  color: rgba(49, 30, 33, 0.58);
+}
+
+/* Character split spans */
+.ct-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* Whitespace chars need width */
+.ct-char-space {
+  width: 0.3em;
+}
+
+/* Epilogue subtitle */
+.epilogue-subtitle {
+  margin: 0.4em 0 0;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: rgba(49, 30, 33, 0.48);
+  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.6);
+}
+
+/* Reduced motion: show all text immediately */
+html[data-motion="reduced"] .scene-text,
+html[data-motion="reduced"] .epilogue-subtitle {
+  opacity: 1 !important;
+}
+
+html[data-motion="reduced"] .ct-char {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html[data-motion="reduced"] .scene-subtitle,
+html[data-motion="reduced"] .epilogue-subtitle {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Triptych title positioning — above the pinned stage */
+.scene-triptych .scene-text {
+  z-index: 5;
+  justify-content: flex-start;
+  padding-top: 3vh;
+}
+
+@media (max-width: 860px) {
+  .scene-text-hero .scene-title {
+    font-size: clamp(2.2rem, 9vw, 4.5rem);
+  }
+
+  .scene-title {
+    font-size: clamp(1.8rem, 5.5vw, 3.2rem);
+  }
+}
+
 @media (max-width: 560px) {
   .epilogue-title {
     letter-spacing: 0.09em;
+  }
+
+  .scene-text-hero .scene-title {
+    letter-spacing: 0.12em;
+  }
+
+  .scene-title {
+    letter-spacing: 0.1em;
   }
 }
 

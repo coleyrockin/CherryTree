@@ -235,9 +235,15 @@ const boot = async () => {
 
     preloader.onProgress(0.1);
 
-    const { initLazySceneMedia, initSceneController } = await import(
-      "./experience/sceneController"
-    );
+    const [
+      { initLazySceneMedia, initSceneController },
+      { initTextAnimations },
+      { initScrollEffects }
+    ] = await Promise.all([
+      import("./experience/sceneController"),
+      import("./experience/textAnimations"),
+      import("./experience/scrollEffects")
+    ]);
 
     preloader.onProgress(0.3);
 
@@ -250,6 +256,13 @@ const boot = async () => {
 
     // sceneResult is { dispose, gsap?, ScrollTrigger?, lenis?, velocityTracker? }
     motionCleanup.push(sceneResult);
+
+    motionCleanup.push(
+      await initTextAnimations({ reducedMotion })
+    );
+    motionCleanup.push(
+      await initScrollEffects({ reducedMotion })
+    );
 
     preloader.onProgress(0.6);
 

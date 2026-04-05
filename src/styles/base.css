@@ -78,6 +78,71 @@ body::before {
   pointer-events: none;
 }
 
+/* ── Cursor glow ──────────────────── */
+
+.cursor-glow {
+  position: fixed;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(232, 150, 178, 0.18) 0%, rgba(232, 150, 178, 0) 70%);
+  mix-blend-mode: screen;
+  transition: opacity 0.6s ease;
+}
+
+@media (pointer: coarse) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+/* ── Horizontal text marquee ribbons ─── */
+
+.marquee-ribbon {
+  position: relative;
+  overflow: hidden;
+  padding: 1.8em 0;
+  background: linear-gradient(180deg,
+      rgba(240, 220, 212, 0.06),
+      rgba(240, 220, 212, 0.14) 50%,
+      rgba(240, 220, 212, 0.06));
+  border-top: 1px solid rgba(88, 52, 62, 0.08);
+  border-bottom: 1px solid rgba(88, 52, 62, 0.08);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.marquee-track span {
+  flex-shrink: 0;
+  font-family: "Bodoni Moda", "Times New Roman", serif;
+  font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+  font-weight: 400;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: rgba(49, 30, 33, 0.2);
+  padding: 0 2em;
+  text-transform: none;
+}
+
+.marquee-track span::after {
+  content: "\2022";
+  margin-left: 2em;
+  opacity: 0.4;
+}
+
+html[data-motion="reduced"] .marquee-ribbon {
+  display: none;
+}
+
 .ui-chrome {
   position: fixed;
   top: clamp(14px, 3vw, 30px);
