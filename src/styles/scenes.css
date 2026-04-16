@@ -525,8 +525,8 @@ html[data-motion="reduced"] .epilogue-subtitle {
   }
 
   .scene-text-hero .scene-title {
-    letter-spacing: 0.08em;
-    font-size: clamp(2.8rem, 16vw, 5rem);
+    letter-spacing: 0.06em;
+    font-size: clamp(2rem, 12vw, 4rem);
   }
 
   .scene-title {
