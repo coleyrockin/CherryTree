@@ -11,7 +11,6 @@ export const initPreloader = () => {
     return { ready: Promise.resolve(), onProgress: () => {}, exit: () => Promise.resolve() };
   }
 
-  // Split brand text for animation
   const split = splitByChars(brandEl);
 
   let progress = 0;
@@ -19,7 +18,6 @@ export const initPreloader = () => {
   let rafId = 0;
   const startTime = performance.now();
 
-  // Smooth progress bar animation
   const animateBar = () => {
     displayedProgress += (progress - displayedProgress) * 0.08;
     if (bar) {
@@ -36,14 +34,51 @@ export const initPreloader = () => {
     progress = Math.max(progress, value);
   };
 
+  const flipIntoHero = async (gsap) => {
+    const heroTitle = document.querySelector('[data-ct-scene="prologue-webgl"] .scene-title');
+    if (!heroTitle || !brandEl) return false;
+
+    const startRect = brandEl.getBoundingClientRect();
+    const endRect = heroTitle.getBoundingClientRect();
+    if (!startRect.width || !endRect.width) return false;
+
+    const startFont = parseFloat(getComputedStyle(brandEl).fontSize);
+    const endFont = parseFloat(getComputedStyle(heroTitle).fontSize);
+    if (!startFont || !endFont) return false;
+
+    const deltaX =
+      endRect.left + endRect.width / 2 - (startRect.left + startRect.width / 2);
+    const deltaY =
+      endRect.top + endRect.height / 2 - (startRect.top + startRect.height / 2);
+    const scale = endFont / startFont;
+
+    gsap.to(el, { backgroundColor: "rgba(247, 239, 231, 0)", duration: 1.1, ease: "power2.out" });
+    gsap.to(bar, { opacity: 0, duration: 0.4, ease: "power2.out" });
+
+    const flipTween = gsap.to(brandEl, {
+      x: deltaX,
+      y: deltaY,
+      scale,
+      duration: 1.25,
+      ease: "expo.inOut"
+    });
+
+    // Race the tween against a hard timeout so we never hang the page.
+    await Promise.race([
+      flipTween,
+      new Promise((resolve) => setTimeout(resolve, 1800))
+    ]);
+
+    gsap.set(brandEl, { opacity: 0 });
+    return true;
+  };
+
   const exit = async (gsap) => {
-    // Ensure minimum display time
     const elapsed = performance.now() - startTime;
     if (elapsed < MIN_DISPLAY_MS) {
       await new Promise((resolve) => setTimeout(resolve, MIN_DISPLAY_MS - elapsed));
     }
 
-    // Fill progress bar
     progress = 1;
     if (bar) {
       bar.style.transform = "scaleX(1)";
@@ -53,7 +88,6 @@ export const initPreloader = () => {
     const isReduced = document.documentElement.dataset.motion === "reduced";
 
     if (gsap && !isReduced && split.chars.length) {
-      // Animate chars in
       await gsap.to(split.chars, {
         y: 0,
         opacity: 1,
@@ -63,14 +97,14 @@ export const initPreloader = () => {
         delay: 0.15
       });
 
-      // Brief pause
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      await new Promise((resolve) => setTimeout(resolve, 260));
 
-      // Exit with clip-path wipe
-      el.classList.add("is-exiting");
-      await new Promise((resolve) => setTimeout(resolve, 1100));
+      const flipped = await flipIntoHero(gsap);
+      if (!flipped) {
+        el.classList.add("is-exiting");
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+      }
     } else {
-      // Reduced motion: instant
       el.style.opacity = "0";
       await new Promise((resolve) => setTimeout(resolve, 100));
     }

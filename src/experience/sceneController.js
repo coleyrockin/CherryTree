@@ -203,43 +203,106 @@ const initScrollProgress = (gsap, ScrollTrigger) => {
 
 /* ── Scene color transitions ────────────────────────────── */
 
-const initColorTransitions = (manifest, gsap, ScrollTrigger) => {
-  const bgBlend = document.querySelector("[data-ct-bg-blend]");
-  if (!bgBlend) {
-    return () => { };
+const applySceneTint = (scene) => {
+  const root = document.documentElement;
+  if (scene.tint) root.style.setProperty("--scene-tint", scene.tint);
+  if (scene.ink) root.style.setProperty("--scene-ink", scene.ink);
+  if (scene.grainTint) root.style.setProperty("--scene-grain", scene.grainTint);
+
+  const numeralNode = document.querySelector("[data-ct-numeral]");
+  const labelNode = document.querySelector("[data-ct-scene-label]");
+  const kanjiNode = document.querySelector("[data-ct-kanji]");
+  if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;
+  if (labelNode && scene.label) labelNode.textContent = scene.label;
+  if (kanjiNode && scene.kanji) kanjiNode.textContent = scene.kanji;
+};
+
+// IntersectionObserver-based tint dispatcher — picks the scene with the
+// highest visibility ratio and applies its tint. Avoids the ScrollTrigger
+// creation-time firing issue where all onEnter callbacks run in creation order.
+const initTintObserver = (manifest) => {
+  applySceneTint(manifest[0]);
+
+  if (!("IntersectionObserver" in window)) {
+    return () => {};
   }
 
-  const triggers = [];
+  const sceneByEl = new Map();
+  const ratios = new Map();
 
-  // Set initial color
-  bgBlend.style.backgroundColor = manifest[0].bgColor;
-
-  manifest.forEach((scene, index) => {
-    if (index === 0) return;
-
+  manifest.forEach((scene) => {
     const el = document.querySelector(`[data-ct-scene="${scene.id}"]`);
     if (!el) return;
-
-    const trigger = ScrollTrigger.create({
-      trigger: el,
-      start: "top 70%",
-      end: "top 30%",
-      scrub: 0.6,
-      onUpdate: (self) => {
-        const prevColor = manifest[index - 1].bgColor;
-        const nextColor = scene.bgColor;
-        // Use GSAP interpolation for smooth color blend
-        const interpolated = gsap.utils.interpolate(prevColor, nextColor, self.progress);
-        bgBlend.style.backgroundColor = interpolated;
-      }
-    });
-
-    triggers.push(trigger);
+    sceneByEl.set(el, scene);
+    ratios.set(el, 0);
   });
+
+  let activeId = manifest[0].id;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        ratios.set(entry.target, entry.intersectionRatio);
+      });
+
+      let bestEl = null;
+      let bestRatio = 0;
+      ratios.forEach((ratio, el) => {
+        if (ratio > bestRatio) {
+          bestRatio = ratio;
+          bestEl = el;
+        }
+      });
+
+      if (bestEl) {
+        const scene = sceneByEl.get(bestEl);
+        if (scene && scene.id !== activeId) {
+          activeId = scene.id;
+          applySceneTint(scene);
+        }
+      }
+    },
+    { threshold: [0, 0.25, 0.5, 0.75, 1] }
+  );
+
+  sceneByEl.forEach((_scene, el) => observer.observe(el));
+
+  return () => observer.disconnect();
+};
+
+const initColorTransitions = (manifest, gsap, ScrollTrigger) => {
+  const bgBlend = document.querySelector("[data-ct-bg-blend]");
+  const triggers = [];
+
+  if (bgBlend) {
+    bgBlend.style.backgroundColor = manifest[0].bgColor;
+    manifest.forEach((scene, index) => {
+      if (index === 0) return;
+      const el = document.querySelector(`[data-ct-scene="${scene.id}"]`);
+      if (!el) return;
+
+      const trigger = ScrollTrigger.create({
+        trigger: el,
+        start: "top 70%",
+        end: "top 30%",
+        scrub: 0.6,
+        onUpdate: (self) => {
+          const prevColor = manifest[index - 1].bgColor;
+          const nextColor = scene.bgColor;
+          const interpolated = gsap.utils.interpolate(prevColor, nextColor, self.progress);
+          bgBlend.style.backgroundColor = interpolated;
+        }
+      });
+      triggers.push(trigger);
+    });
+  }
+
+  const tintCleanup = initTintObserver(manifest);
 
   return () => {
     triggers.forEach((t) => t.kill());
-    bgBlend.style.backgroundColor = "";
+    tintCleanup();
+    if (bgBlend) bgBlend.style.backgroundColor = "";
   };
 };
 
@@ -548,6 +611,27 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
               start: "top bottom",
               end: "bottom top",
               scrub: 0.9
+            }
+          }
+        )
+      );
+    }
+
+    // Text layer counter-parallax: text floats slower than media for depth
+    const textLayer = scene.querySelector(".scene-text");
+    if (textLayer && id !== "triptych") {
+      animations.push(
+        gsap.fromTo(
+          textLayer,
+          { yPercent: -6 },
+          {
+            yPercent: 10,
+            ease: "none",
+            scrollTrigger: {
+              trigger: scene,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 1.4
             }
           }
         )

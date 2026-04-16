@@ -21,29 +21,66 @@
   width: 6px;
   height: 6px;
   margin: -3px 0 0 -3px;
-  background: var(--ink);
+  background: var(--scene-ink, var(--ink));
+  mix-blend-mode: multiply;
+  transition: opacity 0.4s ease, background-color 900ms var(--ease-gallery), transform 0.25s var(--ease-gallery);
 }
 
 .cursor-ring {
   width: 40px;
   height: 40px;
   margin: -20px 0 0 -20px;
-  border: 1.5px solid var(--rose);
+  border: 1.5px solid var(--scene-tint, var(--rose));
   opacity: 0;
-  transition: opacity 0.4s ease, width 0.35s cubic-bezier(0.22, 0.65, 0.14, 1), height 0.35s cubic-bezier(0.22, 0.65, 0.14, 1);
+  display: grid;
+  place-items: center;
+  transition:
+    opacity 0.4s ease,
+    width 0.35s var(--ease-gallery),
+    height 0.35s var(--ease-gallery),
+    margin 0.35s var(--ease-gallery),
+    border-color 900ms var(--ease-gallery),
+    background-color 0.35s var(--ease-gallery),
+    backdrop-filter 0.35s ease;
 }
 
 .has-custom-cursor .cursor-ring {
   opacity: 0.5;
 }
 
-/* Magnetic hover state */
+.cursor-label {
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--scene-tint, var(--rose));
+  opacity: 0;
+  transform: translateY(1px) scale(0.9);
+  transition: opacity 0.25s ease, transform 0.3s var(--ease-gallery), color 900ms var(--ease-gallery);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Magnetic / interactive hover state */
 .cursor-ring.is-magnetic {
-  width: 56px;
-  height: 56px;
-  margin: -28px 0 0 -28px;
-  border-color: var(--rose-bright);
-  opacity: 0.7;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-color: var(--scene-tint, var(--rose-bright));
+  background: color-mix(in srgb, var(--scene-tint, var(--rose)) 14%, transparent);
+  opacity: 0.95;
+  backdrop-filter: blur(3px);
+}
+
+.cursor-ring.is-magnetic .cursor-label {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.cursor-ring.is-pressed {
+  transform-origin: center;
+  transform: scale(0.82) translate3d(var(--cursor-x, 0), var(--cursor-y, 0), 0);
 }
 
 /* Hide on touch and reduced motion */

@@ -2,62 +2,92 @@ export const sceneManifest = Object.freeze([
   {
     id: "prologue-webgl",
     label: "Prologue",
+    numeral: "01",
+    kanji: "序",
     type: "webgl",
     assets: ["heroTextureA", "grain01", "prologueFallback"],
     motionPreset: "parallaxDeep",
     heightVh: 100,
     preload: true,
-    bgColor: "#f8ebe2"
+    bgColor: "#f8ebe2",
+    tint: "#ef8bb0",
+    ink: "#2d1e24",
+    grainTint: "rgba(68, 43, 51, 0.28)"
   },
   {
     id: "bloom-wash",
     label: "Bloom",
+    numeral: "02",
+    kanji: "咲",
     type: "image",
     assets: ["bloomWashPrimary", "matteWarm01"],
     motionPreset: "crossfadeLong",
     heightVh: 100,
     preload: true,
-    bgColor: "#f2ddd6"
+    bgColor: "#f2ddd6",
+    tint: "#cc5f87",
+    ink: "#3a1f28",
+    grainTint: "rgba(80, 42, 55, 0.26)"
   },
   {
     id: "triptych",
     label: "Triptych",
+    numeral: "03",
+    kanji: "三",
     type: "composite",
     assets: ["triptychLeft", "triptychCenter", "triptychRight", "grain02"],
     motionPreset: "parallaxDeep",
     heightVh: 140,
     preload: false,
-    bgColor: "#e8d4cd"
+    bgColor: "#e8d4cd",
+    tint: "#6e8b66",
+    ink: "#2d1e24",
+    grainTint: "rgba(50, 56, 42, 0.25)"
   },
   {
     id: "color-field",
     label: "Color Field",
+    numeral: "04",
+    kanji: "色",
     type: "composite",
     assets: ["colorBloomA", "colorBloomB", "colorBloomC"],
     motionPreset: "driftSlow",
     heightVh: 100,
     preload: false,
-    bgColor: "#edddd2"
+    bgColor: "#edddd2",
+    tint: "#d9577b",
+    ink: "#2d1e24",
+    grainTint: "rgba(76, 38, 48, 0.28)"
   },
   {
     id: "stillness",
     label: "Stillness",
+    numeral: "05",
+    kanji: "静",
     type: "image",
     assets: ["stillnessHero", "filmDust01"],
     motionPreset: "crossfadeLong",
     heightVh: 100,
     preload: false,
-    bgColor: "#ead6cc"
+    bgColor: "#ead6cc",
+    tint: "#8b6f88",
+    ink: "#2a1c24",
+    grainTint: "rgba(60, 44, 58, 0.24)"
   },
   {
     id: "epilogue",
     label: "Epilogue",
+    numeral: "06",
+    kanji: "終",
     type: "composite",
     assets: ["epilogueGlow"],
     motionPreset: "driftSlow",
     heightVh: 140,
     preload: false,
-    bgColor: "#e3cbc0"
+    bgColor: "#e3cbc0",
+    tint: "#e48ca8",
+    ink: "#2d1e24",
+    grainTint: "rgba(78, 44, 55, 0.26)"
   }
 ]);
 

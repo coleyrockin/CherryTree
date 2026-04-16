@@ -44,7 +44,9 @@
 
   <!-- Custom cursor -->
   <div class="cursor-dot" data-ct-cursor-dot aria-hidden="true"></div>
-  <div class="cursor-ring" data-ct-cursor-ring aria-hidden="true"></div>
+  <div class="cursor-ring" data-ct-cursor-ring aria-hidden="true">
+    <span class="cursor-label" data-ct-cursor-label></span>
+  </div>
 
   <!-- Background blend layer for scene color transitions -->
   <div class="bg-blend" data-ct-bg-blend aria-hidden="true"></div>
@@ -58,6 +60,14 @@
   <nav class="scene-nav" data-ct-scene-nav aria-label="Scene navigation">
     <ul class="scene-nav-list"></ul>
   </nav>
+
+  <!-- Editorial chrome: section numeral + kanji watermark -->
+  <aside class="editorial-chrome" data-ct-editorial aria-hidden="true">
+    <span class="editorial-numeral" data-ct-numeral>01</span>
+    <span class="editorial-divider"></span>
+    <span class="editorial-label" data-ct-scene-label>Prologue</span>
+  </aside>
+  <div class="kanji-watermark" data-ct-kanji aria-hidden="true">序</div>
 
   <header class="ui-chrome" aria-label="Site controls">
     <span class="brand-mark">Cherry Tree</span>
@@ -83,7 +93,8 @@
       <div class="scene-layer scene-matte" aria-hidden="true"></div>
       <div class="scene-layer scene-vignette" aria-hidden="true"></div>
       <div class="scene-text scene-text-hero" data-ct-text="prologue">
-        <h2 class="scene-title" data-ct-split>Cherry Tree</h2>
+        <span class="scene-kicker" aria-hidden="true">序 &middot; A Cinematic Gallery</span>
+        <h2 class="scene-title scene-title-display" data-ct-split>Cherry Tree</h2>
         <p class="scene-subtitle" data-ct-subtitle>An immersive gallery</p>
       </div>
       <picture class="scene-media scene-media-fallback" data-scene-media>
@@ -222,10 +233,13 @@
       <div class="epilogue-bloom epilogue-bloom-a" aria-hidden="true"></div>
       <div class="epilogue-bloom epilogue-bloom-b" aria-hidden="true"></div>
       <div class="epilogue-bloom epilogue-bloom-c" aria-hidden="true"></div>
+      <div class="epilogue-petals" data-ct-epilogue-petals aria-hidden="true"></div>
       <div class="epilogue-lockup" data-scene-media>
+        <span class="epilogue-mark" aria-hidden="true">終</span>
         <p class="epilogue-title" data-ct-split>Cherry Tree</p>
         <hr class="epilogue-rule" aria-hidden="true" />
         <p class="epilogue-subtitle" data-ct-subtitle>A cinematic gallery experience</p>
+        <p class="epilogue-sign" aria-hidden="true">— fin —</p>
       </div>
     </section>
   </main>

@@ -62,15 +62,18 @@ const randomBetween = (min, max) => min + Math.random() * (max - min);
 const VERTEX_SHADER = `
   attribute float aPhase;
   attribute float aSpeed;
+  attribute float aRotSpeed;
   uniform float uTime;
   uniform float uSize;
   varying float vDepth;
   varying float vPhase;
+  varying float vRot;
 
   void main() {
     vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
     vDepth = clamp(-mvPosition.z / 12.0, 0.0, 1.0);
     vPhase = aPhase;
+    vRot = uTime * aRotSpeed + aPhase;
 
     float sizeFactor = uSize * (300.0 / -mvPosition.z);
     sizeFactor *= mix(1.0, 1.3, vDepth);
@@ -86,9 +89,18 @@ const FRAGMENT_SHADER = `
   uniform float uOpacity;
   varying float vDepth;
   varying float vPhase;
+  varying float vRot;
 
   void main() {
-    vec4 texColor = texture2D(uMap, gl_PointCoord);
+    // Rotate point sprite UVs so each petal flutters on its own axis
+    vec2 uv = gl_PointCoord - 0.5;
+    float c = cos(vRot);
+    float s = sin(vRot);
+    uv = mat2(c, -s, s, c) * uv;
+    uv += 0.5;
+    if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) discard;
+
+    vec4 texColor = texture2D(uMap, uv);
     if (texColor.a < 0.05) discard;
 
     float shift = sin(uTime * 0.3 + vPhase * 6.28) * 0.5 + 0.5;
@@ -101,6 +113,10 @@ const FRAGMENT_SHADER = `
     vec3 gray = vec3(dot(baseColor, vec3(0.299, 0.587, 0.114)));
     vec3 finalColor = mix(baseColor, gray, depthDesaturate);
 
+    // Soft rim brightening (additive highlight near center of sprite)
+    float rim = smoothstep(0.45, 0.1, length(gl_PointCoord - 0.5));
+    finalColor += rim * 0.12 * vec3(1.0, 0.95, 0.98);
+
     gl_FragColor = vec4(finalColor * texColor.rgb, texColor.a * uOpacity * depthFade);
   }
 `;
@@ -110,6 +126,7 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
   const positions = new Float32Array(petalCount * 3);
   const phases = new Float32Array(petalCount);
   const speeds = new Float32Array(petalCount);
+  const rotSpeeds = new Float32Array(petalCount);
 
   for (let i = 0; i < petalCount; i += 1) {
     const i3 = i * 3;
@@ -118,6 +135,7 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
     positions[i3 + 2] = randomBetween(-2.8, 1.8);
     phases[i] = randomBetween(0, Math.PI * 2);
     speeds[i] = randomBetween(0.16, 0.46);
+    rotSpeeds[i] = randomBetween(-1.2, 1.2);
   }
 
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -128,6 +146,7 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
   if (useShader && texture) {
     geometry.setAttribute("aPhase", new THREE.BufferAttribute(phases, 1));
     geometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
+    geometry.setAttribute("aRotSpeed", new THREE.BufferAttribute(rotSpeeds, 1));
 
     material = new THREE.ShaderMaterial({
       uniforms: {
@@ -165,9 +184,35 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
     positions,
     phases,
     speeds,
+    rotSpeeds,
     petalCount,
     isShader: useShader && !!texture
   };
+};
+
+/* ── Sparse "light specks" additive layer ── */
+const createSpeckField = (THREE, count) => {
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i += 1) {
+    const i3 = i * 3;
+    positions[i3] = randomBetween(-WORLD_WIDTH / 2 - 1, WORLD_WIDTH / 2 + 1);
+    positions[i3 + 1] = randomBetween(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2);
+    positions[i3 + 2] = randomBetween(-3.5, 1.5);
+  }
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({
+    color: 0xfff2df,
+    size: 0.045,
+    transparent: true,
+    opacity: 0.7,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    sizeAttenuation: true
+  });
+
+  return { points: new THREE.Points(geometry, material), geometry, material, positions, count };
 };
 
 const isWeakGPU = () => {
@@ -222,6 +267,11 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   const positionArray = positionAttr.array;
   petalRig.add(field.points);
 
+  const speckField = createSpeckField(THREE, mobile ? 60 : 120);
+  const speckPositionAttr = speckField.geometry.getAttribute("position");
+  const speckPositions = speckPositionAttr.array;
+  petalRig.add(speckField.points);
+
   const hazeGeometry = new THREE.PlaneGeometry(14, 10);
   const hazeMaterial = new THREE.MeshBasicMaterial({
     color: 0xf4c7d3,
@@ -259,10 +309,14 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   let isActive = true;
 
   const updatePetals = (elapsed, deltaSeconds) => {
+    const t = elapsed * 0.00035;
     for (let i = 0; i < field.petalCount; i += 1) {
       const i3 = i * 3;
-      const driftX = Math.sin(elapsed * 0.00035 + field.phases[i]) * 0.2;
-      positionArray[i3] += driftX * deltaSeconds;
+      // Layered wind: base sine + secondary cosine for non-periodic flow
+      const windX =
+        Math.sin(t + field.phases[i]) * 0.22 +
+        Math.cos(t * 0.6 + field.phases[i] * 1.7) * 0.12;
+      positionArray[i3] += windX * deltaSeconds;
       positionArray[i3 + 1] -= field.speeds[i] * deltaSeconds;
 
       if (positionArray[i3 + 1] < -WORLD_HEIGHT / 2 - 0.4) {
@@ -273,6 +327,17 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     }
 
     positionAttr.needsUpdate = true;
+
+    // Light specks drift slowly upward
+    for (let i = 0; i < speckField.count; i += 1) {
+      const i3 = i * 3;
+      speckPositions[i3 + 1] += 0.04 * deltaSeconds;
+      if (speckPositions[i3 + 1] > WORLD_HEIGHT / 2) {
+        speckPositions[i3 + 1] = -WORLD_HEIGHT / 2;
+        speckPositions[i3] = randomBetween(-WORLD_WIDTH / 2 - 1, WORLD_WIDTH / 2 + 1);
+      }
+    }
+    speckPositionAttr.needsUpdate = true;
   };
 
   const resize = () => {
@@ -370,6 +435,8 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     field.geometry.dispose();
     field.material.dispose();
     field.texture?.dispose();
+    speckField.geometry.dispose();
+    speckField.material.dispose();
     hazeGeometry.dispose();
     hazeMaterial.dispose();
 

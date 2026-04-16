@@ -1,11 +1,21 @@
 /**
- * Custom magnetic cursor with trailing ring.
- * Ring snaps toward interactive elements on hover.
+ * Custom magnetic cursor with trailing ring and contextual glyph label.
+ * Ring snaps toward interactive elements on hover and reveals a per-target label.
  */
 
 const LERP_DOT = 0.2;
 const LERP_RING = 0.09;
-const MAGNETIC_DISTANCE = 80;
+
+const INTERACTIVE_SELECTOR = "button, a, [data-magnetic]";
+
+const resolveCursorLabel = (el) => {
+  if (el.dataset?.cursorLabel) return el.dataset.cursorLabel;
+  if (el.matches?.(".scene-nav-dot")) return el.getAttribute("aria-label")?.replace(/^Scene \d+:\s*/, "") ?? "View";
+  if (el.matches?.(".motion-toggle")) return "Toggle";
+  if (el.matches?.(".sound-toggle")) return "Sound";
+  if (el.matches?.("a")) return "Open →";
+  return "View";
+};
 
 export const initMagneticCursor = ({ gsap }) => {
   // Skip on touch devices
@@ -15,6 +25,7 @@ export const initMagneticCursor = ({ gsap }) => {
 
   const dot = document.querySelector("[data-ct-cursor-dot]");
   const ring = document.querySelector("[data-ct-cursor-ring]");
+  const labelNode = document.querySelector("[data-ct-cursor-label]");
   if (!dot || !ring) {
     return () => {};
   }
@@ -46,9 +57,6 @@ export const initMagneticCursor = ({ gsap }) => {
 
   window.addEventListener("mousemove", onMouseMove, { passive: true, signal });
 
-  // Magnetic snap for interactive elements
-  const interactiveSelector = "button, a, [data-magnetic]";
-
   const onEnterInteractive = (e) => {
     const target = e.currentTarget;
     const rect = target.getBoundingClientRect();
@@ -56,6 +64,10 @@ export const initMagneticCursor = ({ gsap }) => {
     ringTargetY = rect.top + rect.height / 2;
     isMagnetic = true;
     ring.classList.add("is-magnetic");
+
+    if (labelNode) {
+      labelNode.textContent = resolveCursorLabel(target);
+    }
   };
 
   const onLeaveInteractive = () => {
@@ -65,8 +77,13 @@ export const initMagneticCursor = ({ gsap }) => {
     ringTargetY = mouseY;
   };
 
+  const onPressDown = () => ring.classList.add("is-pressed");
+  const onPressUp = () => ring.classList.remove("is-pressed");
+
   const attachMagnetic = () => {
-    document.querySelectorAll(interactiveSelector).forEach((el) => {
+    document.querySelectorAll(INTERACTIVE_SELECTOR).forEach((el) => {
+      if (el.dataset.ctCursorBound) return;
+      el.dataset.ctCursorBound = "1";
       el.addEventListener("mouseenter", onEnterInteractive, { passive: true, signal });
       el.addEventListener("mouseleave", onLeaveInteractive, { passive: true, signal });
     });
@@ -74,7 +91,9 @@ export const initMagneticCursor = ({ gsap }) => {
 
   attachMagnetic();
 
-  // Observe DOM changes for new interactive elements
+  window.addEventListener("mousedown", onPressDown, { passive: true, signal });
+  window.addEventListener("mouseup", onPressUp, { passive: true, signal });
+
   const mutationObserver = new MutationObserver(() => {
     attachMagnetic();
   });
@@ -92,7 +111,6 @@ export const initMagneticCursor = ({ gsap }) => {
 
   gsap.ticker.add(onTick);
 
-  // Hide on mouse leave window
   const onMouseLeave = () => {
     dot.style.opacity = "0";
     ring.style.opacity = "0";
@@ -111,5 +129,8 @@ export const initMagneticCursor = ({ gsap }) => {
     abortController.abort();
     mutationObserver.disconnect();
     document.documentElement.classList.remove("has-custom-cursor");
+    document.querySelectorAll("[data-ct-cursor-bound]").forEach((el) => {
+      delete el.dataset.ctCursorBound;
+    });
   };
 };

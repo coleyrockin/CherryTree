@@ -15,6 +15,11 @@
   --dur-quick: 420ms;
   --dur-soft: 980ms;
   --ease-gallery: cubic-bezier(0.22, 0.65, 0.14, 1);
+
+  /* Scene-linked color temperature — mutated by sceneController as scenes enter view */
+  --scene-tint: #ef8bb0;
+  --scene-ink: #2d1e24;
+  --scene-grain: rgba(68, 43, 51, 0.28);
 }
 
 * {
@@ -57,9 +62,10 @@ body::before {
   pointer-events: none;
   opacity: calc(0.22 + var(--scroll-grain-boost, 0));
   mix-blend-mode: multiply;
-  background-image: radial-gradient(rgba(68, 43, 51, 0.28) 0.75px, transparent 0.85px);
+  background-image: radial-gradient(var(--scene-grain) 0.75px, transparent 0.85px);
   background-size: 4px 4px;
   animation: grainDrift 0.8s steps(4) infinite;
+  transition: background-image 900ms var(--ease-gallery);
 }
 
 @keyframes grainDrift {
@@ -420,4 +426,87 @@ body.is-loading .scroll-progress {
 .has-custom-cursor,
 .has-custom-cursor * {
   cursor: none !important;
+}
+
+/* ── Editorial chrome ───────────────────────────────────── */
+
+.editorial-chrome {
+  position: fixed;
+  left: clamp(18px, 3vw, 40px);
+  bottom: clamp(22px, 3.5vw, 42px);
+  z-index: 11;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: rgba(49, 30, 33, 0.52);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s var(--ease-gallery), color 900ms var(--ease-gallery);
+}
+
+body:not(.is-loading) .editorial-chrome {
+  opacity: 1;
+}
+
+.editorial-numeral {
+  font-family: "Bodoni Moda", serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--scene-tint);
+  transition: color 900ms var(--ease-gallery);
+}
+
+.editorial-divider {
+  display: inline-block;
+  width: clamp(28px, 4vw, 56px);
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+.editorial-label {
+  white-space: nowrap;
+}
+
+.kanji-watermark {
+  position: fixed;
+  right: clamp(-10px, -1.6vw, -4px);
+  bottom: clamp(60px, 10vh, 120px);
+  z-index: 1;
+  font-family: "Bodoni Moda", "Noto Serif JP", serif;
+  font-size: clamp(20vh, 34vh, 44vh);
+  line-height: 0.82;
+  color: var(--scene-tint);
+  opacity: 0.06;
+  pointer-events: none;
+  writing-mode: vertical-rl;
+  user-select: none;
+  mix-blend-mode: multiply;
+  transition: color 1.2s var(--ease-gallery), opacity 1.2s var(--ease-gallery);
+}
+
+body.is-loading .kanji-watermark { opacity: 0; }
+
+html[data-motion="reduced"] .kanji-watermark { opacity: 0.04; }
+
+@media (max-width: 760px) {
+  .editorial-chrome {
+    left: 14px;
+    bottom: 18px;
+    font-size: 0.62rem;
+    letter-spacing: 0.28em;
+    gap: 10px;
+  }
+  .kanji-watermark {
+    font-size: clamp(16vh, 24vh, 28vh);
+    opacity: 0.045;
+  }
 }
