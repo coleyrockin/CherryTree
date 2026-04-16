@@ -8,6 +8,8 @@ A cinematic, scroll-driven gallery experience built with WebGL, GSAP, and Lenis 
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
+**[→ Live demo](https://cherry-tree-psi.vercel.app)**
+
 ![Cherry Tree preview](./cherrytree-preview.png)
 
 ---
