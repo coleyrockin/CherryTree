@@ -557,6 +557,29 @@ html[data-motion="reduced"] .epilogue-subtitle {
   .color-field { height: 56vh; }
 }
 
+/* Landscape mobile — constrain by height, not width */
+@media (orientation: landscape) and (max-height: 500px) {
+  .scene-text-hero .scene-title {
+    font-size: clamp(1.6rem, 8vh, 3.2rem);
+    letter-spacing: 0.08em;
+  }
+
+  .scene-kicker {
+    font-size: 0.6rem;
+    letter-spacing: 0.24em;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+
+  .scene-text-hero .scene-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .scene-text {
+    gap: 0.3em;
+  }
+}
+
 /* Reduced motion: clip-path reveals visible immediately */
 html[data-motion="reduced"] .scene-bloom .scene-media,
 html[data-motion="reduced"] .scene-stillness .scene-media {
