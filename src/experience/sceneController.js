@@ -211,10 +211,8 @@ const applySceneTint = (scene) => {
 
   const numeralNode = document.querySelector("[data-ct-numeral]");
   const labelNode = document.querySelector("[data-ct-scene-label]");
-  const kanjiNode = document.querySelector("[data-ct-kanji]");
   if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;
   if (labelNode && scene.label) labelNode.textContent = scene.label;
-  if (kanjiNode && scene.kanji) kanjiNode.textContent = scene.kanji;
 };
 
 // IntersectionObserver-based tint dispatcher — picks the scene with the
