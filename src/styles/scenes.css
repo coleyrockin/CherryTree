@@ -379,6 +379,10 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
     width: 96vw;
     height: 62vh;
   }
+
+  .scene-triptych .scene-text {
+    padding-top: 72px;
+  }
 }
 
 /* ── Scene title cards ──────────────── */
@@ -519,9 +523,9 @@ html[data-motion="reduced"] .epilogue-subtitle {
 }
 
 @media (max-width: 560px) {
-  .epilogue-title {
-    letter-spacing: 0.06em;
-    font-size: clamp(2.4rem, 14vw, 4.2rem);
+  .epilogue-lockup .epilogue-title {
+    letter-spacing: 0.04em;
+    font-size: clamp(1.8rem, 10vw, 3.2rem);
   }
 
   .scene-text-hero .scene-title {

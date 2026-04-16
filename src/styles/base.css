@@ -389,6 +389,24 @@ html[data-motion="reduced"] .scene {
   }
 }
 
+@media (max-width: 480px) {
+  .brand-mark {
+    white-space: nowrap;
+    font-size: 0.92rem;
+    letter-spacing: 0.06em;
+  }
+
+  .sound-toggle,
+  .motion-toggle {
+    min-width: 74px;
+    padding: 7px 9px;
+  }
+
+  .motion-toggle {
+    min-width: 86px;
+  }
+}
+
 @media (max-width: 620px) {
   .film-grain {
     opacity: 0.16;
