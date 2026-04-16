@@ -3,7 +3,6 @@ export const sceneManifest = Object.freeze([
     id: "prologue-webgl",
     label: "Prologue",
     numeral: "01",
-    kanji: "序",
     type: "webgl",
     assets: ["heroTextureA", "grain01", "prologueFallback"],
     motionPreset: "parallaxDeep",
@@ -18,7 +17,6 @@ export const sceneManifest = Object.freeze([
     id: "bloom-wash",
     label: "Bloom",
     numeral: "02",
-    kanji: "咲",
     type: "image",
     assets: ["bloomWashPrimary", "matteWarm01"],
     motionPreset: "crossfadeLong",
@@ -33,7 +31,6 @@ export const sceneManifest = Object.freeze([
     id: "triptych",
     label: "Triptych",
     numeral: "03",
-    kanji: "三",
     type: "composite",
     assets: ["triptychLeft", "triptychCenter", "triptychRight", "grain02"],
     motionPreset: "parallaxDeep",
@@ -48,7 +45,6 @@ export const sceneManifest = Object.freeze([
     id: "color-field",
     label: "Color Field",
     numeral: "04",
-    kanji: "色",
     type: "composite",
     assets: ["colorBloomA", "colorBloomB", "colorBloomC"],
     motionPreset: "driftSlow",
@@ -63,7 +59,6 @@ export const sceneManifest = Object.freeze([
     id: "stillness",
     label: "Stillness",
     numeral: "05",
-    kanji: "静",
     type: "image",
     assets: ["stillnessHero", "filmDust01"],
     motionPreset: "crossfadeLong",
@@ -78,7 +73,6 @@ export const sceneManifest = Object.freeze([
     id: "epilogue",
     label: "Epilogue",
     numeral: "06",
-    kanji: "終",
     type: "composite",
     assets: ["epilogueGlow"],
     motionPreset: "driftSlow",
@@ -90,5 +84,3 @@ export const sceneManifest = Object.freeze([
     grainTint: "rgba(78, 44, 55, 0.26)"
   }
 ]);
-
-export const sceneManifestById = new Map(sceneManifest.map((scene) => [scene.id, scene]));

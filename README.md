@@ -16,7 +16,7 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of the six scenes carries its own color temperature, kanji watermark, and editorial numerals — the whole thing transitions like a cut between shots.
+Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of the six scenes carries its own color temperature and editorial numerals — the whole thing transitions like a cut between shots.
 
 Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline.
 

@@ -494,27 +494,6 @@ body:not(.is-loading) .editorial-chrome {
   white-space: nowrap;
 }
 
-.kanji-watermark {
-  position: fixed;
-  right: clamp(-10px, -1.6vw, -4px);
-  bottom: clamp(60px, 10vh, 120px);
-  z-index: 1;
-  font-family: "Bodoni Moda", "Noto Serif JP", serif;
-  font-size: clamp(20vh, 34vh, 44vh);
-  line-height: 0.82;
-  color: var(--scene-tint);
-  opacity: 0.06;
-  pointer-events: none;
-  writing-mode: vertical-rl;
-  user-select: none;
-  mix-blend-mode: multiply;
-  transition: color 1.2s var(--ease-gallery), opacity 1.2s var(--ease-gallery);
-}
-
-body.is-loading .kanji-watermark { opacity: 0; }
-
-html[data-motion="reduced"] .kanji-watermark { opacity: 0.04; }
-
 @media (max-width: 760px) {
   .editorial-chrome {
     left: 14px;
@@ -522,9 +501,5 @@ html[data-motion="reduced"] .kanji-watermark { opacity: 0.04; }
     font-size: 0.62rem;
     letter-spacing: 0.28em;
     gap: 10px;
-  }
-  .kanji-watermark {
-    font-size: clamp(16vh, 24vh, 28vh);
-    opacity: 0.045;
   }
 }
