@@ -2,17 +2,19 @@
 
 const splitTextToChars = (element) => {
   const text = element.textContent || "";
-  const srOnly = document.createElement("span");
-  srOnly.className = "visually-hidden";
-  srOnly.textContent = text;
-
   const chars = [];
+
+  // Preserve the full text for assistive tech + scrapers (SEO, title tags, copy/paste)
+  // by promoting it to an aria-label on the parent rather than duplicating a srOnly node.
+  // Without this, .textContent would concatenate the srOnly copy + all char spans,
+  // producing "Cherry TreeCherry Tree" style duplicates.
+  if (!element.hasAttribute("aria-label")) {
+    element.setAttribute("aria-label", text);
+  }
 
   while (element.firstChild) {
     element.removeChild(element.firstChild);
   }
-
-  element.appendChild(srOnly);
 
   for (const char of text) {
     const span = document.createElement("span");
