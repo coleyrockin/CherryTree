@@ -232,10 +232,10 @@
 .epilogue-lockup .epilogue-title {
   margin: 0;
   font-family: "Bodoni Moda", "Times New Roman", serif;
-  font-size: clamp(3rem, 12vw, 10rem);
+  font-size: clamp(3rem, 9vw, 7.5rem);
   font-weight: 500;
   font-style: italic;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(49, 30, 33, 0.88);
   text-shadow:
@@ -404,8 +404,8 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
 }
 
 .scene-text-hero .scene-title {
-  font-size: clamp(3.2rem, 14vw, 13rem);
-  letter-spacing: 0.12em;
+  font-size: clamp(3.2rem, 10vw, 8.5rem);
+  letter-spacing: 0.1em;
   font-weight: 500;
   color: rgba(49, 30, 33, 0.94);
   text-shadow:
