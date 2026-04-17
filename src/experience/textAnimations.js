@@ -89,6 +89,28 @@ const initHeroTextAnimation = (gsap) => {
     animations.push(subtitleTl);
   }
 
+  // Scroll hint: fade in after hero text, fade out immediately on scroll
+  const scrollHint = document.querySelector(".scroll-hint");
+  if (scrollHint) {
+    const hintTl = gsap.timeline({ delay: 3 });
+    hintTl.fromTo(
+      scrollHint,
+      { opacity: 0, y: 10 },
+      { opacity: 1, y: 0, duration: 0.9, ease: "power2.out" }
+    );
+    gsap.to(scrollHint, {
+      opacity: 0,
+      ease: "power1.in",
+      scrollTrigger: {
+        trigger: scrollHint.closest(".scene"),
+        start: "top top",
+        end: "12% top",
+        scrub: 0.3
+      }
+    });
+    animations.push(hintTl);
+  }
+
   return animations;
 };
 
@@ -189,6 +211,8 @@ export const initTextAnimations = async ({ reducedMotion = false }) => {
     document.querySelectorAll(".scene-text, .epilogue-subtitle").forEach((el) => {
       el.style.opacity = "1";
     });
+    const scrollHint = document.querySelector(".scroll-hint");
+    if (scrollHint) scrollHint.style.opacity = "0.7";
     return () => {};
   }
 

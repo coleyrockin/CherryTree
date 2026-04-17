@@ -213,6 +213,14 @@ const applySceneTint = (scene) => {
   const labelNode = document.querySelector("[data-ct-scene-label]");
   if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;
   if (labelNode && scene.label) labelNode.textContent = scene.label;
+
+  // Per-scene document title
+  document.title = scene.label ? `${scene.label} — Cherry Tree` : "Cherry Tree";
+
+  // Broadcast scene change so cursor labels and other modules can react
+  document.dispatchEvent(
+    new CustomEvent("ct:scene-enter", { detail: { id: scene.id, label: scene.label } })
+  );
 };
 
 // IntersectionObserver-based tint dispatcher — picks the scene with the

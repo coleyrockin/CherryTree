@@ -578,3 +578,39 @@ html[data-motion="reduced"] .epilogue-rule {
 html[data-motion="reduced"] .epilogue-subtitle {
   opacity: 1;
 }
+
+/* ── Scroll hint ──────────────────────────────────────────── */
+
+.scroll-hint {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0; /* GSAP animates this in */
+}
+
+.scroll-hint-line {
+  width: 1px;
+  height: 52px;
+  background: linear-gradient(to bottom, var(--scene-tint, #ef8bb0), transparent);
+  animation: scroll-line-pulse 1.9s ease-in-out infinite;
+}
+
+@keyframes scroll-line-pulse {
+  0%, 100% { opacity: 0.25; transform: scaleY(0.4); transform-origin: top; }
+  50% { opacity: 0.9; transform: scaleY(1); transform-origin: top; }
+}
+
+@media (max-width: 560px) {
+  .scroll-hint { bottom: 1.5rem; }
+  .scroll-hint-line { height: 36px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .scroll-hint { display: none; }
+}

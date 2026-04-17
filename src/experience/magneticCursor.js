@@ -8,13 +8,23 @@ const LERP_RING = 0.09;
 
 const INTERACTIVE_SELECTOR = "button, a, [data-magnetic]";
 
-const resolveCursorLabel = (el) => {
+// Cursor narrative: one word per scene
+const SCENE_CURSOR_LABELS = {
+  "prologue-webgl": "scroll",
+  "bloom-wash": "look",
+  "triptych": "explore",
+  "color-field": "breathe",
+  "stillness": "wait",
+  "epilogue": "fall"
+};
+
+const resolveCursorLabel = (el, sceneLabel = "scroll") => {
   if (el.dataset?.cursorLabel) return el.dataset.cursorLabel;
-  if (el.matches?.(".scene-nav-dot")) return el.getAttribute("aria-label")?.replace(/^Scene \d+:\s*/, "") ?? "View";
+  if (el.matches?.(".scene-nav-dot")) return el.getAttribute("aria-label")?.replace(/^Scene \d+:\s*/, "") ?? sceneLabel;
   if (el.matches?.(".motion-toggle")) return "Toggle";
   if (el.matches?.(".sound-toggle")) return "Sound";
   if (el.matches?.("a")) return "Open →";
-  return "View";
+  return sceneLabel;
 };
 
 export const initMagneticCursor = ({ gsap }) => {
@@ -45,6 +55,13 @@ export const initMagneticCursor = ({ gsap }) => {
   const abortController = new AbortController();
   const signal = abortController.signal;
 
+  let currentSceneLabel = "scroll";
+
+  const onSceneEnter = (e) => {
+    currentSceneLabel = SCENE_CURSOR_LABELS[e.detail?.id] ?? "scroll";
+  };
+  document.addEventListener("ct:scene-enter", onSceneEnter, { signal });
+
   const onMouseMove = (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
@@ -66,7 +83,7 @@ export const initMagneticCursor = ({ gsap }) => {
     ring.classList.add("is-magnetic");
 
     if (labelNode) {
-      labelNode.textContent = resolveCursorLabel(target);
+      labelNode.textContent = resolveCursorLabel(target, currentSceneLabel);
     }
   };
 
@@ -75,6 +92,9 @@ export const initMagneticCursor = ({ gsap }) => {
     ring.classList.remove("is-magnetic");
     ringTargetX = mouseX;
     ringTargetY = mouseY;
+    if (labelNode) {
+      labelNode.textContent = currentSceneLabel;
+    }
   };
 
   const onPressDown = () => ring.classList.add("is-pressed");

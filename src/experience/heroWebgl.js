@@ -65,12 +65,20 @@ const VERTEX_SHADER = `
   attribute float aRotSpeed;
   uniform float uTime;
   uniform float uSize;
+  uniform vec2 uMouse;
+  uniform float uRepelRadius;
   varying float vDepth;
   varying float vPhase;
   varying float vRot;
 
   void main() {
-    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    // Cursor repulsion — visual displacement only, physics buffer unchanged
+    vec2 diff = position.xy - uMouse;
+    float dist = length(diff);
+    float repel = smoothstep(uRepelRadius, uRepelRadius * 0.08, dist) * 0.8;
+    vec3 displaced = vec3(position.xy + normalize(diff + vec2(0.0001)) * repel, position.z);
+
+    vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
     vDepth = clamp(-mvPosition.z / 12.0, 0.0, 1.0);
     vPhase = aPhase;
     vRot = uTime * aRotSpeed + aPhase;
@@ -153,7 +161,9 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
         uMap: { value: texture },
         uTime: { value: 0 },
         uSize: { value: petalSize * 100 },
-        uOpacity: { value: 0.95 }
+        uOpacity: { value: 0.95 },
+        uMouse: { value: new THREE.Vector2(999, 999) },
+        uRepelRadius: { value: 1.5 }
       },
       vertexShader: VERTEX_SHADER,
       fragmentShader: FRAGMENT_SHADER,
@@ -294,14 +304,20 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   let pointerY = 0;
   let targetPointerX = 0;
   let targetPointerY = 0;
+  let hasPointer = false;
 
   const handlePointerMove = (event) => {
+    hasPointer = true;
     const bounds = host.getBoundingClientRect();
     if (!bounds.width || !bounds.height) {
       return;
     }
     targetPointerX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
     targetPointerY = ((event.clientY - bounds.top) / bounds.height) * 2 - 1;
+  };
+
+  const handlePointerLeave = () => {
+    hasPointer = false;
   };
 
   let rafId = 0;
@@ -369,6 +385,10 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
 
     if (field.isShader && field.material.uniforms) {
       field.material.uniforms.uTime.value = time * 0.001;
+      field.material.uniforms.uMouse.value.set(
+        hasPointer ? pointerX * (WORLD_WIDTH / 2) : 999,
+        hasPointer ? -pointerY * (WORLD_HEIGHT / 2) : 999
+      );
     }
 
     updatePetals(time, deltaSeconds);
@@ -414,6 +434,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
 
   window.addEventListener("resize", resize);
   host.addEventListener("pointermove", handlePointerMove, { passive: true });
+  host.addEventListener("pointerleave", handlePointerLeave, { passive: true });
   visibilityObserver?.observe(host);
 
   resize();
@@ -431,6 +452,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     visibilityObserver?.disconnect();
     window.removeEventListener("resize", resize);
     host.removeEventListener("pointermove", handlePointerMove);
+    host.removeEventListener("pointerleave", handlePointerLeave);
 
     field.geometry.dispose();
     field.material.dispose();
