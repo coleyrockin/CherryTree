@@ -73,9 +73,10 @@ const VERTEX_SHADER = `
 
   void main() {
     // Cursor repulsion — visual displacement only, physics buffer unchanged
+    // smoothstep requires edge0 < edge1, so we use (1 - smoothstep) for falloff
     vec2 diff = position.xy - uMouse;
     float dist = length(diff);
-    float repel = smoothstep(uRepelRadius, uRepelRadius * 0.08, dist) * 0.8;
+    float repel = (1.0 - smoothstep(uRepelRadius * 0.08, uRepelRadius, dist)) * 0.8;
     vec3 displaced = vec3(position.xy + normalize(diff + vec2(0.0001)) * repel, position.z);
 
     vec4 mvPosition = modelViewMatrix * vec4(displaced, 1.0);
