@@ -54,12 +54,13 @@
   background:
     linear-gradient(180deg, rgba(240, 224, 215, 0.82), rgba(232, 212, 205, 0.93)),
     radial-gradient(circle at 15% 70%, rgba(100, 126, 85, 0.15), rgba(100, 126, 85, 0) 42%);
-  padding: 8vh 4vw;
+  padding: 8vh 0;
 }
 
 .triptych-stage {
   position: relative;
   width: min(1240px, 96vw);
+  margin-inline: auto;
   min-height: min(86vh, 900px);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -352,7 +353,7 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
 
 @media (max-width: 760px) {
   .scene-triptych {
-    padding: 8vh 2.5vw;
+    padding: 8vh 0;
   }
 
   .triptych-stage {
