@@ -567,6 +567,8 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   });
 
   /* ── Per-scene media animation (preset-driven) ─── */
+  const isMobileViewport = window.matchMedia("(max-width: 760px)").matches;
+
   scenes.forEach((scene) => {
     const preset = MOTION_PRESETS[scene.dataset.motionPreset] || DEFAULT_PRESET;
     const id = scene.dataset.ctScene;
@@ -615,9 +617,10 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
       );
     }
 
-    // Text layer counter-parallax: text floats slower than media for depth
+    // Text layer counter-parallax: text floats slower than media for depth.
+    // Disabled on mobile to prevent text drifting into the fixed nav zone.
     const textLayer = scene.querySelector(".scene-text");
-    if (textLayer && id !== "triptych") {
+    if (textLayer && id !== "triptych" && !isMobileViewport) {
       animations.push(
         gsap.fromTo(
           textLayer,

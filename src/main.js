@@ -200,9 +200,23 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress })
 
 /* ── Boot orchestrator ──────────────────────────────────── */
 
+const HARD_PRELOADER_TIMEOUT_MS = 6000;
+
+const forceHidePreloader = () => {
+  document.body.classList.remove("is-loading");
+  const preloaderEl = document.querySelector("[data-ct-preloader]");
+  if (preloaderEl) {
+    preloaderEl.classList.add("is-done");
+  }
+};
+
 const boot = async () => {
   const motion = getMotionPreference();
   document.documentElement.dataset.motion = motion.reduced ? "reduced" : "full";
+
+  // Hard safety timeout — no matter what happens during boot, the preloader
+  // is guaranteed to be gone after this window. Prevents any UI hang.
+  const safetyTimer = window.setTimeout(forceHidePreloader, HARD_PRELOADER_TIMEOUT_MS);
 
   // Start preloader immediately
   const preloader = initPreloader();
@@ -309,6 +323,7 @@ const boot = async () => {
     gsapForPreloader = sceneResult.gsap;
   }
   await preloader.exit(gsapForPreloader);
+  window.clearTimeout(safetyTimer);
 
   // Motion toggle with live re-init
   stableCleanup.push(
@@ -341,10 +356,7 @@ const boot = async () => {
 
 const handleBootError = (error) => {
   console.error("Cherry Tree failed to initialize:", error);
-  // Ensure preloader exits even on error
-  document.body.classList.remove("is-loading");
-  const preloaderEl = document.querySelector("[data-ct-preloader]");
-  if (preloaderEl) preloaderEl.classList.add("is-done");
+  forceHidePreloader();
 };
 
 if (document.readyState === "loading") {

@@ -243,17 +243,6 @@
     0 30px 90px rgba(81, 44, 56, 0.22);
 }
 
-.epilogue-mark {
-  display: block;
-  font-family: "Bodoni Moda", serif;
-  font-size: clamp(2.2rem, 4.4vw, 3.4rem);
-  color: rgba(49, 30, 33, 0.38);
-  letter-spacing: 0;
-  line-height: 1;
-  margin-bottom: clamp(18px, 2.6vw, 30px);
-  opacity: 0.85;
-}
-
 .epilogue-sign {
   margin-top: clamp(22px, 3vw, 34px);
   font-family: "Bodoni Moda", serif;
@@ -378,10 +367,6 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   .color-field {
     width: 96vw;
     height: 62vh;
-  }
-
-  .scene-triptych .scene-text {
-    padding-top: 72px;
   }
 }
 
@@ -509,7 +494,7 @@ html[data-motion="reduced"] .epilogue-subtitle {
 .scene-triptych .scene-text {
   z-index: 5;
   justify-content: flex-start;
-  padding-top: 3vh;
+  padding-top: max(88px, 4vh);
 }
 
 @media (max-width: 860px) {
@@ -540,11 +525,6 @@ html[data-motion="reduced"] .epilogue-subtitle {
   .scene-kicker {
     font-size: 0.62rem;
     letter-spacing: 0.28em;
-  }
-
-  .epilogue-mark {
-    font-size: clamp(1.8rem, 8vw, 2.6rem);
-    margin-bottom: 14px;
   }
 
   .epilogue-sign {
