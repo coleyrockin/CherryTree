@@ -16,9 +16,9 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of the six scenes carries its own color temperature and editorial numerals — the whole thing transitions like a cut between shots.
+Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of the six scenes carries its own color temperature — the whole thing transitions like a cut between shots.
 
-Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline.
+Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline. Tuned across iPhone portrait, landscape, tablet, desktop, and ultrawide.
 
 ## Stack
 
@@ -34,11 +34,12 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 ## What's under the hood
 
 - **Custom ShaderMaterial** — per-petal UV rotation, depth-of-field color shift, additive light-speck layer; ~400 particles on desktop
-- **FLIP preloader** — brand text measures its position, animates directly into the hero title via `expo.inOut`, no clone hack
+- **FLIP preloader** — brand text measures its position, animates directly into the hero title via `expo.inOut`, no clone hack. Hard 6s safety timeout guarantees the loader never hangs.
 - **Scene tinting** — `IntersectionObserver` tracks which scene occupies the most viewport and dispatches `--scene-tint`, `--scene-ink`, `--scene-grain` CSS vars in real time
-- **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger` scrub
+- **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger` scrub (suppressed on ≤760px to keep mobile scrolling smooth)
 - **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows contextual label
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL; user-overridable toggle at runtime without reload
+- **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px up through 1920px
 
 ## Performance
 
