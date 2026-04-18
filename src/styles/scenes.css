@@ -313,7 +313,7 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   font-size: clamp(0.85rem, 2vw, 1.2rem);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.5);
+  color: rgba(49, 30, 33, 0.72);
   opacity: 0;
 }
 
@@ -388,6 +388,21 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
 
 .scene-text-hero {
   z-index: 4;
+  position: relative;
+}
+
+.scene-text-hero::before {
+  content: "";
+  position: absolute;
+  inset: -10% -20%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 238, 230, 0.32) 0%,
+    rgba(255, 238, 230, 0.14) 35%,
+    rgba(255, 238, 230, 0) 65%
+  );
+  z-index: -1;
+  pointer-events: none;
 }
 
 .scene-title {
@@ -440,16 +455,18 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
   font-size: clamp(0.85rem, 1.8vw, 1.1rem);
   font-weight: 400;
-  letter-spacing: 0.06em;
-  color: rgba(49, 30, 33, 0.54);
-  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.7);
+  letter-spacing: 0.08em;
+  color: rgba(49, 30, 33, 0.78);
+  text-shadow:
+    0 2px 20px rgba(247, 233, 224, 0.85),
+    0 1px 0 rgba(255, 249, 243, 0.4);
   line-height: 1.4;
 }
 
 .scene-text-hero .scene-subtitle {
   font-size: clamp(0.9rem, 2vw, 1.25rem);
-  letter-spacing: 0.1em;
-  color: rgba(49, 30, 33, 0.58);
+  letter-spacing: 0.12em;
+  color: rgba(49, 30, 33, 0.82);
 }
 
 /* Character split spans */

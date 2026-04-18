@@ -63,6 +63,18 @@ const initHeroTextAnimation = (gsap) => {
     });
     animations.push(entranceTl);
 
+    // Idle breathing: after entrance completes, begin subtle scale pulse
+    const idleBreath = gsap.to(titleEl, {
+      scale: 1.008,
+      duration: 5.5,
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+      delay: 8,
+      transformOrigin: "center center"
+    });
+    animations.push(idleBreath);
+
     // Exit on scroll: fade out + drift up
     animations.push(
       gsap.to(heroText, {
@@ -83,7 +95,7 @@ const initHeroTextAnimation = (gsap) => {
     gsap.set(subtitleEl, { opacity: 0, y: 20 });
     const subtitleTl = gsap.timeline({ delay: 1.2 });
     subtitleTl.to(subtitleEl, {
-      opacity: 0.58,
+      opacity: 1,
       y: 0,
       duration: 1,
       ease: "power2.out"
@@ -94,7 +106,7 @@ const initHeroTextAnimation = (gsap) => {
   // Scroll hint: fade in after hero text, fade out immediately on scroll
   const scrollHint = document.querySelector(".scroll-hint");
   if (scrollHint) {
-    const hintTl = gsap.timeline({ delay: 3 });
+    const hintTl = gsap.timeline({ delay: 1.5 });
     hintTl.fromTo(
       scrollHint,
       { opacity: 0, y: 10 },
@@ -169,7 +181,7 @@ const initSceneTextAnimations = (gsap, ScrollTrigger) => {
           subtitleEl,
           { opacity: 0, y: 16 },
           {
-            opacity: 0.54,
+            opacity: 1,
             y: 0,
             ease: "power2.out",
             scrollTrigger: {

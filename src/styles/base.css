@@ -1,3 +1,9 @@
+@property --scene-tint {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ef8bb0;
+}
+
 :root {
   --bg-0: #f7efe7;
   --bg-1: #f2e2d8;
@@ -20,6 +26,11 @@
   --scene-tint: #ef8bb0;
   --scene-ink: #2d1e24;
   --scene-grain: rgba(68, 43, 51, 0.28);
+  transition: --scene-tint 900ms var(--ease-gallery);
+}
+
+html[data-motion="reduced"] {
+  transition: none;
 }
 
 * {
@@ -51,6 +62,30 @@ body::before {
   background:
     radial-gradient(circle at 15% 30%, rgba(255, 243, 231, 0.34), rgba(255, 243, 231, 0) 42%),
     radial-gradient(circle at 82% 70%, rgba(213, 117, 150, 0.2), rgba(213, 117, 150, 0) 44%);
+}
+
+.scene-bloom {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    var(--scene-tint) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  transition: opacity 650ms var(--ease-gallery);
+  will-change: opacity;
+}
+
+.scene-bloom.is-blooming {
+  opacity: 0.55;
+}
+
+html[data-motion="reduced"] .scene-bloom {
+  display: none;
 }
 
 .film-grain {
@@ -184,7 +219,7 @@ html[data-motion="reduced"] .marquee-ribbon {
 .sound-toggle,
 .motion-toggle {
   pointer-events: auto;
-  border: 1px solid rgba(84, 51, 59, 0.32);
+  border: 1px solid rgba(49, 30, 33, 0.22);
   border-radius: 999px;
   padding: 9px 14px;
   min-width: 102px;
@@ -192,14 +227,14 @@ html[data-motion="reduced"] .marquee-ribbon {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: rgba(41, 26, 32, 0.82);
-  background: rgba(253, 246, 240, 0.82);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 28px rgba(81, 49, 59, 0.16);
+  color: rgba(41, 26, 32, 0.7);
+  background: transparent;
+  backdrop-filter: blur(4px);
+  box-shadow: none;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.68rem;
-  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-size: 0.66rem;
+  font-weight: 500;
   transition:
     color var(--dur-quick) var(--ease-gallery),
     transform var(--dur-quick) var(--ease-gallery),
@@ -216,9 +251,9 @@ html[data-motion="reduced"] .marquee-ribbon {
 .motion-toggle:hover,
 .motion-toggle:focus-visible {
   color: var(--ink);
-  transform: translateY(-2px);
-  border-color: rgba(84, 51, 59, 0.44);
-  background: rgba(255, 248, 243, 0.9);
+  transform: translateY(-1px);
+  border-color: rgba(49, 30, 33, 0.42);
+  background: rgba(253, 246, 240, 0.45);
 }
 
 .sound-toggle:focus-visible,

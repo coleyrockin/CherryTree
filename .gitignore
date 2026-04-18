@@ -20,3 +20,6 @@ yarn-error.log*
 .idea/
 .claude/
 .vercel
+
+# playwright MCP session files
+.playwright-mcp/

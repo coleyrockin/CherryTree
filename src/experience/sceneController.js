@@ -203,6 +203,18 @@ const initScrollProgress = (gsap, ScrollTrigger) => {
 
 /* ── Scene color transitions ────────────────────────────── */
 
+let bloomTimer = null;
+const triggerSceneBloom = () => {
+  const bloom = document.querySelector("[data-ct-scene-bloom]");
+  if (!bloom) return;
+  bloom.classList.add("is-blooming");
+  if (bloomTimer) clearTimeout(bloomTimer);
+  bloomTimer = setTimeout(() => {
+    bloom.classList.remove("is-blooming");
+  }, 400);
+};
+
+let lastTintedSceneId = null;
 const applySceneTint = (scene) => {
   const root = document.documentElement;
   if (scene.tint) root.style.setProperty("--scene-tint", scene.tint);
@@ -216,6 +228,12 @@ const applySceneTint = (scene) => {
 
   // Per-scene document title
   document.title = scene.label ? `${scene.label} — Cherry Tree` : "Cherry Tree";
+
+  // Color-bloom flash on scene transition (not on initial load)
+  if (lastTintedSceneId && lastTintedSceneId !== scene.id) {
+    triggerSceneBloom();
+  }
+  lastTintedSceneId = scene.id;
 
   // Broadcast scene change so cursor labels and other modules can react
   document.dispatchEvent(
