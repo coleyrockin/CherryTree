@@ -26,28 +26,68 @@
   opacity: 0.1;
 }
 
-.scene-bloom {
-  background: #f2ddd6;
+/* Use a more specific selector to avoid collision with the body .scene-bloom overlay */
+.scene.scene-bloom {
+  background:
+    radial-gradient(85% 100% at 50% 36%, rgba(255, 215, 228, 0.6), rgba(255, 215, 228, 0) 60%),
+    radial-gradient(70% 80% at 18% 88%, rgba(200, 120, 150, 0.28), rgba(200, 120, 150, 0) 68%),
+    linear-gradient(188deg, #f5dcd3 0%, #eec9c4 52%, #d7a9b5 100%);
+  overflow: hidden;
 }
 
-.scene-bloom .scene-media {
+.scene.scene-bloom .scene-media {
   z-index: 1;
   clip-path: circle(0% at 50% 50%);
 }
 
-.scene-bloom .scene-media.is-revealed {
-  clip-path: circle(75% at 50% 50%);
+.scene.scene-bloom .scene-media.is-revealed {
+  clip-path: circle(78% at 50% 50%);
 }
 
-.scene-bloom::after {
+.scene.scene-bloom .scene-media img {
+  filter: saturate(1.06) contrast(1.04) brightness(0.95);
+}
+
+/* Top vignette — frames the scene, keeps nav legible */
+.scene.scene-bloom::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 3;
   pointer-events: none;
   background:
-    linear-gradient(0deg, rgba(252, 242, 235, 0.1), rgba(252, 242, 235, 0.35)),
-    radial-gradient(circle at 70% 30%, rgba(255, 214, 225, 0.26), rgba(255, 214, 225, 0) 45%);
+    linear-gradient(180deg, rgba(55, 22, 36, 0.34) 0%, rgba(55, 22, 36, 0) 22%),
+    linear-gradient(0deg, rgba(80, 36, 54, 0.2) 0%, rgba(80, 36, 54, 0) 26%);
+}
+
+/* Soft atmospheric glow — doesn't wash out the title */
+.scene.scene-bloom::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 36% at 50% 44%, rgba(255, 208, 220, 0.44), rgba(255, 208, 220, 0) 70%),
+    radial-gradient(55% 45% at 72% 22%, rgba(255, 196, 210, 0.26), rgba(255, 196, 210, 0) 72%);
+  mix-blend-mode: soft-light;
+}
+
+.scene.scene-bloom .scene-title {
+  color: rgba(44, 18, 28, 0.96);
+  text-shadow:
+    0 4px 32px rgba(255, 228, 236, 0.72),
+    0 2px 0 rgba(255, 248, 244, 0.5),
+    0 1px 4px rgba(55, 18, 34, 0.2);
+}
+
+.scene.scene-bloom .scene-subtitle {
+  color: rgba(44, 18, 28, 0.68);
+  text-shadow: 0 2px 18px rgba(255, 228, 236, 0.65);
+}
+
+html[data-motion="reduced"] .scene.scene-bloom .scene-media {
+  clip-path: none !important;
 }
 
 .scene-triptych {
@@ -583,7 +623,7 @@ html[data-motion="reduced"] .epilogue-subtitle {
 }
 
 /* Reduced motion: clip-path reveals visible immediately */
-html[data-motion="reduced"] .scene-bloom .scene-media,
+html[data-motion="reduced"] .scene.scene-bloom .scene-media,
 html[data-motion="reduced"] .scene-stillness .scene-media {
   clip-path: none !important;
 }
