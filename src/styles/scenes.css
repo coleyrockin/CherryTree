@@ -26,14 +26,20 @@
   opacity: 0.1;
 }
 
-/* Bloom — cherry blossom scene. Periwinkle-blue sky + hot pink petals.
-   Background matches the photo so the circle-reveal feels seamless. */
+/* Bloom — cherry blossom photo speaks for itself. No overlays dulling it.
+   The body-level .scene-bloom overlay rule (base.css) leaks fixed/z-index:-3/
+   mix-blend-mode:soft-light onto this section because the class name collides.
+   Explicitly reset every property that rule sets. */
 .scene.scene-bloom {
+  position: relative;
+  inset: auto;
+  z-index: auto;
+  mix-blend-mode: normal;
+  opacity: 1;
+  pointer-events: auto;
   background:
-    radial-gradient(110% 80% at 78% 70%, rgba(255, 168, 206, 0.88), rgba(255, 168, 206, 0) 52%),
-    radial-gradient(90% 100% at 12% 18%, rgba(196, 218, 240, 0.82), rgba(196, 218, 240, 0) 55%),
-    radial-gradient(60% 55% at 55% 45%, rgba(255, 200, 225, 0.5), rgba(255, 200, 225, 0) 60%),
-    linear-gradient(155deg, #cee0f4 0%, #e8c6d8 42%, #f5a8c2 78%, #e8789e 100%);
+    radial-gradient(90% 100% at 15% 20%, #c6dcf2 0%, rgba(198, 220, 242, 0) 60%),
+    linear-gradient(150deg, #cee0f4 0%, #e8c0d4 50%, #f090b2 100%);
   overflow: hidden;
 }
 
@@ -43,61 +49,33 @@
 }
 
 .scene.scene-bloom .scene-media.is-revealed {
-  clip-path: circle(80% at 50% 50%);
+  clip-path: circle(85% at 50% 50%);
 }
 
-/* Let the image colors shine — no muting */
+/* No filter — the photo is already gorgeous */
 .scene.scene-bloom .scene-media img {
-  filter: saturate(1.1) contrast(1.02) brightness(1.04);
+  filter: saturate(1.08) contrast(1.04);
 }
 
-/* Fade the heavy scene-matte for Bloom — photo speaks for itself */
+/* Kill the scene-matte completely on Bloom — it was the main color-muter */
 .scene.scene-bloom .scene-matte {
-  background:
-    linear-gradient(180deg,
-      rgba(195, 215, 238, 0.05) 0%,
-      rgba(240, 205, 220, 0.06) 55%,
-      rgba(55, 24, 38, 0.14) 100%);
+  display: none;
 }
 
-/* Whisper of light at the edges — no dark vignette */
-.scene.scene-bloom::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255, 230, 242, 0.18) 0%, rgba(255, 230, 242, 0) 65%);
-}
-
-/* Luminous petal-pink screen glow — adds warmth without muddying */
-.scene.scene-bloom::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  background:
-    radial-gradient(55% 45% at 68% 28%, rgba(255, 180, 210, 0.35), rgba(255, 180, 210, 0) 65%),
-    radial-gradient(45% 55% at 28% 72%, rgba(200, 225, 248, 0.28), rgba(200, 225, 248, 0) 60%);
-  mix-blend-mode: screen;
-}
-
-/* White text — legible over both the pink petals and blue sky */
+/* White title that pops against both sky and blossoms */
 .scene.scene-bloom .scene-title {
-  color: rgba(255, 248, 252, 0.97);
+  color: #ffffff;
   text-shadow:
-    0 2px 28px rgba(210, 90, 145, 0.55),
-    0 1px 0 rgba(255, 255, 255, 0.35),
-    0 4px 14px rgba(28, 10, 22, 0.28);
+    0 2px 10px rgba(180, 60, 110, 0.55),
+    0 4px 24px rgba(30, 12, 26, 0.4),
+    0 0 2px rgba(255, 255, 255, 0.6);
 }
 
 .scene.scene-bloom .scene-subtitle {
-  color: rgba(255, 240, 248, 0.88);
+  color: rgba(255, 248, 252, 0.92);
   text-shadow:
-    0 1px 16px rgba(200, 80, 135, 0.5),
-    0 2px 8px rgba(20, 8, 18, 0.22);
+    0 1px 8px rgba(160, 50, 100, 0.5),
+    0 2px 14px rgba(22, 10, 20, 0.32);
 }
 
 html[data-motion="reduced"] .scene.scene-bloom .scene-media {
