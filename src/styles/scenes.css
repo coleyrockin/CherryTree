@@ -26,44 +26,35 @@
   opacity: 0.1;
 }
 
-/* Bloom — cherry blossom photo speaks for itself. No overlays dulling it.
-   The body-level .scene-bloom overlay rule (base.css) leaks fixed/z-index:-3/
-   mix-blend-mode:soft-light onto this section because the class name collides.
-   Explicitly reset every property that rule sets. */
-.scene.scene-bloom {
-  position: relative;
-  inset: auto;
-  z-index: auto;
-  mix-blend-mode: normal;
-  opacity: 1;
-  pointer-events: auto;
+/* Bloom — cherry blossom photo speaks for itself. */
+.scene-bloom {
   background:
     radial-gradient(90% 100% at 15% 20%, #c6dcf2 0%, rgba(198, 220, 242, 0) 60%),
     linear-gradient(150deg, #cee0f4 0%, #e8c0d4 50%, #f090b2 100%);
   overflow: hidden;
 }
 
-.scene.scene-bloom .scene-media {
+.scene-bloom .scene-media {
   z-index: 1;
   clip-path: circle(0% at 50% 50%);
 }
 
-.scene.scene-bloom .scene-media.is-revealed {
+.scene-bloom .scene-media.is-revealed {
   clip-path: circle(85% at 50% 50%);
 }
 
 /* No filter — the photo is already gorgeous */
-.scene.scene-bloom .scene-media img {
+.scene-bloom .scene-media img {
   filter: saturate(1.08) contrast(1.04);
 }
 
 /* Kill the scene-matte completely on Bloom — it was the main color-muter */
-.scene.scene-bloom .scene-matte {
+.scene-bloom .scene-matte {
   display: none;
 }
 
 /* White title that pops against both sky and blossoms */
-.scene.scene-bloom .scene-title {
+.scene-bloom .scene-title {
   color: #ffffff;
   text-shadow:
     0 2px 10px rgba(180, 60, 110, 0.55),
@@ -71,14 +62,14 @@
     0 0 2px rgba(255, 255, 255, 0.6);
 }
 
-.scene.scene-bloom .scene-subtitle {
+.scene-bloom .scene-subtitle {
   color: rgba(255, 248, 252, 0.92);
   text-shadow:
     0 1px 8px rgba(160, 50, 100, 0.5),
     0 2px 14px rgba(22, 10, 20, 0.32);
 }
 
-html[data-motion="reduced"] .scene.scene-bloom .scene-media {
+html[data-motion="reduced"] .scene-bloom .scene-media {
   clip-path: none !important;
 }
 
@@ -615,7 +606,7 @@ html[data-motion="reduced"] .epilogue-subtitle {
 }
 
 /* Reduced motion: clip-path reveals visible immediately */
-html[data-motion="reduced"] .scene.scene-bloom .scene-media,
+html[data-motion="reduced"] .scene-bloom .scene-media,
 html[data-motion="reduced"] .scene-stillness .scene-media {
   clip-path: none !important;
 }

@@ -65,7 +65,7 @@ body::before {
     radial-gradient(circle at 82% 70%, rgba(213, 117, 150, 0.2), rgba(213, 117, 150, 0) 44%);
 }
 
-.scene-bloom {
+.scene-tint-flash {
   position: fixed;
   inset: 0;
   z-index: -3;
@@ -81,11 +81,11 @@ body::before {
   will-change: opacity;
 }
 
-.scene-bloom.is-blooming {
+.scene-tint-flash.is-blooming {
   opacity: 0.55;
 }
 
-html[data-motion="reduced"] .scene-bloom {
+html[data-motion="reduced"] .scene-tint-flash {
   display: none;
 }
 
