@@ -121,46 +121,6 @@ const initCursorGlow = () => {
   };
 };
 
-/* ── Image scene clip-path reveal ──────────────────────────── */
-
-const initClipPathReveals = (gsap, ScrollTrigger) => {
-  const animations = [];
-
-  // Apply to bloom and stillness scenes
-  ["bloom-wash", "stillness"].forEach((id) => {
-    const scene = document.querySelector(`[data-ct-scene="${id}"]`);
-    if (!scene) {
-      return;
-    }
-
-    const media = scene.querySelector("[data-scene-media]");
-    if (!media) {
-      return;
-    }
-
-    animations.push(
-      gsap.fromTo(
-        media,
-        { clipPath: "inset(12% 8% 12% 8% round 28px)" },
-        {
-          clipPath: "inset(0% 0% 0% 0% round 0px)",
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: scene,
-            start: "top 80%",
-            end: "top 20%",
-            scrub: 0.8
-          }
-        }
-      )
-    );
-  });
-
-  return () => {
-    animations.forEach((a) => a.kill());
-  };
-};
-
 /* ── Enhanced scroll progress with glow pulse ──────────────── */
 
 const initScrollProgressGlow = (gsap, ScrollTrigger) => {
