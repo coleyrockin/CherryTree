@@ -12,7 +12,7 @@
 
 ---
 
-![Cherry Tree — Prologue](./.github/preview/cherrytree-hero.png)
+![Cherry Tree — Prologue](./docs/screenshot.jpg)
 
 ---
 
