@@ -203,19 +203,35 @@ const initScrollProgress = (gsap, ScrollTrigger) => {
 
 /* ── Scene color transitions ────────────────────────────── */
 
-let bloomTimer = null;
-const triggerSceneBloom = () => {
-  const bloom = document.querySelector("[data-ct-scene-bloom]");
-  if (!bloom) return;
-  bloom.classList.add("is-blooming");
-  if (bloomTimer) clearTimeout(bloomTimer);
-  bloomTimer = setTimeout(() => {
-    bloom.classList.remove("is-blooming");
-  }, 400);
+const createSceneBloomTrigger = () => {
+  let bloomTimer = null;
+
+  const trigger = () => {
+    const bloom = document.querySelector("[data-ct-scene-bloom]");
+    if (!bloom) return;
+
+    bloom.classList.add("is-blooming");
+    if (bloomTimer) {
+      clearTimeout(bloomTimer);
+    }
+
+    bloomTimer = window.setTimeout(() => {
+      bloom.classList.remove("is-blooming");
+    }, 400);
+  };
+
+  const dispose = () => {
+    if (bloomTimer) {
+      clearTimeout(bloomTimer);
+      bloomTimer = null;
+    }
+  };
+
+  return { trigger, dispose };
 };
 
 let lastTintedSceneId = null;
-const applySceneTint = (scene) => {
+const applySceneTint = (scene, triggerBloom = null) => {
   const root = document.documentElement;
   if (scene.tint) root.style.setProperty("--scene-tint", scene.tint);
   if (scene.ink) root.style.setProperty("--scene-ink", scene.ink);
@@ -231,7 +247,7 @@ const applySceneTint = (scene) => {
 
   // Color-bloom flash on scene transition (not on initial load)
   if (lastTintedSceneId && lastTintedSceneId !== scene.id) {
-    triggerSceneBloom();
+    triggerBloom?.();
   }
   lastTintedSceneId = scene.id;
 
@@ -246,6 +262,7 @@ const applySceneTint = (scene) => {
 // creation-time firing issue where all onEnter callbacks run in creation order.
 const initTintObserver = (manifest) => {
   applySceneTint(manifest[0]);
+  const bloomTrigger = createSceneBloomTrigger();
 
   if (!("IntersectionObserver" in window)) {
     return () => {};
@@ -282,7 +299,7 @@ const initTintObserver = (manifest) => {
         const scene = sceneByEl.get(bestEl);
         if (scene && scene.id !== activeId) {
           activeId = scene.id;
-          applySceneTint(scene);
+          applySceneTint(scene, bloomTrigger.trigger);
         }
       }
     },
@@ -291,7 +308,10 @@ const initTintObserver = (manifest) => {
 
   sceneByEl.forEach((_scene, el) => observer.observe(el));
 
-  return () => observer.disconnect();
+  return () => {
+    observer.disconnect();
+    bloomTrigger.dispose();
+  };
 };
 
 const initColorTransitions = (manifest, gsap, ScrollTrigger) => {

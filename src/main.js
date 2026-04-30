@@ -51,6 +51,22 @@ const applySceneManifest = (manifest) => {
   });
 };
 
+const disposeResource = (resource) => {
+  if (typeof resource === "function") {
+    resource();
+    return;
+  }
+  if (resource && typeof resource.dispose === "function") {
+    resource.dispose();
+  }
+};
+
+const disposeCollection = (collection) => {
+  collection.splice(0).forEach((resource) => {
+    disposeResource(resource);
+  });
+};
+
 /* ── Live motion toggle (no reload) ─────────────────────── */
 
 const initMotionToggle = ({ mode, reduced, prefersReduced, onToggle }) => {
@@ -112,12 +128,14 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress })
   }
 
   let started = false;
+  let startScheduled = false;
+  let cancelled = false;
   let timeoutId = 0;
   let idleId = 0;
   let observer = null;
 
   const start = async () => {
-    if (started) {
+    if (started || cancelled) {
       return;
     }
     started = true;
@@ -142,9 +160,10 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress })
   };
 
   const scheduleStart = () => {
-    if (started) {
+    if (started || startScheduled || cancelled) {
       return;
     }
+    startScheduled = true;
 
     if (typeof window.requestIdleCallback === "function") {
       idleId = window.requestIdleCallback(
@@ -188,6 +207,7 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress })
   }
 
   cleanup.push(() => {
+    cancelled = true;
     if (timeoutId) {
       window.clearTimeout(timeoutId);
     }
@@ -230,13 +250,19 @@ const boot = async () => {
 
   // Mutable cleanup array for motion-dependent resources
   let motionCleanup = [];
+  let motionInitToken = 0;
 
   const initMotionDependentSystems = async (reducedMotion) => {
+    const initToken = ++motionInitToken;
+    const pendingCleanup = [];
+    const registerCleanup = (resource) => {
+      pendingCleanup.push(resource);
+      return resource;
+    };
+    const isStale = () => initToken !== motionInitToken;
+
     // Tear down previous motion-dependent systems
-    motionCleanup.splice(0).forEach((dispose) => {
-      if (typeof dispose === "function") dispose();
-      else if (dispose && typeof dispose.dispose === "function") dispose.dispose();
-    });
+    disposeCollection(motionCleanup);
 
     // Remove stale state classes from scenes
     document.querySelectorAll(".scene").forEach((scene) => {
@@ -259,31 +285,47 @@ const boot = async () => {
       import("./experience/scrollEffects")
     ]);
 
+    if (isStale()) {
+      disposeCollection(pendingCleanup);
+      return;
+    }
+
     preloader.onProgress(0.3);
 
-    motionCleanup.push(initLazySceneMedia(sceneManifest));
+    registerCleanup(initLazySceneMedia(sceneManifest));
 
     const sceneResult = await initSceneController({
       manifest: sceneManifest,
       reducedMotion
     });
 
-    // sceneResult is { dispose, gsap?, ScrollTrigger?, lenis?, velocityTracker? }
-    motionCleanup.push(sceneResult);
+    if (isStale()) {
+      disposeResource(sceneResult);
+      disposeCollection(pendingCleanup);
+      return;
+    }
 
-    motionCleanup.push(
+    // sceneResult is { dispose, gsap?, ScrollTrigger?, lenis?, velocityTracker? }
+    registerCleanup(sceneResult);
+
+    registerCleanup(
       await initTextAnimations({ reducedMotion })
     );
-    motionCleanup.push(
+    registerCleanup(
       await initScrollEffects({ reducedMotion })
     );
+
+    if (isStale()) {
+      disposeCollection(pendingCleanup);
+      return;
+    }
 
     preloader.onProgress(0.6);
 
     initDeferredHeroWebgl({
       reducedMotion,
       heroHost,
-      cleanup: motionCleanup,
+      cleanup: pendingCleanup,
       onProgress: (v) => preloader.onProgress(0.6 + v * 0.3)
     });
 
@@ -293,23 +335,29 @@ const boot = async () => {
 
       // Scroll velocity visual effects
       const { initScrollVelocityFx } = await import("./experience/scrollVelocityFx");
-      motionCleanup.push(initScrollVelocityFx({ velocityTracker, gsap }));
+      registerCleanup(initScrollVelocityFx({ velocityTracker, gsap }));
 
       // Scene navigation dots
       const { initSceneNav } = await import("./experience/sceneNav");
-      motionCleanup.push(
+      registerCleanup(
         initSceneNav({ manifest: sceneManifest, gsap, ScrollTrigger, lenis })
       );
 
       // Magnetic cursor
       const { initMagneticCursor } = await import("./experience/magneticCursor");
-      motionCleanup.push(initMagneticCursor({ gsap }));
+      registerCleanup(initMagneticCursor({ gsap }));
 
       // Micro-interactions (spring hover)
       const { initMicroInteractions } = await import("./experience/microInteractions");
-      motionCleanup.push(initMicroInteractions({ gsap }));
+      registerCleanup(initMicroInteractions({ gsap }));
     }
 
+    if (isStale()) {
+      disposeCollection(pendingCleanup);
+      return;
+    }
+
+    motionCleanup = pendingCleanup;
     preloader.onProgress(0.95);
   };
 
@@ -344,10 +392,7 @@ const boot = async () => {
   );
 
   const runCleanup = () => {
-    motionCleanup.splice(0).forEach((dispose) => {
-      if (typeof dispose === "function") dispose();
-      else if (dispose && typeof dispose.dispose === "function") dispose.dispose();
-    });
+    disposeCollection(motionCleanup);
     stableCleanup.splice(0).forEach((dispose) => dispose?.());
   };
 

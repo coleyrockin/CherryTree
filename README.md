@@ -7,12 +7,12 @@
 ![Three.js](https://img.shields.io/badge/Three.js-r181-000?style=flat&logo=threedotjs&logoColor=white)
 ![GSAP](https://img.shields.io/badge/GSAP-3.13-88CE02?style=flat&logo=greensock&logoColor=black)
 ![Lenis](https://img.shields.io/badge/Lenis-1.3-111?style=flat)
-![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ---
 
-![Cherry Tree — Prologue](./docs/screenshot.jpg)
+![Cherry Tree — Prologue](./public/assets/images/generated/prologue-fallback-1920.jpg)
 
 ---
 
@@ -33,8 +33,8 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 
 <table>
   <tr>
-    <td><img src="./.github/preview/cherrytree-bloom.png" alt="Bloom scene" /></td>
-    <td><img src="./.github/preview/cherrytree-triptych.png" alt="Triptych scene" /></td>
+    <td><img src="./public/assets/images/generated/bloom-wash-1920.jpg" alt="Bloom scene" /></td>
+    <td><img src="./public/assets/images/generated/triptych-b-1920.jpg" alt="Triptych scene" /></td>
   </tr>
   <tr>
     <td align="center"><sub>02 — Bloom</sub></td>
@@ -68,12 +68,12 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 
 ## Performance
 
-Build output (gzipped): Three.js ~188 KB · GSAP ~45 KB · Lenis ~5 KB · app ~15 KB.
+Build output (gzipped, Vite 8): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · app ~14 KB.
 Three.js defers behind `IntersectionObserver` + `requestIdleCallback` — it never touches first paint.
 
 ## Mobile
 
-<img src="./.github/preview/cherrytree-mobile.png" alt="Cherry Tree on iPhone" width="280" />
+<img src="./public/assets/images/generated/stillness-1280.jpg" alt="Cherry Tree on iPhone" width="280" />
 
 Polished pass across all iPhone sizes. The hero title is constrained by viewport height in landscape, by clamp ceilings in portrait. Velocity parallax, magnetic cursor, and the desktop scene-rail are suppressed below 760px.
 

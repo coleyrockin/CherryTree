@@ -1,10 +1,32 @@
+import {
+  AdditiveBlending,
+  AmbientLight,
+  BufferAttribute,
+  BufferGeometry,
+  CanvasTexture,
+  DirectionalLight,
+  Fog,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  NormalBlending,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Points,
+  PointsMaterial,
+  Scene,
+  ShaderMaterial,
+  SRGBColorSpace,
+  Vector2,
+  WebGLRenderer
+} from "three";
+
 const PETAL_COUNT_DESKTOP = 400;
 const PETAL_COUNT_MOBILE = 200;
 const PETAL_SIZE_DESKTOP = 0.22;
 const PETAL_SIZE_MOBILE = 0.18;
 const WORLD_WIDTH = 6.8;
 const WORLD_HEIGHT = 8;
-let threeModulePromise;
 
 const isMobileDevice = () =>
   window.matchMedia("(max-width: 760px)").matches || navigator.maxTouchPoints > 1;
@@ -21,14 +43,7 @@ const supportsWebGL = () => {
   }
 };
 
-const loadThree = async () => {
-  if (!threeModulePromise) {
-    threeModulePromise = import("three");
-  }
-  return threeModulePromise;
-};
-
-const createPetalTexture = (THREE) => {
+const createPetalTexture = () => {
   const canvas = document.createElement("canvas");
   canvas.width = 256;
   canvas.height = 256;
@@ -49,7 +64,7 @@ const createPetalTexture = (THREE) => {
   ctx.ellipse(128, 128, 84, 104, Math.PI / 8, 0, Math.PI * 2);
   ctx.fill();
 
-  const texture = new THREE.CanvasTexture(canvas);
+  const texture = new CanvasTexture(canvas);
   texture.anisotropy = 4;
   texture.needsUpdate = true;
   return texture;
@@ -130,8 +145,8 @@ const FRAGMENT_SHADER = `
   }
 `;
 
-const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
-  const geometry = new THREE.BufferGeometry();
+const createPetalField = ({ petalCount, petalSize, useShader }) => {
+  const geometry = new BufferGeometry();
   const positions = new Float32Array(petalCount * 3);
   const phases = new Float32Array(petalCount);
   const speeds = new Float32Array(petalCount);
@@ -147,45 +162,45 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
     rotSpeeds[i] = randomBetween(-1.2, 1.2);
   }
 
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("position", new BufferAttribute(positions, 3));
 
-  const texture = createPetalTexture(THREE);
+  const texture = createPetalTexture();
   let material;
 
   if (useShader && texture) {
-    geometry.setAttribute("aPhase", new THREE.BufferAttribute(phases, 1));
-    geometry.setAttribute("aSpeed", new THREE.BufferAttribute(speeds, 1));
-    geometry.setAttribute("aRotSpeed", new THREE.BufferAttribute(rotSpeeds, 1));
+    geometry.setAttribute("aPhase", new BufferAttribute(phases, 1));
+    geometry.setAttribute("aSpeed", new BufferAttribute(speeds, 1));
+    geometry.setAttribute("aRotSpeed", new BufferAttribute(rotSpeeds, 1));
 
-    material = new THREE.ShaderMaterial({
+    material = new ShaderMaterial({
       uniforms: {
         uMap: { value: texture },
         uTime: { value: 0 },
         uSize: { value: petalSize * 100 },
         uOpacity: { value: 0.95 },
-        uMouse: { value: new THREE.Vector2(999, 999) },
+        uMouse: { value: new Vector2(999, 999) },
         uRepelRadius: { value: 1.5 }
       },
       vertexShader: VERTEX_SHADER,
       fragmentShader: FRAGMENT_SHADER,
       transparent: true,
       depthWrite: false,
-      blending: THREE.NormalBlending
+      blending: NormalBlending
     });
   } else {
-    material = new THREE.PointsMaterial({
+    material = new PointsMaterial({
       color: 0xfdd7e4,
       size: petalSize,
       map: texture ?? undefined,
       transparent: true,
       opacity: 0.95,
       depthWrite: false,
-      blending: THREE.NormalBlending,
+      blending: NormalBlending,
       sizeAttenuation: true
     });
   }
 
-  const points = new THREE.Points(geometry, material);
+  const points = new Points(geometry, material);
 
   return {
     points,
@@ -202,8 +217,8 @@ const createPetalField = (THREE, { petalCount, petalSize, useShader }) => {
 };
 
 /* ── Sparse "light specks" additive layer ── */
-const createSpeckField = (THREE, count) => {
-  const geometry = new THREE.BufferGeometry();
+const createSpeckField = (count) => {
+  const geometry = new BufferGeometry();
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i += 1) {
     const i3 = i * 3;
@@ -211,19 +226,19 @@ const createSpeckField = (THREE, count) => {
     positions[i3 + 1] = randomBetween(-WORLD_HEIGHT / 2, WORLD_HEIGHT / 2);
     positions[i3 + 2] = randomBetween(-3.5, 1.5);
   }
-  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("position", new BufferAttribute(positions, 3));
 
-  const material = new THREE.PointsMaterial({
+  const material = new PointsMaterial({
     color: 0xfff2df,
     size: 0.045,
     transparent: true,
     opacity: 0.7,
     depthWrite: false,
-    blending: THREE.AdditiveBlending,
+    blending: AdditiveBlending,
     sizeAttenuation: true
   });
 
-  return { points: new THREE.Points(geometry, material), geometry, material, positions, count };
+  return { points: new Points(geometry, material), geometry, material, positions, count };
 };
 
 const isWeakGPU = () => {
@@ -251,53 +266,51 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     return () => { };
   }
 
-  const THREE = await loadThree();
-
   const mobile = isMobileDevice();
   const petalCount = mobile ? PETAL_COUNT_MOBILE : PETAL_COUNT_DESKTOP;
   const petalSize = mobile ? PETAL_SIZE_MOBILE : PETAL_SIZE_DESKTOP;
   const useShader = !isWeakGPU();
 
-  const renderer = new THREE.WebGLRenderer({
+  const renderer = new WebGLRenderer({
     canvas,
     antialias: true,
     alpha: true,
     powerPreference: "high-performance"
   });
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.outputColorSpace = SRGBColorSpace;
 
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.Fog(0xf5ddd8, 3, 14);
+  const scene = new Scene();
+  scene.fog = new Fog(0xf5ddd8, 3, 14);
 
-  const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 30);
+  const camera = new PerspectiveCamera(42, 1, 0.1, 30);
   camera.position.set(0, 0, 6.2);
 
-  const petalRig = new THREE.Group();
-  const field = createPetalField(THREE, { petalCount, petalSize, useShader });
+  const petalRig = new Group();
+  const field = createPetalField({ petalCount, petalSize, useShader });
   const positionAttr = field.geometry.getAttribute("position");
   const positionArray = positionAttr.array;
   petalRig.add(field.points);
 
-  const speckField = createSpeckField(THREE, mobile ? 60 : 120);
+  const speckField = createSpeckField(mobile ? 60 : 120);
   const speckPositionAttr = speckField.geometry.getAttribute("position");
   const speckPositions = speckPositionAttr.array;
   petalRig.add(speckField.points);
 
-  const hazeGeometry = new THREE.PlaneGeometry(14, 10);
-  const hazeMaterial = new THREE.MeshBasicMaterial({
+  const hazeGeometry = new PlaneGeometry(14, 10);
+  const hazeMaterial = new MeshBasicMaterial({
     color: 0xf4c7d3,
     transparent: true,
     opacity: 0.12,
     depthWrite: false
   });
-  const haze = new THREE.Mesh(hazeGeometry, hazeMaterial);
+  const haze = new Mesh(hazeGeometry, hazeMaterial);
   haze.position.z = -4;
 
   scene.add(haze);
   scene.add(petalRig);
 
-  const ambientLight = new THREE.AmbientLight(0xfff4ed, 1.35);
-  const rimLight = new THREE.DirectionalLight(0xffb9ce, 0.8);
+  const ambientLight = new AmbientLight(0xfff4ed, 1.35);
+  const rimLight = new DirectionalLight(0xffb9ce, 0.8);
   rimLight.position.set(-2, 2, 1.5);
   scene.add(ambientLight, rimLight);
 
