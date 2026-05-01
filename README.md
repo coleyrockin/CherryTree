@@ -12,7 +12,7 @@
 
 ---
 
-![Cherry Tree — Prologue](./public/assets/images/generated/prologue-fallback-1920.jpg)
+![Cherry Tree — Prologue](./.github/preview/cherrytree-hero.png)
 
 ---
 
@@ -33,8 +33,8 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 
 <table>
   <tr>
-    <td><img src="./public/assets/images/generated/bloom-wash-1920.jpg" alt="Bloom scene" /></td>
-    <td><img src="./public/assets/images/generated/triptych-b-1920.jpg" alt="Triptych scene" /></td>
+    <td><img src="./.github/preview/cherrytree-bloom.png" alt="Bloom scene" /></td>
+    <td><img src="./.github/preview/cherrytree-triptych.png" alt="Triptych scene" /></td>
   </tr>
   <tr>
     <td align="center"><sub>02 — Bloom</sub></td>
@@ -49,7 +49,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 | 3D / WebGL | Three.js r181, custom `ShaderMaterial` |
 | Animation | GSAP 3.13 + ScrollTrigger |
 | Smooth scroll | Lenis 1.3 (shared frame clock with GSAP) |
-| Build | Vite 7, manual vendor chunking |
+| Build | Vite 8, manual vendor chunking |
 | Images | Sharp — AVIF / WebP / JPEG + LQIP |
 | Language | Vanilla ES2021, no framework |
 
@@ -61,7 +61,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 - **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger.scrub`. Suppressed below 760px to keep mobile scrolling smooth.
 - **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows a contextual label.
 - **Audio controller** — toggleable ambient bed with crossfade, persistent across reloads via `localStorage`.
-- **Ghost nav + scene labels** — six numerals along the right rail, current scene labeled at lower-left.
+- **Ghost nav + scene labels** — six dot indicators along the right rail track the active scene; current scene name appears at lower-left.
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
 - **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
 - **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.
@@ -73,7 +73,7 @@ Three.js defers behind `IntersectionObserver` + `requestIdleCallback` — it nev
 
 ## Mobile
 
-<img src="./public/assets/images/generated/stillness-1280.jpg" alt="Cherry Tree on iPhone" width="280" />
+<img src="./.github/preview/cherrytree-mobile.png" alt="Cherry Tree on iPhone" width="280" />
 
 Polished pass across all iPhone sizes. The hero title is constrained by viewport height in landscape, by clamp ceilings in portrait. Velocity parallax, magnetic cursor, and the desktop scene-rail are suppressed below 760px.
 
