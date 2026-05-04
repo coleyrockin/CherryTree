@@ -68,7 +68,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 
 ## Performance
 
-Build output (gzipped, Vite 8): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · app ~14 KB.
+Current build output (Vite 8, gzipped): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · main app ~5.5 KB (~14 KB raw).
 Three.js defers behind `IntersectionObserver` + `requestIdleCallback` — it never touches first paint.
 
 ## Mobile
@@ -88,10 +88,16 @@ npm run dev
 
 | Script | |
 |---|---|
-| `npm run dev` | Vite dev server at localhost:5173 |
+| `npm run dev` | Vite dev server at 127.0.0.1:5173 |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Serve the production build locally |
 | `npm run optimize-assets` | Regenerate responsive image sets from source files |
+
+Dev and preview bind to localhost by default. For LAN or tunnel testing, opt in explicitly:
+
+```bash
+CHERRYTREE_EXPOSE_DEV_SERVER=true npm run dev
+```
 
 ## Project structure
 

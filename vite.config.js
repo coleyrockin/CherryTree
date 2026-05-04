@@ -1,20 +1,24 @@
 import { defineConfig } from "vite";
 
-const tunnelHostAllowList = [".lhr.life", ".loca.lt"];
-const extraHosts = (process.env.CHERRYTREE_ALLOWED_HOSTS || "")
-  .split(",")
-  .map((host) => host.trim())
-  .filter(Boolean);
+const exposeDevServer = process.env.CHERRYTREE_EXPOSE_DEV_SERVER === "true";
+const tunnelHostAllowList = exposeDevServer ? [".lhr.life", ".loca.lt"] : [];
+const extraHosts = exposeDevServer
+  ? (process.env.CHERRYTREE_ALLOWED_HOSTS || "")
+      .split(",")
+      .map((host) => host.trim())
+      .filter(Boolean)
+  : [];
 const allowedHosts = ["127.0.0.1", "localhost", ...tunnelHostAllowList, ...extraHosts];
+const devHost = exposeDevServer ? true : "127.0.0.1";
 
 export default defineConfig({
   server: {
-    host: true,
+    host: devHost,
     port: 5173,
     allowedHosts
   },
   preview: {
-    host: true,
+    host: devHost,
     port: 4173,
     allowedHosts
   },

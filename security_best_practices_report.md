@@ -4,7 +4,7 @@
 
 CherryTree is a static Vite site built with vanilla browser JavaScript, Three.js, GSAP, Lenis, and a Node/Sharp asset optimization script. There is no backend, authentication, database, upload route, API route, or server-side secret boundary in this repository.
 
-No critical or high-severity best-practice failures were found. The main recommendations are defense-in-depth and future-proofing: add a CSP/Trusted Types plan, reduce reliance on third-party hosted font CSS, mark the `innerHTML` restoration helper as trusted-markup-only or refactor it, make dev-server tunnel exposure opt-in, and harden the Sharp optimizer if source images ever become untrusted or CI-provided.
+No critical or high-severity best-practice failures were found. The remaining recommendations are defense-in-depth and future-proofing: reduce reliance on third-party hosted font CSS, keep Trusted Types in mind if future raw HTML sinks are introduced, and harden the Sharp optimizer if source images ever become untrusted or CI-provided.
 
 `npm audit --json` was run with current registry access and reported 0 vulnerabilities across 103 dependencies.
 
@@ -14,7 +14,7 @@ No critical or high-severity best-practice failures were found. The main recomme
 - Browser runtime dependencies: `package.json:12-15`
 - Node/Sharp asset tooling: `package.json:17-19`, `scripts/optimize-assets.mjs:1-3`
 - Static HTML entrypoint: `index.html:1-49`
-- Vite dev/preview server config: `vite.config.js:10-20`
+- Vite dev/preview server config: `vite.config.js:14-24`
 
 Guidance used: `/Users/boydroberts/.codex/skills/security-best-practices/references/javascript-general-web-frontend-security.md`
 
@@ -32,7 +32,7 @@ None.
 
 - Severity: Medium
 - Status: Fixed
-- Location: `index.html:23-36`, `index.html:45-48`, `index.html:273`, `vercel.json:1-24`
+- Location: `index.html:25-38`, `index.html:47-50`, `index.html:275`, `vercel.json:1-24`
 - Rule: JS-CSP-001, JS-CSP-002, JS-TT-001
 - Evidence: `vercel.json` now ships a header-delivered CSP. Inline script execution is limited to hashes for the existing JSON-LD and no-js boot blocks, and the policy avoids `unsafe-eval`.
 - Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
@@ -44,7 +44,7 @@ None.
 ### SBP-002: Third-party Google Fonts CSS is not pinned with integrity
 
 - Severity: Low
-- Location: `index.html:37-41`
+- Location: `index.html:39-43`
 - Rule: JS-SUPPLY-001, JS-SRI-001
 - Evidence: The page loads CSS from `https://fonts.googleapis.com/...` without `integrity`.
 - Impact: Third-party CSS is lower risk than third-party JavaScript, but it is still an external production dependency and privacy/supply-chain surface.
@@ -65,11 +65,12 @@ None.
 ### SBP-004: Dev and preview servers expose all interfaces and tunnel hosts by default
 
 - Severity: Low
-- Location: `vite.config.js:3-19`
+- Status: Fixed
+- Location: `vite.config.js:3-24`
 - Rule: secure development configuration
-- Evidence: `server.host` and `preview.host` are `true`; `.lhr.life`, `.loca.lt`, and `CHERRYTREE_ALLOWED_HOSTS` are accepted by default host allowlist construction.
-- Impact: This is a development footgun, not a production vulnerability. If a developer runs Vite while on an untrusted network or with a tunnel active, source/build artifacts are easier to expose.
-- Fix: Make tunnel exposure opt-in with an environment flag, or default `host` to localhost and document the command for tunnel testing.
+- Evidence: `server.host` and `preview.host` now bind to `127.0.0.1` by default. LAN and tunnel exposure require `CHERRYTREE_EXPOSE_DEV_SERVER=true`; tunnel hosts and `CHERRYTREE_ALLOWED_HOSTS` are only applied in that opt-in mode.
+- Impact: This was a development footgun, not a production vulnerability. Default local runs no longer expose source/build artifacts on the LAN.
+- Validation: `npm run build` passed after the config change, and the README now documents the explicit opt-in command for LAN or tunnel testing.
 - False positive notes: No privileged dev API route or secret-serving route exists in this repo.
 
 ### SBP-005: Sharp optimizer should be hardened before accepting untrusted images
@@ -95,5 +96,5 @@ None.
 1. Fixed: production CSP and baseline security headers are defined in `vercel.json`.
 2. Self-host fonts or document the Google Fonts dependency.
 3. Fixed: `splitText.js` is trusted-plain-text-only and scene nav clearing uses `replaceChildren()`.
-4. Make tunnel-enabled Vite hosting opt-in.
+4. Fixed: tunnel-enabled Vite hosting is opt-in.
 5. Harden `scripts/optimize-assets.mjs` before it is ever run on untrusted or PR-supplied image files.

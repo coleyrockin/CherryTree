@@ -443,6 +443,40 @@ html[data-motion="reduced"] .scene {
   }
 }
 
+@media (max-width: 340px) {
+  .ui-chrome {
+    width: calc(100% - 12px);
+  }
+
+  .brand-mark {
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+  }
+
+  .control-stack {
+    gap: 5px;
+  }
+
+  .sound-toggle,
+  .motion-toggle {
+    min-width: 66px;
+    padding: 6px 7px;
+    gap: 4px;
+    font-size: 0.56rem;
+    letter-spacing: 0.08em;
+  }
+
+  .motion-toggle {
+    min-width: 76px;
+  }
+
+  .sound-toggle-state,
+  .motion-toggle-state {
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+  }
+}
+
 @media (max-width: 620px) {
   .film-grain {
     opacity: 0.16;
