@@ -1,5 +1,5 @@
 /**
- * Splits an element's text content into individually animatable spans.
+ * Splits trusted plain text into individually animatable spans.
  * Preserves the original text in an aria-label for screen readers.
  */
 
@@ -43,13 +43,13 @@ export const splitByChars = (element) => {
     return { chars: [], revert: () => {} };
   }
 
-  const originalHTML = element.innerHTML;
+  const originalText = element.textContent || "";
   const chars = wrapNodes(element, "chars");
 
   return {
     chars,
     revert: () => {
-      element.innerHTML = originalHTML;
+      element.textContent = originalText;
       element.removeAttribute("aria-label");
     }
   };
@@ -60,13 +60,13 @@ export const splitByWords = (element) => {
     return { words: [], revert: () => {} };
   }
 
-  const originalHTML = element.innerHTML;
+  const originalText = element.textContent || "";
   const words = wrapNodes(element, "words");
 
   return {
     words,
     revert: () => {
-      element.innerHTML = originalHTML;
+      element.textContent = originalText;
       element.removeAttribute("aria-label");
     }
   };

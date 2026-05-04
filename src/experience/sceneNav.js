@@ -76,7 +76,7 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
 
   return () => {
     cleanup.forEach((fn) => fn());
-    list.innerHTML = "";
+    list.replaceChildren();
     nav.classList.remove("is-visible");
   };
 };
