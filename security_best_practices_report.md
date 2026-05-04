@@ -31,12 +31,13 @@ None.
 ### SBP-001: Add a CSP and Trusted Types plan for production
 
 - Severity: Medium
-- Location: `index.html:23-36`, `index.html:45-48`, `index.html:273`
+- Status: Fixed
+- Location: `index.html:23-36`, `index.html:45-48`, `index.html:273`, `vercel.json:1-24`
 - Rule: JS-CSP-001, JS-CSP-002, JS-TT-001
-- Evidence: The HTML contains inline JSON-LD and an inline boot script, and no `Content-Security-Policy` or Trusted Types policy is visible in repository HTML/config.
-- Impact: This is not currently exploitable by itself, but if future URL/CMS/API content introduces DOM XSS, the page has no visible browser-enforced policy to reduce script execution impact. Inline scripts also make a strict CSP harder unless they are moved, hashed, or nonced.
-- Fix: Prefer a Vercel/edge header-delivered CSP. At minimum, define `script-src` without `unsafe-eval`; move the tiny `no-js` class toggle into `/src/main.js` or hash it; hash or externalize JSON-LD if needed. Consider `require-trusted-types-for 'script'` after auditing remaining `innerHTML` sinks.
-- False positive notes: Security headers can be configured outside this repo. If Vercel already sets CSP headers, document that in the repo.
+- Evidence: `vercel.json` now ships a header-delivered CSP. Inline script execution is limited to hashes for the existing JSON-LD and no-js boot blocks, and the policy avoids `unsafe-eval`.
+- Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
+- Validation: `npm run build` passed after adding the header config; `vercel.json` parses as valid JSON; CSP inline allowances were checked against both `index.html` and `dist/index.html`.
+- False positive notes: Trusted Types enforcement is not enabled yet because the current app has no remaining raw HTML sink in source and the immediate fix is a deployable CSP baseline.
 
 ## Low Findings
 
@@ -91,7 +92,7 @@ None.
 
 ## Recommended Fix Order
 
-1. Add a production CSP plan and decide whether headers live in Vercel config, platform settings, or repository-managed deployment files.
+1. Fixed: production CSP and baseline security headers are defined in `vercel.json`.
 2. Self-host fonts or document the Google Fonts dependency.
 3. Fixed: `splitText.js` is trusted-plain-text-only and scene nav clearing uses `replaceChildren()`.
 4. Make tunnel-enabled Vite hosting opt-in.
