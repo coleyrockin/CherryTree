@@ -1,6 +1,6 @@
 # Cherry Tree
 
-> A scroll-driven cinematic gallery — six scenes, one continuous film.
+> A scroll-driven cinematic gallery — seven scenes, one continuous film.
 
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
@@ -16,20 +16,21 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of six scenes carries its own color temperature — the whole thing transitions like a cut between shots.
+Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of seven scenes carries its own color temperature — the whole thing transitions like a cut between shots.
 
 Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline. Tuned across iPhone portrait, landscape, tablet, desktop, and ultrawide.
 
-## The six scenes
+## The Seven Scenes
 
 | № | Scene | Treatment |
 |---|---|---|
 | 01 | **Prologue** | Real-time WebGL petal field, depth-of-field shader, cursor repulsion |
 | 02 | **Bloom** | Photographic hero, long crossfade, saturation lift on scrub |
-| 03 | **Triptych** | Three composite panels, parallax-deep motion preset |
-| 04 | **Color Field** | Triple bloom layers, slow drift, painterly transition |
-| 05 | **Stillness** | Single still image, film-dust grain overlay |
-| 06 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
+| 03 | **Drift** | Photographic wind path, parallax-deep motion preset |
+| 04 | **Triptych** | Three composite panels, parallax-deep motion preset |
+| 05 | **Color Field** | Triple bloom layers, slow drift, painterly transition |
+| 06 | **Stillness** | Single still image, film-dust grain overlay |
+| 07 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
 
 <table>
   <tr>
@@ -38,7 +39,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
   </tr>
   <tr>
     <td align="center"><sub>02 — Bloom</sub></td>
-    <td align="center"><sub>03 — Triptych</sub></td>
+    <td align="center"><sub>04 — Triptych</sub></td>
   </tr>
 </table>
 
@@ -61,14 +62,14 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 - **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger.scrub`. Suppressed below 760px to keep mobile scrolling smooth.
 - **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows a contextual label.
 - **Audio controller** — toggleable ambient bed with crossfade, persistent across reloads via `localStorage`.
-- **Ghost nav + scene labels** — six dot indicators along the right rail track the active scene; current scene name appears at lower-left.
+- **Ghost nav + scene labels** — seven dot indicators along the right rail track the active scene; current scene name appears at lower-left.
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
 - **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
 - **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.
 
 ## Performance
 
-Current build output (Vite 8, gzipped): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · main app ~5.5 KB (~14 KB raw).
+Current build output (Vite 8, gzipped): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · main app ~5.7 KB (~15 KB raw).
 Three.js defers behind `IntersectionObserver` + `requestIdleCallback` — it never touches first paint.
 
 ## Mobile

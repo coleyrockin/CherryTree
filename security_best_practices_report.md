@@ -13,7 +13,7 @@ No critical or high-severity best-practice failures were found. The remaining re
 - JavaScript ES modules and Vite: `package.json:5-10`
 - Browser runtime dependencies: `package.json:12-15`
 - Node/Sharp asset tooling: `package.json:17-19`, `scripts/optimize-assets.mjs:1-3`
-- Static HTML entrypoint: `index.html:1-49`
+- Static HTML entrypoint: `index.html:1-51`
 - Vite dev/preview server config: `vite.config.js:14-24`
 
 Guidance used: `/Users/boydroberts/.codex/skills/security-best-practices/references/javascript-general-web-frontend-security.md`
@@ -32,7 +32,7 @@ None.
 
 - Severity: Medium
 - Status: Fixed
-- Location: `index.html:25-38`, `index.html:47-50`, `index.html:275`, `vercel.json:1-24`
+- Location: `index.html:25-38`, `index.html:47-50`, `index.html:296`, `vercel.json:1-24`
 - Rule: JS-CSP-001, JS-CSP-002, JS-TT-001
 - Evidence: `vercel.json` now ships a header-delivered CSP. Inline script execution is limited to hashes for the existing JSON-LD and no-js boot blocks, and the policy avoids `unsafe-eval`.
 - Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
