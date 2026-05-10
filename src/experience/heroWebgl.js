@@ -260,7 +260,13 @@ const isWeakGPU = () => {
   }
 };
 
-export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => {
+export const initHeroWebgl = async ({
+  canvas,
+  host,
+  reducedMotion = false,
+  gsap = null,
+  ScrollTrigger = null
+}) => {
   if (!canvas || !host || !supportsWebGL()) {
     host?.classList.add("is-webgl-fallback");
     return () => { };
@@ -283,7 +289,8 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
   scene.fog = new Fog(0xf5ddd8, 3, 14);
 
   const camera = new PerspectiveCamera(42, 1, 0.1, 30);
-  camera.position.set(0, 0, 6.2);
+  const baseCameraZ = 6.2;
+  camera.position.set(0, 0, baseCameraZ);
 
   const petalRig = new Group();
   const field = createPetalField({ petalCount, petalSize, useShader });
@@ -342,12 +349,24 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     const t = elapsed * 0.00035;
     for (let i = 0; i < field.petalCount; i += 1) {
       const i3 = i * 3;
-      // Layered wind: base sine + secondary cosine for non-periodic flow
+      const px = positionArray[i3];
+      const py = positionArray[i3 + 1];
+      const phase = field.phases[i];
+
+      // Multi-octave wind field. Spatial terms (px, py) make nearby petals
+      // drift together momentarily; irrational frequency ratios (1.0/0.43/
+      // 0.27/0.51/0.36) prevent the field from settling into a visible loop.
       const windX =
-        Math.sin(t + field.phases[i]) * 0.22 +
-        Math.cos(t * 0.6 + field.phases[i] * 1.7) * 0.12;
+        Math.sin(t + px * 0.18 + phase * 0.4) * 0.18 +
+        Math.cos(t * 0.43 + py * 0.22) * 0.12 +
+        Math.sin(t * 0.27 + px * 0.07 + py * 0.13 + phase) * 0.07;
+
+      const windY =
+        Math.cos(t * 0.51 + py * 0.16 + phase * 0.3) * 0.05 +
+        Math.sin(t * 0.36 + px * 0.09) * 0.03;
+
       positionArray[i3] += windX * deltaSeconds;
-      positionArray[i3 + 1] -= field.speeds[i] * deltaSeconds;
+      positionArray[i3 + 1] += (windY - field.speeds[i]) * deltaSeconds;
 
       if (positionArray[i3 + 1] < -WORLD_HEIGHT / 2 - 0.4) {
         positionArray[i3] = randomBetween(-WORLD_WIDTH / 2, WORLD_WIDTH / 2);
@@ -427,12 +446,32 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
     rafId = 0;
   };
 
+  // Scroll-tied dolly — camera pulls in across the prologue scene so you
+  // feel like you're moving through the petal field rather than watching it.
+  // No-op if GSAP wasn't passed in.
+  let dollyTrigger = null;
+  if (gsap && ScrollTrigger && !reducedMotion) {
+    dollyTrigger = ScrollTrigger.create({
+      trigger: host,
+      start: "top top",
+      end: "bottom top",
+      scrub: 1.2,
+      onUpdate: (self) => {
+        camera.position.z = baseCameraZ - self.progress * 1.8;
+      }
+    });
+  }
+
+  // Pause the dolly along with the render loop — otherwise camera.position.z
+  // keeps mutating on scroll while we're not rendering, and the next time
+  // the prologue comes into view the first frame can pop.
   let visibilityObserver = null;
   if ("IntersectionObserver" in window) {
     visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         isActive = !!entry?.isIntersecting;
         if (isActive) {
+          dollyTrigger?.enable();
           if (reducedMotion) {
             renderer.render(scene, camera);
           } else {
@@ -440,6 +479,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
           }
         } else {
           stopLoop();
+          dollyTrigger?.disable();
         }
       },
       { threshold: 0.1 }
@@ -463,6 +503,7 @@ export const initHeroWebgl = async ({ canvas, host, reducedMotion = false }) => 
 
   return () => {
     stopLoop();
+    dollyTrigger?.kill();
     visibilityObserver?.disconnect();
     window.removeEventListener("resize", resize);
     host.removeEventListener("pointermove", handlePointerMove);

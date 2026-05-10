@@ -393,11 +393,19 @@ html[data-motion="reduced"] .marquee-ribbon {
   /* Presence state — GSAP drives opacity for full-motion; this is the reduced-motion fallback */
 }
 
-html[data-motion="reduced"] * {
+html[data-motion="reduced"] *:not(.sound-toggle):not(.motion-toggle):not(.scene-nav-dot) {
   animation-duration: 1ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 1ms !important;
   scroll-behavior: auto !important;
+}
+
+/* The breathe pulse on toggles/dots is a UX affordance, not decoration —
+   stays alive under reduced-motion but slowed and de-amplified. */
+html[data-motion="reduced"] .sound-toggle,
+html[data-motion="reduced"] .motion-toggle,
+html[data-motion="reduced"] .scene-nav-dot {
+  animation-duration: 8s;
 }
 
 html[data-motion="reduced"] .scroll-progress {

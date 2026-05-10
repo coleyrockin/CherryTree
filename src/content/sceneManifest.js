@@ -28,9 +28,23 @@ export const sceneManifest = Object.freeze([
     grainTint: "rgba(80, 42, 55, 0.26)"
   },
   {
+    id: "drift",
+    label: "Drift",
+    numeral: "03",
+    type: "image",
+    assets: ["drift"],
+    motionPreset: "parallaxDeep",
+    heightVh: 110,
+    preload: false,
+    bgColor: "#ecc8c4",
+    tint: "#c46180",
+    ink: "#2c1820",
+    grainTint: "rgba(70, 30, 44, 0.26)"
+  },
+  {
     id: "triptych",
     label: "Triptych",
-    numeral: "03",
+    numeral: "04",
     type: "composite",
     assets: ["triptychLeft", "triptychCenter", "triptychRight", "grain02"],
     motionPreset: "parallaxDeep",
@@ -44,7 +58,7 @@ export const sceneManifest = Object.freeze([
   {
     id: "color-field",
     label: "Color Field",
-    numeral: "04",
+    numeral: "05",
     type: "composite",
     assets: ["colorBloomA", "colorBloomB", "colorBloomC"],
     motionPreset: "driftSlow",
@@ -58,7 +72,7 @@ export const sceneManifest = Object.freeze([
   {
     id: "stillness",
     label: "Stillness",
-    numeral: "05",
+    numeral: "06",
     type: "image",
     assets: ["stillnessHero", "filmDust01"],
     motionPreset: "crossfadeLong",
@@ -72,7 +86,7 @@ export const sceneManifest = Object.freeze([
   {
     id: "epilogue",
     label: "Epilogue",
-    numeral: "06",
+    numeral: "07",
     type: "composite",
     assets: ["epilogueGlow"],
     motionPreset: "driftSlow",

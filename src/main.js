@@ -116,7 +116,14 @@ const initMotionToggle = ({ mode, reduced, prefersReduced, onToggle }) => {
 
 /* ── WebGL hero initialization ──────────────────────────── */
 
-const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress }) => {
+const initDeferredHeroWebgl = ({
+  reducedMotion,
+  heroHost,
+  cleanup,
+  onProgress,
+  gsap = null,
+  ScrollTrigger = null
+}) => {
   if (!heroHost) {
     return;
   }
@@ -148,7 +155,9 @@ const initDeferredHeroWebgl = ({ reducedMotion, heroHost, cleanup, onProgress })
         await initHeroWebgl({
           canvas: document.getElementById("hero-webgl"),
           host: heroHost,
-          reducedMotion
+          reducedMotion,
+          gsap,
+          ScrollTrigger
         })
       );
       onProgress?.(1);
@@ -252,6 +261,12 @@ const boot = async () => {
   let motionCleanup = [];
   let motionInitToken = 0;
 
+  // Stable handle to the latest velocity tracker — survives motion toggles.
+  // The audio controller closes over this so it can follow scroll velocity
+  // without being torn down each time motion changes.
+  let activeVelocityTracker = null;
+  const getScrollVelocity = () => activeVelocityTracker?.getNormalized() ?? 0;
+
   const initMotionDependentSystems = async (reducedMotion) => {
     const initToken = ++motionInitToken;
     const pendingCleanup = [];
@@ -263,6 +278,7 @@ const boot = async () => {
 
     // Tear down previous motion-dependent systems
     disposeCollection(motionCleanup);
+    activeVelocityTracker = null;
 
     // Remove stale state classes from scenes
     document.querySelectorAll(".scene").forEach((scene) => {
@@ -326,7 +342,9 @@ const boot = async () => {
       reducedMotion,
       heroHost,
       cleanup: pendingCleanup,
-      onProgress: (v) => preloader.onProgress(0.6 + v * 0.3)
+      onProgress: (v) => preloader.onProgress(0.6 + v * 0.3),
+      gsap: sceneResult.gsap ?? null,
+      ScrollTrigger: sceneResult.ScrollTrigger ?? null
     });
 
     // Wire up motion-dependent enhancement modules
@@ -358,6 +376,7 @@ const boot = async () => {
     }
 
     motionCleanup = pendingCleanup;
+    activeVelocityTracker = sceneResult.velocityTracker ?? null;
     preloader.onProgress(0.95);
   };
 
@@ -387,7 +406,8 @@ const boot = async () => {
 
   stableCleanup.push(
     initAudioController({
-      selector: "[data-ct-sound-toggle]"
+      selector: "[data-ct-sound-toggle]",
+      getVelocity: getScrollVelocity
     })
   );
 

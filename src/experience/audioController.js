@@ -94,7 +94,10 @@ const createSynthFallback = () => {
   };
 };
 
-export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}) => {
+export const initAudioController = ({
+  selector = "[data-ct-sound-toggle]",
+  getVelocity = null
+} = {}) => {
   const button = document.querySelector(selector);
   if (!button) {
     return () => {};
@@ -106,12 +109,22 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
   fileAudio.preload = "none";
   fileAudio.volume = 0;
 
+  // Base volumes — modulated by scroll velocity once fade-in completes.
+  // Swing is small and asymmetric (boost only) so the bed doesn't dip below
+  // its resting level when the user stops scrolling.
+  const FILE_BASE_VOLUME = 0.55;
+  const FILE_VELOCITY_BOOST = 0.1;
+  const SYNTH_BASE_GAIN = 0.1;
+  const SYNTH_VELOCITY_BOOST = 0.06;
+
   let synth = null;
   let usingSynth = false;
   let isEnabled = false;
   let hasUnlocked = false;
   let pendingEnable = readStoredState();
   let isToggling = false;
+  let canModulate = false;
+  let velocityRafId = 0;
   let cancelFileFade = () => {};
   let cancelSynthFade = () => {};
 
@@ -135,6 +148,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
   };
 
   const disableCurrentAudio = ({ immediate = false } = {}) => {
+    canModulate = false;
     if (usingSynth && synth) {
       const target = synth;
       if (immediate) {
@@ -208,29 +222,37 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     }
 
     usingSynth = true;
+    canModulate = false;
     runSynthFade({
       from: 0,
-      to: 0.1,
+      to: SYNTH_BASE_GAIN,
       durationMs: 1000,
       onUpdate: (value) => {
         if (synth) {
           synth.master.gain.value = value;
         }
+      },
+      onComplete: () => {
+        canModulate = true;
       }
     });
   };
 
   const startFileAudio = async () => {
     usingSynth = false;
+    canModulate = false;
     fileAudio.volume = 0;
     await fileAudio.play();
 
     runFileFade({
       from: 0,
-      to: 0.55,
+      to: FILE_BASE_VOLUME,
       durationMs: 1100,
       onUpdate: (value) => {
         fileAudio.volume = Math.min(0.65, Math.max(0, value));
+      },
+      onComplete: () => {
+        canModulate = true;
       }
     });
   };
@@ -252,6 +274,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
 
     isEnabled = true;
     writeStoredState(true);
+    startVelocityLoop();
   };
 
   const disable = () => {
@@ -259,6 +282,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     isEnabled = false;
     writeStoredState(false);
     setButtonState(button, stateNode, false);
+    stopVelocityLoop();
   };
 
   const onToggle = async () => {
@@ -292,6 +316,37 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
     }
   };
 
+  // Velocity-driven volume boost — the ambient bed leans in when the user
+  // scrolls, settles when still. The RAF only runs while audio is enabled
+  // and modulation is unlocked — otherwise it would burn battery 60×/sec
+  // doing nothing. Started by enable(), stopped by disable().
+  let tickVelocity = null;
+  const startVelocityLoop = () => {
+    if (typeof getVelocity !== "function" || velocityRafId) return;
+    tickVelocity = () => {
+      if (!isEnabled) {
+        velocityRafId = 0;
+        return;
+      }
+      if (canModulate) {
+        const v = Math.max(0, Math.min(1, getVelocity()));
+        if (usingSynth && synth) {
+          synth.master.gain.value = SYNTH_BASE_GAIN + v * SYNTH_VELOCITY_BOOST;
+        } else if (!fileAudio.paused) {
+          fileAudio.volume = Math.min(0.7, FILE_BASE_VOLUME + v * FILE_VELOCITY_BOOST);
+        }
+      }
+      velocityRafId = requestAnimationFrame(tickVelocity);
+    };
+    velocityRafId = requestAnimationFrame(tickVelocity);
+  };
+  const stopVelocityLoop = () => {
+    if (velocityRafId) {
+      cancelAnimationFrame(velocityRafId);
+      velocityRafId = 0;
+    }
+  };
+
   if (pendingEnable) {
     setButtonState(button, stateNode, false, "Armed");
   } else {
@@ -311,6 +366,7 @@ export const initAudioController = ({ selector = "[data-ct-sound-toggle]" } = {}
 
   return () => {
     listenerController.abort();
+    stopVelocityLoop();
     disableCurrentAudio({ immediate: true });
     fileAudio.removeAttribute("src");
     fileAudio.load();
