@@ -66,6 +66,8 @@ const createPetalTexture = () => {
 
   const texture = new CanvasTexture(canvas);
   texture.anisotropy = 4;
+  texture.flipY = false;
+  texture.premultiplyAlpha = false;
   texture.needsUpdate = true;
   return texture;
 };
