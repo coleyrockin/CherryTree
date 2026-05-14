@@ -150,18 +150,29 @@ const initDeferredHeroWebgl = ({
     try {
       onProgress?.(0.4);
       const { initHeroWebgl } = await import("./experience/heroWebgl");
+      if (cancelled) {
+        return;
+      }
       onProgress?.(0.7);
-      cleanup.push(
-        await initHeroWebgl({
-          canvas: document.getElementById("hero-webgl"),
-          host: heroHost,
-          reducedMotion,
-          gsap,
-          ScrollTrigger
-        })
-      );
+      const disposeHeroWebgl = await initHeroWebgl({
+        canvas: document.getElementById("hero-webgl"),
+        host: heroHost,
+        reducedMotion,
+        gsap,
+        ScrollTrigger
+      });
+
+      if (cancelled) {
+        disposeResource(disposeHeroWebgl);
+        return;
+      }
+
+      cleanup.push(disposeHeroWebgl);
       onProgress?.(1);
     } catch (error) {
+      if (cancelled) {
+        return;
+      }
       console.error("Cherry Tree WebGL failed to initialize:", error);
       heroHost.classList.add("is-webgl-fallback");
       onProgress?.(1);

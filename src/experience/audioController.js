@@ -127,6 +127,7 @@ export const initAudioController = ({
   let velocityRafId = 0;
   let cancelFileFade = () => {};
   let cancelSynthFade = () => {};
+  let skipNextButtonToggle = false;
 
   const listenerController = new AbortController();
 
@@ -286,6 +287,11 @@ export const initAudioController = ({
   };
 
   const onToggle = async () => {
+    if (skipNextButtonToggle) {
+      skipNextButtonToggle = false;
+      return;
+    }
+
     if (isToggling) {
       return;
     }
@@ -304,16 +310,22 @@ export const initAudioController = ({
     }
   };
 
-  const unlockAudio = async () => {
+  const unlockAudio = async (event) => {
     if (hasUnlocked) {
       return;
     }
 
     hasUnlocked = true;
 
-    if (pendingEnable && !isEnabled) {
-      await enable();
+    if (!pendingEnable || isEnabled) {
+      return;
     }
+
+    if (event?.target instanceof Node && button.contains(event.target)) {
+      skipNextButtonToggle = true;
+    }
+
+    await enable();
   };
 
   // Velocity-driven volume boost — the ambient bed leans in when the user

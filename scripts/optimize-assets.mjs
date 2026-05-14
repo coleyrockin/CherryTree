@@ -6,14 +6,17 @@ const ROOT_DIR = process.cwd();
 const SOURCE_DIR = path.join(ROOT_DIR, "public/assets/images/source");
 const OUTPUT_DIR = path.join(ROOT_DIR, "public/assets/images/generated");
 const WIDTHS = [3840, 2560, 1920, 1280];
-const INPUT_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif", ".tif", ".tiff", ".svg"]);
+const MAX_INPUT_PIXELS = 50_000_000;
+const INPUT_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
 const isRenderableImage = (name) => INPUT_EXTENSIONS.has(path.extname(name).toLowerCase());
 
 const buildOutputPath = (baseName, width, ext) => path.join(OUTPUT_DIR, `${baseName}-${width}.${ext}`);
 
+const loadImage = (inputPath) => sharp(inputPath, { limitInputPixels: MAX_INPUT_PIXELS });
+
 const writeFormatsForWidth = async (inputPath, baseName, width) => {
-  const image = sharp(inputPath, { unlimited: true }).resize({
+  const image = loadImage(inputPath).resize({
     width,
     fit: "inside",
     withoutEnlargement: true
@@ -36,7 +39,7 @@ const writeFormatsForWidth = async (inputPath, baseName, width) => {
 };
 
 const writeLqip = async (inputPath, baseName) => {
-  await sharp(inputPath, { unlimited: true })
+  await loadImage(inputPath)
     .resize({ width: 36, fit: "inside", withoutEnlargement: true })
     .jpeg({ quality: 48, mozjpeg: true })
     .toFile(path.join(OUTPUT_DIR, `${baseName}-lqip.jpg`));
