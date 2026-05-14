@@ -123,7 +123,7 @@ const initCursorGlow = () => {
 
 /* ── Enhanced scroll progress with glow pulse ──────────────── */
 
-const initScrollProgressGlow = (gsap, ScrollTrigger) => {
+const initScrollProgressGlow = () => {
   const bar = document.querySelector("[data-ct-scroll-progress]");
   if (!bar) {
     return () => {};
@@ -160,7 +160,7 @@ export const initScrollEffects = async ({ reducedMotion = false }) => {
 
   cleanup.push(initMarqueeRibbons(gsap, ScrollTrigger));
   // Note: clip-path reveals are handled by sceneController.js
-  cleanup.push(initScrollProgressGlow(gsap, ScrollTrigger));
+  cleanup.push(initScrollProgressGlow());
 
   return () => cleanup.forEach((fn) => fn?.());
 };

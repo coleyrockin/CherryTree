@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cherry-tree-psi.vercel.app/sitemap.xml
