@@ -35,11 +35,19 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 <table>
   <tr>
     <td><img src="./.github/preview/cherrytree-bloom.png" alt="Bloom scene" /></td>
-    <td><img src="./.github/preview/cherrytree-triptych.png" alt="Triptych scene" /></td>
+    <td><img src="./.github/preview/cherrytree-drift.png" alt="Drift scene" /></td>
   </tr>
   <tr>
     <td align="center"><sub>02 — Bloom</sub></td>
+    <td align="center"><sub>03 — Drift</sub></td>
+  </tr>
+  <tr>
+    <td><img src="./.github/preview/cherrytree-triptych.png" alt="Triptych scene" /></td>
+    <td><img src="./.github/preview/cherrytree-stillness.png" alt="Stillness scene" /></td>
+  </tr>
+  <tr>
     <td align="center"><sub>04 — Triptych</sub></td>
+    <td align="center"><sub>06 — Stillness</sub></td>
   </tr>
 </table>
 
