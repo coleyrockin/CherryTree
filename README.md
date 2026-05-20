@@ -74,6 +74,9 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
 - **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
 - **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.
+- **Keyboard navigation** — `PageDown` / `J` next scene, `PageUp` / `K` previous, `Home` / `End` jump to first / last, `1`–`7` jump to a specific scene.
+- **Deep links** — every scene has its own URL hash (`/#bloom`, `/#drift`, …). The URL updates as you scroll, and visiting a `#scene-id` link jumps there on load.
+- **Screen-reader announcements** — an `aria-live="polite"` region announces the current scene as you move through the gallery.
 
 ## Performance
 

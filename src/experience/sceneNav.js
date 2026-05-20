@@ -43,6 +43,10 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
     dots.forEach((dot) => dot.removeEventListener("click", onClick));
   });
 
+  // Screen reader announcement + URL hash sync on scene change
+  const announceRegion = document.querySelector("[data-ct-scene-announce]");
+  let lastAnnouncedIndex = -1;
+
   const setActive = (index) => {
     dots.forEach((dot, i) => {
       if (i === index) {
@@ -51,6 +55,22 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
         dot.removeAttribute("aria-current");
       }
     });
+
+    if (index !== lastAnnouncedIndex) {
+      lastAnnouncedIndex = index;
+      const scene = manifest[index];
+      if (scene) {
+        // Announce to assistive tech
+        if (announceRegion) {
+          announceRegion.textContent = `Now viewing: ${scene.label || scene.id}`;
+        }
+        // Sync URL hash without scroll / history pollution
+        const desired = `#${scene.id}`;
+        if (window.location.hash !== desired) {
+          history.replaceState(null, "", desired);
+        }
+      }
+    }
   };
 
   // Track active scene
@@ -69,9 +89,14 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
     cleanup.push(() => trigger.kill());
   });
 
-  // Keyboard navigation: PageUp/PageDown jump scenes; Home/End go to first/
-  // last. Arrow keys are deliberately left alone so users keep native fine-
-  // grained scrolling. Skipped when focus is in an editable field.
+  // Keyboard navigation:
+  //   PageDown / J  — next scene
+  //   PageUp   / K  — previous scene
+  //   Home          — first scene
+  //   End           — last scene
+  //   1–7           — jump to scene index (clamped to manifest length)
+  // Arrow keys are deliberately left alone so users keep native fine-grained
+  // scrolling. Skipped when focus is in an editable field or a modifier is held.
   const isEditableTarget = (target) => {
     if (!target || target.nodeType !== 1) return false;
     if (target.matches("input, textarea, select")) return true;
@@ -125,10 +150,18 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
     const currentIndex = activeIndex === -1 ? inferIndexFromScroll() : activeIndex;
 
     let nextIndex = null;
-    if (event.key === "PageDown") nextIndex = currentIndex + 1;
-    else if (event.key === "PageUp") nextIndex = currentIndex - 1;
-    else if (event.key === "Home") nextIndex = 0;
-    else if (event.key === "End") nextIndex = manifest.length - 1;
+    if (event.key === "PageDown" || event.key === "j" || event.key === "J") {
+      nextIndex = currentIndex + 1;
+    } else if (event.key === "PageUp" || event.key === "k" || event.key === "K") {
+      nextIndex = currentIndex - 1;
+    } else if (event.key === "Home") {
+      nextIndex = 0;
+    } else if (event.key === "End") {
+      nextIndex = manifest.length - 1;
+    } else if (/^[1-9]$/.test(event.key)) {
+      const numeric = parseInt(event.key, 10) - 1;
+      if (numeric < manifest.length) nextIndex = numeric;
+    }
 
     if (nextIndex === null) return;
 
@@ -138,6 +171,30 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
 
   window.addEventListener("keydown", onKeyDown);
   cleanup.push(() => window.removeEventListener("keydown", onKeyDown));
+
+  // Hash-based deep linking. Capture the initial hash AT INIT so the
+  // scroll-driven setActive can't overwrite it before our timer fires.
+  const initialHash = window.location.hash.replace(/^#/, "");
+
+  const navigateToSceneById = (id) => {
+    if (!id) return;
+    const index = manifest.findIndex((s) => s.id === id);
+    if (index >= 0) jumpToScene(index);
+  };
+
+  // Defer initial hash jump until after preloader settles
+  if (initialHash) {
+    const initialHashTimer = setTimeout(() => navigateToSceneById(initialHash), 1500);
+    cleanup.push(() => clearTimeout(initialHashTimer));
+  }
+
+  // Subsequent hashchange events (user pasting new # URL, browser back/forward)
+  const onHashChange = () => {
+    const id = window.location.hash.replace(/^#/, "");
+    navigateToSceneById(id);
+  };
+  window.addEventListener("hashchange", onHashChange);
+  cleanup.push(() => window.removeEventListener("hashchange", onHashChange));
 
   // Show nav after preloader
   requestAnimationFrame(() => {

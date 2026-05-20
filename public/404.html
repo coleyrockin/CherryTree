@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lost in the petals — Cherry Tree</title>
+  <meta name="description" content="The page you were looking for has drifted away." />
+  <meta name="theme-color" content="#f2e2d8" />
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Plus+Jakarta+Sans:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: radial-gradient(ellipse at 50% 40%, #fbe8f0 0%, #f2e2d8 45%, #e9c9c2 100%);
+      color: #2d1e24;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle bloom orbs in the background */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    .orb-a { top: -10%; left: -8%; width: 380px; height: 380px; background: #ef8bb0; }
+    .orb-b { bottom: -12%; right: -6%; width: 460px; height: 460px; background: #d9577b; opacity: 0.32; }
+    .orb-c { top: 35%; right: 18%; width: 220px; height: 220px; background: #fbe8f0; opacity: 0.55; }
+
+    main { position: relative; z-index: 1; max-width: 520px; }
+    .kicker {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.42em;
+      text-transform: uppercase;
+      color: rgba(45, 30, 36, 0.55);
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-family: "Bodoni Moda", "Times New Roman", serif;
+      font-weight: 400;
+      font-style: italic;
+      font-size: clamp(2.6rem, 7vw, 4.4rem);
+      letter-spacing: -0.01em;
+      line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .numeral {
+      font-family: "Bodoni Moda", serif;
+      font-weight: 500;
+      font-style: normal;
+      font-size: clamp(5rem, 14vw, 8rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: rgba(45, 30, 36, 0.16);
+      margin-bottom: 0.5rem;
+    }
+    p.lede {
+      font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+      color: rgba(45, 30, 36, 0.7);
+      line-height: 1.6;
+      max-width: 36ch;
+      margin: 0 auto 2.25rem;
+    }
+    a.home {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.4rem;
+      border: 1px solid rgba(49, 30, 33, 0.32);
+      border-radius: 999px;
+      color: rgba(45, 30, 36, 0.92);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      background: rgba(253, 246, 240, 0.4);
+      backdrop-filter: blur(6px);
+      transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), border-color 280ms, background 280ms;
+    }
+    a.home:hover, a.home:focus-visible {
+      transform: translateY(-2px);
+      border-color: rgba(49, 30, 33, 0.55);
+      background: rgba(253, 246, 240, 0.7);
+      outline: none;
+    }
+    a.home::after { content: "→"; transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+    a.home:hover::after, a.home:focus-visible::after { transform: translateX(4px); }
+    @media (prefers-reduced-motion: reduce) {
+      a.home, a.home::after { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-a" aria-hidden="true"></div>
+  <div class="orb orb-b" aria-hidden="true"></div>
+  <div class="orb orb-c" aria-hidden="true"></div>
+  <main>
+    <div class="numeral" aria-hidden="true">404</div>
+    <p class="kicker">A Page Adrift</p>
+    <h1>Lost in the petals.</h1>
+    <p class="lede">The page you were looking for has drifted somewhere we can't reach. Let's return to the gallery.</p>
+    <a class="home" href="/">Back to Cherry Tree</a>
+  </main>
+</body>
+</html>
