@@ -86,7 +86,7 @@ const initMotionToggle = ({ mode, reduced, prefersReduced, onToggle }) => {
     }
 
     if (nextMode === "auto") {
-      stateNode.textContent = prefersReduced ? "Reduced*" : "Full*";
+      stateNode.textContent = "System";
       return;
     }
 

@@ -26,8 +26,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Showcase checks
+        run: npm run check:showcase
+
       - name: Build
         run: npm run build
+
+      - name: Production audit
+        run: npm run audit:prod
 
       - name: Verify build output
         run: |

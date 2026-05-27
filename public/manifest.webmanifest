@@ -1,7 +1,7 @@
 {
   "name": "Cherry Tree",
   "short_name": "Cherry Tree",
-  "description": "A scroll-driven cinematic gallery — six scenes, one continuous film.",
+  "description": "A scroll-driven cinematic gallery — seven scenes, one continuous film.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f2e2d8",
@@ -10,6 +10,16 @@
     {
       "src": "/apple-touch-icon.png",
       "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png"
     }
   ]

@@ -1,13 +1,40 @@
 {
   "name": "cherry-tree",
   "version": "2.0.0",
+  "description": "A seven-scene, scroll-driven cinematic gallery with real-time WebGL petals.",
   "private": true,
   "type": "module",
+  "author": "Boyd Roberts",
+  "license": "MIT",
+  "homepage": "https://cherry-tree-psi.vercel.app/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/coleyrockin/CherryTree.git"
+  },
+  "bugs": {
+    "url": "https://github.com/coleyrockin/CherryTree/issues"
+  },
+  "keywords": [
+    "threejs",
+    "gsap",
+    "lenis",
+    "vite",
+    "webgl",
+    "scroll-animation",
+    "cinematic-gallery",
+    "portfolio"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "optimize-assets": "node scripts/optimize-assets.mjs"
+    "optimize-assets": "node scripts/optimize-assets.mjs",
+    "check:showcase": "node scripts/showcase-check.mjs",
+    "audit:prod": "npm audit --omit=dev",
+    "validate": "npm run check:showcase && npm run build && npm run audit:prod"
   },
   "dependencies": {
     "gsap": "^3.13.0",
