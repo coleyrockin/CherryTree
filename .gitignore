@@ -23,3 +23,13 @@ yarn-error.log*
 
 # playwright MCP session files
 .playwright-mcp/
+
+# Playwright test artifacts
+test-results/
+playwright-report/
+
+# Source images for the optimize-assets pipeline are kept under assets-source/
+# (intentionally NOT ignored — committed for reproducible asset regeneration).
+# They are deliberately OUTSIDE public/ so Vercel does not ship them; only the
+# derived variants in public/assets/images/generated/ are served.
+

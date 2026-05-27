@@ -3,7 +3,7 @@ import path from "node:path";
 import sharp from "sharp";
 
 const ROOT_DIR = process.cwd();
-const SOURCE_DIR = path.join(ROOT_DIR, "public/assets/images/source");
+const SOURCE_DIR = path.join(ROOT_DIR, "assets-source");
 const OUTPUT_DIR = path.join(ROOT_DIR, "public/assets/images/generated");
 const WIDTHS = [3840, 2560, 1920, 1280];
 const MAX_INPUT_PIXELS = 50_000_000;

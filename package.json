@@ -34,6 +34,7 @@
     "optimize-assets": "node scripts/optimize-assets.mjs",
     "check:showcase": "node scripts/showcase-check.mjs",
     "audit:prod": "npm audit --omit=dev",
+    "test:smoke": "playwright test",
     "validate": "npm run check:showcase && npm run build && npm run audit:prod"
   },
   "dependencies": {
@@ -42,6 +43,7 @@
     "three": "^0.181.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "sharp": "^0.34.5",
     "vite": "^8.0.10"
   }

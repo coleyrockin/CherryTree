@@ -1,27 +1,8 @@
-import { splitByChars, splitByWords } from "../utils/splitText";
 import { createVelocityTracker } from "../utils/scrollVelocity";
-
-/* ── Motion-preset configurations ─────────────────────────── */
-
-const MOTION_PRESETS = {
-  parallaxDeep: {
-    from: { yPercent: 14, scale: 1.12, filter: "saturate(0.8)" },
-    to: { yPercent: -8, scale: 1, filter: "saturate(1)" },
-    scrub: 1.2
-  },
-  crossfadeLong: {
-    from: { yPercent: 3, scale: 1.04, filter: "saturate(0.92)" },
-    to: { yPercent: -2, scale: 1, filter: "saturate(1)" },
-    scrub: 0.8
-  },
-  driftSlow: {
-    from: { xPercent: -2, rotate: -0.5 },
-    to: { xPercent: 2, rotate: 0.5 },
-    scrub: 1.4
-  }
-};
-
-const DEFAULT_PRESET = MOTION_PRESETS.parallaxDeep;
+import { initSceneColorTransitions } from "./sceneTint";
+import { initVelocityParallax } from "./velocityParallax";
+import { initEpilogueAnimations } from "./epilogueAnimations";
+import { initPointerTilt } from "./pointerTilt";
 
 /* ── Lazy media hydration ──────────────────────────────────── */
 
@@ -103,86 +84,9 @@ const initPresenceObserver = (scenes) => {
   };
 };
 
-/* ── Pointer-reactive tilt (desktop image scenes only) ─── */
-
-const initPointerTilt = (scenes, gsap) => {
-  const isCoarse = window.matchMedia("(pointer: coarse)").matches;
-  if (isCoarse) {
-    return () => { };
-  }
-
-  const MAX_DEG = 1.5;
-  const tiltTargets = [];
-  const abortController = new AbortController();
-
-  scenes.forEach((scene) => {
-    const id = scene.dataset.ctScene;
-    if (id === "prologue-webgl" || id === "triptych") {
-      return;
-    }
-
-    const media = scene.querySelector("[data-scene-media]");
-    if (!media) {
-      return;
-    }
-
-    const state = { targetX: 0, targetY: 0, currentX: 0, currentY: 0 };
-    tiltTargets.push({ media, state });
-
-    scene.addEventListener(
-      "pointermove",
-      (event) => {
-        const bounds = scene.getBoundingClientRect();
-        if (!bounds.width || !bounds.height) {
-          return;
-        }
-        state.targetX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-        state.targetY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
-      },
-      { passive: true, signal: abortController.signal }
-    );
-
-    scene.addEventListener(
-      "pointerleave",
-      () => {
-        state.targetX = 0;
-        state.targetY = 0;
-      },
-      { passive: true, signal: abortController.signal }
-    );
-  });
-
-  if (!tiltTargets.length) {
-    return () => { };
-  }
-
-  const onTick = () => {
-    tiltTargets.forEach(({ media, state }) => {
-      state.currentX += (state.targetX - state.currentX) * 0.06;
-      state.currentY += (state.targetY - state.currentY) * 0.06;
-
-      const rotY = state.currentX * MAX_DEG;
-      const rotX = -state.currentY * MAX_DEG;
-
-      media.style.transform =
-        `perspective(1200px) rotateY(${rotY.toFixed(3)}deg) rotateX(${rotX.toFixed(3)}deg)`;
-    });
-  };
-
-  gsap.ticker.add(onTick);
-
-  return () => {
-    gsap.ticker.remove(onTick);
-    abortController.abort();
-    tiltTargets.forEach(({ media }) => {
-      media.style.transform = "";
-    });
-  };
-};
-
 /* ── Scroll progress bar ────────────────────────────────── */
 
-const initScrollProgress = (gsap, ScrollTrigger) => {
+const initScrollProgress = (ScrollTrigger) => {
   const bar = document.querySelector("[data-ct-scroll-progress]");
   if (!bar) {
     return () => { };
@@ -201,158 +105,9 @@ const initScrollProgress = (gsap, ScrollTrigger) => {
   };
 };
 
-/* ── Scene color transitions ────────────────────────────── */
-
-const createSceneBloomTrigger = () => {
-  let bloomTimer = null;
-
-  const trigger = () => {
-    const bloom = document.querySelector("[data-ct-scene-bloom]");
-    if (!bloom) return;
-
-    bloom.classList.add("is-blooming");
-    if (bloomTimer) {
-      clearTimeout(bloomTimer);
-    }
-
-    bloomTimer = window.setTimeout(() => {
-      bloom.classList.remove("is-blooming");
-    }, 400);
-  };
-
-  const dispose = () => {
-    if (bloomTimer) {
-      clearTimeout(bloomTimer);
-      bloomTimer = null;
-    }
-  };
-
-  return { trigger, dispose };
-};
-
-let lastTintedSceneId = null;
-const applySceneTint = (scene, triggerBloom = null) => {
-  const root = document.documentElement;
-  if (scene.tint) root.style.setProperty("--scene-tint", scene.tint);
-  if (scene.ink) root.style.setProperty("--scene-ink", scene.ink);
-  if (scene.grainTint) root.style.setProperty("--scene-grain", scene.grainTint);
-
-  const numeralNode = document.querySelector("[data-ct-numeral]");
-  const labelNode = document.querySelector("[data-ct-scene-label]");
-  if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;
-  if (labelNode && scene.label) labelNode.textContent = scene.label;
-
-  // Per-scene document title
-  document.title = scene.label ? `${scene.label} — Cherry Tree` : "Cherry Tree";
-
-  // Color-bloom flash on scene transition (not on initial load)
-  if (lastTintedSceneId && lastTintedSceneId !== scene.id) {
-    triggerBloom?.();
-  }
-  lastTintedSceneId = scene.id;
-
-  // Broadcast scene change so cursor labels and other modules can react
-  document.dispatchEvent(
-    new CustomEvent("ct:scene-enter", { detail: { id: scene.id, label: scene.label } })
-  );
-};
-
-// IntersectionObserver-based tint dispatcher — picks the scene with the
-// highest visibility ratio and applies its tint. Avoids the ScrollTrigger
-// creation-time firing issue where all onEnter callbacks run in creation order.
-const initTintObserver = (manifest) => {
-  applySceneTint(manifest[0]);
-  const bloomTrigger = createSceneBloomTrigger();
-
-  if (!("IntersectionObserver" in window)) {
-    return () => {};
-  }
-
-  const sceneByEl = new Map();
-  const ratios = new Map();
-
-  manifest.forEach((scene) => {
-    const el = document.querySelector(`[data-ct-scene="${scene.id}"]`);
-    if (!el) return;
-    sceneByEl.set(el, scene);
-    ratios.set(el, 0);
-  });
-
-  let activeId = manifest[0].id;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        ratios.set(entry.target, entry.intersectionRatio);
-      });
-
-      let bestEl = null;
-      let bestRatio = 0;
-      ratios.forEach((ratio, el) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          bestEl = el;
-        }
-      });
-
-      if (bestEl) {
-        const scene = sceneByEl.get(bestEl);
-        if (scene && scene.id !== activeId) {
-          activeId = scene.id;
-          applySceneTint(scene, bloomTrigger.trigger);
-        }
-      }
-    },
-    { threshold: [0, 0.25, 0.5, 0.75, 1] }
-  );
-
-  sceneByEl.forEach((_scene, el) => observer.observe(el));
-
-  return () => {
-    observer.disconnect();
-    bloomTrigger.dispose();
-  };
-};
-
-const initColorTransitions = (manifest, gsap, ScrollTrigger) => {
-  const bgBlend = document.querySelector("[data-ct-bg-blend]");
-  const triggers = [];
-
-  if (bgBlend) {
-    bgBlend.style.backgroundColor = manifest[0].bgColor;
-    manifest.forEach((scene, index) => {
-      if (index === 0) return;
-      const el = document.querySelector(`[data-ct-scene="${scene.id}"]`);
-      if (!el) return;
-
-      const trigger = ScrollTrigger.create({
-        trigger: el,
-        start: "top 70%",
-        end: "top 30%",
-        scrub: 0.6,
-        onUpdate: (self) => {
-          const prevColor = manifest[index - 1].bgColor;
-          const nextColor = scene.bgColor;
-          const interpolated = gsap.utils.interpolate(prevColor, nextColor, self.progress);
-          bgBlend.style.backgroundColor = interpolated;
-        }
-      });
-      triggers.push(trigger);
-    });
-  }
-
-  const tintCleanup = initTintObserver(manifest);
-
-  return () => {
-    triggers.forEach((t) => t.kill());
-    tintCleanup();
-    if (bgBlend) bgBlend.style.backgroundColor = "";
-  };
-};
-
 /* ── Clip-path image reveals ────────────────────────────── */
 
-const initClipPathReveals = (gsap, ScrollTrigger) => {
+const initClipPathReveals = (gsap) => {
   const animations = [];
 
   // Bloom-wash: iris-open (circle reveal)
@@ -402,122 +157,115 @@ const initClipPathReveals = (gsap, ScrollTrigger) => {
   };
 };
 
-/* ── Split-text epilogue ────────────────────────────────── */
+/* ── Triptych pin-and-reveal timeline ─────────────────── */
 
-const initEpilogueAnimations = (gsap, ScrollTrigger) => {
-  const epilogue = document.querySelector('[data-ct-scene="epilogue"]');
-  if (!epilogue) {
+const initTriptychTimeline = (gsap) => {
+  const triptych = document.querySelector('[data-ct-scene="triptych"]');
+  if (!triptych) {
+    return () => { };
+  }
+
+  const stage = triptych.querySelector(".triptych-stage");
+  const panels = triptych.querySelectorAll(".triptych-panel");
+  if (!stage || !panels.length) {
+    return () => { };
+  }
+
+  const timeline = gsap.timeline({
+    defaults: { ease: "power3.out", duration: 1.1 },
+    scrollTrigger: {
+      trigger: triptych,
+      start: "top top",
+      end: "+=170%",
+      scrub: 1,
+      pin: true,
+      anticipatePin: 1
+    }
+  });
+
+  panels.forEach((panel, index) => {
+    timeline.fromTo(
+      panel,
+      {
+        yPercent: 28 - index * 6,
+        xPercent: index === 1 ? 0 : index === 0 ? -14 : 14,
+        opacity: 0.15,
+        scale: 0.88
+      },
+      { yPercent: 0, xPercent: 0, opacity: 1, scale: 1 },
+      index * 0.22
+    );
+  });
+
+  timeline.to(stage, { rotate: -0.7, duration: 0.8, ease: "sine.inOut" }, 0);
+
+  return () => {
+    timeline.kill();
+  };
+};
+
+/* ── Color-field bloom animation ──────────────────────── */
+
+const initColorFieldBloom = (gsap) => {
+  const colorField = document.querySelector('[data-ct-scene="color-field"] .color-field');
+  if (!colorField) {
     return () => { };
   }
 
   const animations = [];
-  const splitCleanups = [];
+  const blooms = colorField.querySelectorAll(".color-bloom");
+  blooms.forEach((bloom, index) => {
+    animations.push(
+      gsap.to(bloom, {
+        scale: 1.25,
+        rotate: index % 2 === 0 ? 16 : -14,
+        duration: 1.5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: colorField,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.2
+        }
+      })
+    );
+  });
 
-  // Epilogue blooms
-  const epilogueBlooms = epilogue.querySelectorAll(".epilogue-bloom");
-  epilogueBlooms.forEach((bloom, index) => {
+  return () => {
+    animations.forEach((a) => a.kill());
+  };
+};
+
+/* ── Per-scene crossfade (enter/exit) ─────────────────── */
+
+const initSceneCrossfade = (scenes, gsap) => {
+  const animations = [];
+
+  scenes.forEach((scene) => {
+    if (scene.dataset.ctScene === "prologue-webgl") {
+      return;
+    }
+
     animations.push(
       gsap.fromTo(
-        bloom,
-        { scale: 0.6, opacity: 0, rotate: index % 2 === 0 ? -12 : 10 },
+        scene,
+        { opacity: 0.15 },
         {
-          scale: 1.15,
-          opacity: 0.45,
-          rotate: index % 2 === 0 ? 8 : -6,
-          ease: "elastic.out(1, 0.6)",
+          opacity: 1,
+          ease: "power2.out",
           scrollTrigger: {
-            trigger: epilogue,
-            start: "top 80%",
-            end: "top 15%",
-            scrub: 1
+            trigger: scene,
+            start: "top 92%",
+            end: "top 35%",
+            scrub: 0.6
           }
         }
       )
     );
   });
 
-  // Split-text title: chars flip up with rotateX
-  const titleEl = epilogue.querySelector(".epilogue-title");
-  if (titleEl) {
-    const titleSplit = splitByChars(titleEl);
-    splitCleanups.push(titleSplit.revert);
-
-    if (titleSplit.chars.length) {
-      gsap.set(titleSplit.chars, {
-        opacity: 0,
-        rotateX: -90,
-        transformOrigin: "bottom center",
-        y: 20
-      });
-
-      animations.push(
-        gsap.to(titleSplit.chars, {
-          opacity: 0.84,
-          rotateX: 0,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.04,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: epilogue,
-            start: "top 65%",
-            end: "top 25%",
-            scrub: 0.8
-          }
-        })
-      );
-    }
-  }
-
-  // Self-drawing horizontal rule
-  const ruleEl = epilogue.querySelector(".epilogue-rule");
-  if (ruleEl) {
-    animations.push(
-      gsap.to(ruleEl, {
-        width: "min(280px, 60vw)",
-        opacity: 0.6,
-        duration: 1,
-        ease: "power2.inOut",
-        scrollTrigger: {
-          trigger: epilogue,
-          start: "top 55%",
-          end: "top 25%",
-          scrub: 0.6
-        }
-      })
-    );
-  }
-
-  // Subtitle word stagger
-  const subtitleEl = epilogue.querySelector(".epilogue-subtitle");
-  if (subtitleEl) {
-    const subtitleSplit = splitByWords(subtitleEl);
-    splitCleanups.push(subtitleSplit.revert);
-
-    if (subtitleSplit.words.length) {
-      gsap.set(subtitleSplit.words, { opacity: 0, y: 14 });
-
-      animations.push(
-        gsap.to(subtitleSplit.words, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.08,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: epilogue,
-            start: "top 50%",
-            end: "top 20%",
-            scrub: 0.6
-          }
-        })
-      );
-    }
-  }
-
   return () => {
     animations.forEach((a) => a.kill());
-    splitCleanups.forEach((fn) => fn());
   };
 };
 
@@ -571,7 +319,6 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   gsap.ticker.add(tick);
   gsap.ticker.lagSmoothing(0);
 
-  // Create velocity tracker
   const velocityTracker = createVelocityTracker(lenis);
   velocityTracker.attachTicker(gsap);
 
@@ -582,202 +329,15 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
     lenis.destroy();
   });
 
-  const animations = [];
-
-  /* ── Scene color transitions ─── */
-  cleanup.push(initColorTransitions(manifest, gsap, ScrollTrigger));
-
-  /* ── Per-scene crossfade (enter/exit) ─── */
-  scenes.forEach((scene) => {
-    const id = scene.dataset.ctScene;
-    if (id === "prologue-webgl") {
-      return;
-    }
-
-    animations.push(
-      gsap.fromTo(
-        scene,
-        { opacity: 0.15 },
-        {
-          opacity: 1,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: scene,
-            start: "top 92%",
-            end: "top 35%",
-            scrub: 0.6
-          }
-        }
-      )
-    );
-  });
-
-  /* ── Per-scene media animation (preset-driven) ─── */
-  const isMobileViewport = window.matchMedia("(max-width: 760px)").matches;
-
-  scenes.forEach((scene) => {
-    const preset = MOTION_PRESETS[scene.dataset.motionPreset] || DEFAULT_PRESET;
-    const id = scene.dataset.ctScene;
-
-    if (id === "triptych") {
-      return;
-    }
-
-    const media = scene.querySelector("[data-scene-media]");
-    if (media) {
-      animations.push(
-        gsap.fromTo(
-          media,
-          { ...preset.from },
-          {
-            ...preset.to,
-            ease: "none",
-            scrollTrigger: {
-              trigger: scene,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: preset.scrub
-            }
-          }
-        )
-      );
-    }
-
-    const matte = scene.querySelector(".scene-matte");
-    if (matte) {
-      animations.push(
-        gsap.fromTo(
-          matte,
-          { opacity: 0.45 },
-          {
-            opacity: 0.18,
-            ease: "none",
-            scrollTrigger: {
-              trigger: scene,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 0.9
-            }
-          }
-        )
-      );
-    }
-
-    // Text layer counter-parallax: text floats slower than media for depth.
-    // Disabled on mobile to prevent text drifting into the fixed nav zone.
-    const textLayer = scene.querySelector(".scene-text");
-    if (textLayer && id !== "triptych" && !isMobileViewport) {
-      animations.push(
-        gsap.fromTo(
-          textLayer,
-          { yPercent: -6 },
-          {
-            yPercent: 10,
-            ease: "none",
-            scrollTrigger: {
-              trigger: scene,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.4
-            }
-          }
-        )
-      );
-    }
-  });
-
-  /* ── Triptych pin-and-reveal timeline ─── */
-  const triptych = document.querySelector('[data-ct-scene="triptych"]');
-  if (triptych) {
-    const stage = triptych.querySelector(".triptych-stage");
-    const panels = triptych.querySelectorAll(".triptych-panel");
-
-    if (stage && panels.length) {
-      const timeline = gsap.timeline({
-        defaults: {
-          ease: "power3.out",
-          duration: 1.1
-        },
-        scrollTrigger: {
-          trigger: triptych,
-          start: "top top",
-          end: "+=170%",
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1
-        }
-      });
-
-      panels.forEach((panel, index) => {
-        timeline.fromTo(
-          panel,
-          {
-            yPercent: 28 - index * 6,
-            xPercent: index === 1 ? 0 : index === 0 ? -14 : 14,
-            opacity: 0.15,
-            scale: 0.88
-          },
-          {
-            yPercent: 0,
-            xPercent: 0,
-            opacity: 1,
-            scale: 1
-          },
-          index * 0.22
-        );
-      });
-
-      timeline.to(
-        stage,
-        {
-          rotate: -0.7,
-          duration: 0.8,
-          ease: "sine.inOut"
-        },
-        0
-      );
-
-      animations.push(timeline);
-    }
-  }
-
-  /* ── Color-field bloom animation ─── */
-  const colorField = document.querySelector('[data-ct-scene="color-field"] .color-field');
-  if (colorField) {
-    const blooms = colorField.querySelectorAll(".color-bloom");
-    blooms.forEach((bloom, index) => {
-      animations.push(
-        gsap.to(bloom, {
-          scale: 1.25,
-          rotate: index % 2 === 0 ? 16 : -14,
-          duration: 1.5,
-          ease: "none",
-          scrollTrigger: {
-            trigger: colorField,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: 1.2
-          }
-        })
-      );
-    });
-  }
-
-  /* ── Clip-path image reveals ─── */
-  cleanup.push(initClipPathReveals(gsap, ScrollTrigger));
-
-  /* ── Epilogue animations ─── */
-  cleanup.push(initEpilogueAnimations(gsap, ScrollTrigger));
-
-  /* ── Pointer tilt ─── */
+  cleanup.push(initSceneColorTransitions(manifest, gsap, ScrollTrigger));
+  cleanup.push(initSceneCrossfade(scenes, gsap));
+  cleanup.push(initVelocityParallax({ scenes, gsap, velocityTracker }));
+  cleanup.push(initTriptychTimeline(gsap));
+  cleanup.push(initColorFieldBloom(gsap));
+  cleanup.push(initClipPathReveals(gsap));
+  cleanup.push(initEpilogueAnimations(gsap));
   cleanup.push(initPointerTilt(scenes, gsap));
-
-  /* ── Scroll progress ─── */
-  cleanup.push(initScrollProgress(gsap, ScrollTrigger));
-
-  cleanup.push(() => {
-    animations.forEach((animation) => animation.kill());
-  });
+  cleanup.push(initScrollProgress(ScrollTrigger));
 
   return {
     gsap,
