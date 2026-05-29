@@ -127,8 +127,9 @@ by `background-position`. Tint `#6688aa` (steel-blue — new hue). Gate the over
 animation behind `html[data-motion="reduced"] … { animation: none }`.
 
 **Koi — living pond** · `driftSlow` · *Medium* · ✅ **SHIPPED (scene 06)**
-Shipped as **real koi-pond video** (CC0, Pexels) in a framed dark water panel
-that mirrors `.color-field` sizing. Sources are lazy/visibility-driven via
+Shipped as **real koi-pond video** (CC0, Pexels — a calm, sparse top-down clip of
+a few koi drifting in dark water) in a framed dark water panel that mirrors
+`.color-field` sizing. Sources are lazy/visibility-driven via
 `src/experience/koiVideo.js` (`preload="none"` → hydrate + play on approach,
 pause offscreen; reduced motion shows the poster only). Optimised to WebM+MP4 at
 960×540/12s (~1.3–1.5 MB each) in `public/assets/video/`. Light title over a soft
