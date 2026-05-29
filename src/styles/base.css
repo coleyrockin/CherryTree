@@ -12,6 +12,7 @@
   --ink-soft: rgba(45, 30, 36, 0.72);
   --rose: #cc5f87;
   --rose-bright: #ef8bb0;
+  --rose-deep: #bb4168;
   --olive: #6e8b66;
   --matte: rgba(240, 218, 207, 0.28);
   --line: rgba(66, 38, 47, 0.2);
@@ -262,15 +263,15 @@ html[data-motion="reduced"] .marquee-ribbon {
 
 .sound-toggle:focus-visible,
 .motion-toggle:focus-visible {
-  outline: 2px solid rgba(206, 98, 134, 0.38);
+  outline: 2px solid var(--rose-deep);
   outline-offset: 3px;
 }
 
 .sound-toggle.is-enabled,
 .motion-toggle.is-enabled {
-  background: #bb4168;
+  background: var(--rose-deep);
   color: #fff;
-  border-color: #bb4168;
+  border-color: var(--rose-deep);
 }
 
 .sound-toggle-state,
@@ -505,6 +506,15 @@ html[data-motion="reduced"] .scene {
 .motion-toggle,
 .scene-nav-dot {
   animation: breathe 4s ease-in-out infinite;
+}
+
+/* Offset the cycles so the controls breathe organically, not in lockstep */
+.motion-toggle {
+  animation-delay: -1.3s;
+}
+
+.scene-nav-dot {
+  animation-delay: -2.6s;
 }
 
 .sound-toggle:hover,

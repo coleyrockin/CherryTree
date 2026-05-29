@@ -39,10 +39,6 @@
   clip-path: circle(0% at 50% 50%);
 }
 
-.scene-bloom .scene-media.is-revealed {
-  clip-path: circle(85% at 50% 50%);
-}
-
 /* No filter — the photo is already gorgeous */
 .scene-bloom .scene-media img {
   filter: saturate(1.08) contrast(1.04);
@@ -69,9 +65,6 @@
     0 2px 14px rgba(22, 10, 20, 0.32);
 }
 
-html[data-motion="reduced"] .scene-bloom .scene-media {
-  clip-path: none !important;
-}
 
 /* ── Drift — photographic, pathway between blossoms ─────────── */
 
@@ -261,7 +254,7 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
   inset: -4%;
   z-index: 0;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 46%, #1d3530, #0e1917 92%);
+  /* Pre-hydration backdrop comes from .scene-koi behind this layer. */
 }
 
 .koi-video {
@@ -356,6 +349,12 @@ html.is-scene-dark .scene-nav-dot::before {
   background: rgba(255, 255, 255, 0.42);
 }
 
+/* Active dot picks up the scene tint (koi gold) — cohesive with the numeral,
+   and reads as the active marker rather than muddy rose over dark footage. */
+html.is-scene-dark .scene-nav-dot[aria-current="step"]::before {
+  background: var(--scene-tint);
+}
+
 /* Focus rings: the rose outline is near-invisible on the dark scene (1.7:1) */
 html.is-scene-dark .motion-toggle:focus-visible,
 html.is-scene-dark .sound-toggle:focus-visible,
@@ -383,10 +382,6 @@ html.is-scene-dark .film-grain {
 .scene-stillness .scene-media {
   z-index: 1;
   clip-path: inset(100% 0 0 0);
-}
-
-.scene-stillness .scene-media.is-revealed {
-  clip-path: inset(0 0 0 0);
 }
 
 .scene-stillness .scene-media img {
@@ -571,10 +566,6 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
 }
 
 @media (max-width: 760px) {
-  .scene-triptych {
-    padding: 8vh 0;
-  }
-
   .triptych-stage {
     grid-template-columns: 1fr;
     min-height: auto;
