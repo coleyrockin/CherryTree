@@ -116,6 +116,31 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
     rgba(58, 26, 36, 0.32) 100%);
 }
 
+/* Text-only legibility halo for the white-title photo scenes. A soft, blurred
+   pool sits directly behind the title block so white text stays readable on
+   bright blossom/sky regions — WITHOUT re-muting the whole photo (the full
+   scene-matte stays disabled on Bloom by design). Absolutely positioned so it
+   never becomes a flex item and never shifts the centered text. */
+.scene-bloom .scene-text::before,
+.scene-drift .scene-text::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(82%, 56ch);
+  height: 46%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(22, 10, 16, 0.3) 0%,
+    rgba(22, 10, 16, 0.14) 42%,
+    rgba(22, 10, 16, 0) 72%
+  );
+  filter: blur(22px);
+}
+
 .scene-triptych {
   background:
     linear-gradient(180deg, rgba(240, 224, 215, 0.82), rgba(232, 212, 205, 0.93)),
@@ -180,7 +205,7 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
 }
 
 .color-field::before {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0), rgba(39, 17, 22, 0.22));
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0), rgba(39, 17, 22, 0.3));
 }
 
 .color-field::after {
@@ -510,9 +535,9 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   font-weight: 500;
   letter-spacing: 0.4em;
   text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.46);
+  color: rgba(49, 30, 33, 0.74);
   padding-bottom: clamp(10px, 1.2vw, 18px);
-  border-bottom: 1px solid rgba(49, 30, 33, 0.18);
+  border-bottom: 1px solid rgba(49, 30, 33, 0.3);
   margin-bottom: clamp(14px, 1.8vw, 22px);
 }
 
@@ -553,7 +578,7 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   font-size: clamp(0.85rem, 1.8vw, 1.15rem);
   font-weight: 400;
   letter-spacing: 0.08em;
-  color: rgba(49, 30, 33, 0.48);
+  color: rgba(49, 30, 33, 0.6);
   text-shadow: 0 2px 20px rgba(247, 233, 224, 0.6);
 }
 

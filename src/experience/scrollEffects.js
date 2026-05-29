@@ -9,7 +9,7 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
   const animations = [];
   const velocity = { value: 0 };
 
-  // Track scroll velocity
+  // Track scroll velocity (single ScrollTrigger, onUpdate is scroll-driven)
   const velocityTracker = ScrollTrigger.create({
     start: 0,
     end: "max",
@@ -18,6 +18,10 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
     }
   });
 
+  // Build per-ribbon drift state once; a single shared ticker updates them all
+  // (one gsap.ticker callback for N ribbons rather than one per ribbon).
+  const tracks = [];
+
   ribbons.forEach((ribbon) => {
     const track = ribbon.querySelector(".marquee-track");
     if (!track) {
@@ -25,26 +29,12 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
     }
 
     const isReverse = ribbon.classList.contains("marquee-ribbon-reverse");
-    const baseSpeed = isReverse ? 0.03 : -0.03;
-
-    // Continuous drift driven by GSAP ticker
-    let xPos = 0;
-    const trackWidth = track.scrollWidth / 2;
-
-    const onTick = () => {
-      const velocityBoost = velocity.value * 0.00004;
-      xPos += baseSpeed + velocityBoost;
-
-      // Loop seamlessly
-      if (Math.abs(xPos) > trackWidth) {
-        xPos = xPos % trackWidth;
-      }
-
-      track.style.transform = `translateX(${xPos}px)`;
-    };
-
-    gsap.ticker.add(onTick);
-    animations.push(() => gsap.ticker.remove(onTick));
+    tracks.push({
+      track,
+      baseSpeed: isReverse ? 0.03 : -0.03,
+      xPos: 0,
+      trackWidth: track.scrollWidth / 2
+    });
 
     // Fade in on scroll
     animations.push(
@@ -65,9 +55,25 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
     );
   });
 
+  let sharedTick = null;
+  if (tracks.length) {
+    sharedTick = () => {
+      const velocityBoost = velocity.value * 0.00004;
+      tracks.forEach((t) => {
+        t.xPos += t.baseSpeed + velocityBoost;
+        if (Math.abs(t.xPos) > t.trackWidth) {
+          t.xPos = t.xPos % t.trackWidth;
+        }
+        t.track.style.transform = `translateX(${t.xPos}px)`;
+      });
+    };
+    gsap.ticker.add(sharedTick);
+  }
+
   return () => {
     velocityTracker.kill();
-    animations.forEach((fn) => (typeof fn === "function" ? fn() : fn.kill()));
+    if (sharedTick) gsap.ticker.remove(sharedTick);
+    animations.forEach((a) => a.kill());
   };
 };
 
@@ -86,6 +92,38 @@ const initCursorGlow = () => {
   let isVisible = false;
   let rafId = 0;
 
+  // Position via transform from the viewport origin so the per-frame update is
+  // composite-only (no layout). The -50%/-50% preserves the centered glow.
+  glow.style.left = "0";
+  glow.style.top = "0";
+
+  const paint = () => {
+    glow.style.transform =
+      `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
+  };
+
+  const animate = () => {
+    currentX += (targetX - currentX) * 0.08;
+    currentY += (targetY - currentY) * 0.08;
+    paint();
+
+    // Stop the loop once we've caught up to the pointer — restarts on move.
+    if (Math.abs(targetX - currentX) < 0.1 && Math.abs(targetY - currentY) < 0.1) {
+      currentX = targetX;
+      currentY = targetY;
+      paint();
+      rafId = 0;
+      return;
+    }
+    rafId = requestAnimationFrame(animate);
+  };
+
+  const ensureRunning = () => {
+    if (!rafId) {
+      rafId = requestAnimationFrame(animate);
+    }
+  };
+
   const onMove = (e) => {
     targetX = e.clientX;
     targetY = e.clientY;
@@ -94,6 +132,7 @@ const initCursorGlow = () => {
       isVisible = true;
       glow.style.opacity = "1";
     }
+    ensureRunning();
   };
 
   const onLeave = () => {
@@ -101,41 +140,14 @@ const initCursorGlow = () => {
     glow.style.opacity = "0";
   };
 
-  const animate = () => {
-    currentX += (targetX - currentX) * 0.08;
-    currentY += (targetY - currentY) * 0.08;
-    glow.style.left = `${currentX}px`;
-    glow.style.top = `${currentY}px`;
-    rafId = requestAnimationFrame(animate);
-  };
-
   document.addEventListener("pointermove", onMove, { passive: true });
   document.addEventListener("pointerleave", onLeave, { passive: true });
-  rafId = requestAnimationFrame(animate);
 
   return () => {
     document.removeEventListener("pointermove", onMove);
     document.removeEventListener("pointerleave", onLeave);
-    cancelAnimationFrame(rafId);
+    if (rafId) cancelAnimationFrame(rafId);
     glow.style.opacity = "0";
-  };
-};
-
-/* ── Enhanced scroll progress with glow pulse ──────────────── */
-
-const initScrollProgressGlow = () => {
-  const bar = document.querySelector("[data-ct-scroll-progress]");
-  if (!bar) {
-    return () => {};
-  }
-
-  // Add a glow effect to the progress bar
-  bar.style.boxShadow = "0 0 12px rgba(204, 95, 135, 0.4)";
-  bar.style.height = "3px";
-
-  return () => {
-    bar.style.boxShadow = "";
-    bar.style.height = "";
   };
 };
 
@@ -159,8 +171,8 @@ export const initScrollEffects = async ({ reducedMotion = false }) => {
   gsap.registerPlugin(ScrollTrigger);
 
   cleanup.push(initMarqueeRibbons(gsap, ScrollTrigger));
-  // Note: clip-path reveals are handled by sceneController.js
-  cleanup.push(initScrollProgressGlow());
+  // Note: clip-path reveals are handled by sceneController.js.
+  // The scroll-progress glow/height now lives in CSS (.scroll-progress).
 
   return () => cleanup.forEach((fn) => fn?.());
 };

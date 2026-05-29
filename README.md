@@ -120,10 +120,14 @@ src/
 ├── experience/
 │   ├── heroWebgl.js          # Three.js petal field + custom shader
 │   ├── preloader.js          # FLIP brand → hero title transition
-│   ├── sceneController.js    # IntersectionObserver, tint dispatch, lazy media
+│   ├── sceneController.js    # Orchestrator: lazy media, presence, clip-path reveals, triptych
+│   ├── sceneTint.js          # IntersectionObserver tint dispatch + bg-color blend
+│   ├── velocityParallax.js   # Per-scene media/text parallax presets
+│   ├── epilogueAnimations.js # Epilogue split-text + bloom reveals
+│   ├── pointerTilt.js        # Desktop pointer-reactive image tilt
 │   ├── sceneNav.js           # Right-rail numerals + active state
-│   ├── scrollEffects.js      # GSAP ScrollTrigger orchestration
-│   ├── scrollVelocityFx.js   # Velocity-driven parallax
+│   ├── scrollEffects.js      # Marquee ribbons + cursor-glow
+│   ├── scrollVelocityFx.js   # Scroll-velocity blur + grain boost
 │   ├── magneticCursor.js     # Custom cursor with contextual labels
 │   ├── microInteractions.js  # Hover, focus, scroll-hint micro-anims
 │   ├── textAnimations.js     # Char/word splits and reveals

@@ -34,9 +34,10 @@ None.
 - Status: Fixed
 - Location: `index.html:25-38`, `index.html:47-50`, `index.html:296`, `vercel.json:1-24`
 - Rule: JS-CSP-001, JS-CSP-002, JS-TT-001
-- Evidence: `vercel.json` now ships a header-delivered CSP. Inline script execution is limited to hashes for the existing JSON-LD and no-js boot blocks, and the policy avoids `unsafe-eval`.
+- Evidence: `vercel.json` now ships a header-delivered CSP. The only executable inline script (the no-js→js classlist swap) is pinned by `'sha256-4kQO9Cu9+CG6W4TqXRcp/FyT0ez8jgpUssYPeytIJZA='`, and the policy avoids `unsafe-eval` / `unsafe-inline`.
 - Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
 - Validation: `npm run build` passed after adding the header config; `vercel.json` parses as valid JSON; CSP inline allowances were checked against both `index.html` and `dist/index.html`.
+- 2026-05-28 hardening: removed a stale orphan hash (`'sha256-i9oAhtQaH0dZXNqHwY+w5xdjuzZaw24l/fWEyHD9pSI='`) that matched no inline script in either `index.html` or `dist/index.html`. Verified by recomputing SHA-256 over every inline `<script>` block in both files; the JSON-LD block is `type="application/ld+json"` (data, not governed by `script-src`) and needs no hash. Removing the orphan only tightens the policy and changes no live hash.
 - False positive notes: Trusted Types enforcement is not enabled yet because the current app has no remaining raw HTML sink in source and the immediate fix is a deployable CSP baseline.
 
 ## Low Findings

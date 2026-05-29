@@ -44,8 +44,12 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
     rel="stylesheet" />
-  <link rel="preload" as="image" href="/assets/images/generated/prologue-fallback-1920.jpg"
-    imagesrcset="/assets/images/generated/prologue-fallback-1280.jpg 1280w, /assets/images/generated/prologue-fallback-1920.jpg 1920w, /assets/images/generated/prologue-fallback-2560.jpg 2560w, /assets/images/generated/prologue-fallback-3840.jpg 3840w"
+  <!-- LCP hero preload. Typed AVIF matches what <picture> serves to the vast
+       majority of browsers, so the preload is the exact resource rendered (no
+       wasted JPEG fetch). Non-AVIF browsers ignore this and discover the WebP/
+       JPEG sources normally. A single typed preload avoids double-downloading. -->
+  <link rel="preload" as="image" type="image/avif" href="/assets/images/generated/prologue-fallback-1920.avif"
+    imagesrcset="/assets/images/generated/prologue-fallback-1280.avif 1280w, /assets/images/generated/prologue-fallback-1920.avif 1920w, /assets/images/generated/prologue-fallback-2560.avif 2560w, /assets/images/generated/prologue-fallback-3840.avif 3840w"
     imagesizes="100vw" fetchpriority="high" />
   <script>
     document.documentElement.classList.remove("no-js");

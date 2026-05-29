@@ -101,7 +101,6 @@ html[data-motion="reduced"] .scene-tint-flash {
   background-image: radial-gradient(var(--scene-grain) 0.75px, transparent 0.85px);
   background-size: 4px 4px;
   animation: grainDrift 0.8s steps(4) infinite;
-  transition: background-image 900ms var(--ease-gallery);
 }
 
 @keyframes grainDrift {
@@ -373,13 +372,14 @@ html[data-motion="reduced"] .marquee-ribbon {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 2px;
+  height: 3px;
   z-index: 15;
   pointer-events: none;
   transform-origin: left center;
   transform: scaleX(0);
   background: linear-gradient(90deg, var(--rose), var(--rose-bright));
   opacity: 0.7;
+  box-shadow: 0 0 12px rgba(204, 95, 135, 0.4);
 }
 
 .no-js .hero-webgl {

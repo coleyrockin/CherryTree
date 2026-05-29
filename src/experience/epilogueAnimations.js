@@ -99,6 +99,11 @@ export const initEpilogueAnimations = (gsap) => {
     splitCleanups.push(subtitleSplit.revert);
 
     if (subtitleSplit.words.length) {
+      // Reveal the container: its CSS opacity is 0 (it expects an `.is-visible`
+      // class that nothing adds), so the word-stagger below was animating inside
+      // an invisible parent in full motion. Show the parent and let the words
+      // carry the reveal. Reduced motion keeps the CSS `!important` opacity.
+      gsap.set(subtitleEl, { opacity: 1 });
       gsap.set(subtitleSplit.words, { opacity: 0, y: 14 });
 
       animations.push(

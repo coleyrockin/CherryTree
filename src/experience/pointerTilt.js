@@ -30,7 +30,7 @@ export const initPointerTilt = (scenes, gsap) => {
       return;
     }
 
-    const state = { targetX: 0, targetY: 0, currentX: 0, currentY: 0 };
+    const state = { targetX: 0, targetY: 0, currentX: 0, currentY: 0, lastRotY: null, lastRotX: null };
     tiltTargets.push({ media, state });
 
     scene.addEventListener(
@@ -65,11 +65,19 @@ export const initPointerTilt = (scenes, gsap) => {
       state.currentX += (state.targetX - state.currentX) * SMOOTH;
       state.currentY += (state.targetY - state.currentY) * SMOOTH;
 
-      const rotY = state.currentX * MAX_DEG;
-      const rotX = -state.currentY * MAX_DEG;
+      const rotY = Number((state.currentX * MAX_DEG).toFixed(3));
+      const rotX = Number((-state.currentY * MAX_DEG).toFixed(3));
+
+      // Skip the style write once the tilt has settled — identical output,
+      // no per-frame transform mutation while the pointer is still.
+      if (rotY === state.lastRotY && rotX === state.lastRotX) {
+        return;
+      }
+      state.lastRotY = rotY;
+      state.lastRotX = rotX;
 
       media.style.transform =
-        `perspective(1200px) rotateY(${rotY.toFixed(3)}deg) rotateX(${rotX.toFixed(3)}deg)`;
+        `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
     });
   };
 

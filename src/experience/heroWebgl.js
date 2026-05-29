@@ -346,6 +346,9 @@ export const initHeroWebgl = async ({
   let rafId = 0;
   let lastTime = performance.now();
   let isActive = true;
+  let isOnscreen = true;
+  let isPageVisible =
+    typeof document.visibilityState === "string" ? !document.hidden : true;
 
   const updatePetals = (elapsed, deltaSeconds) => {
     const t = elapsed * 0.00035;
@@ -400,6 +403,16 @@ export const initHeroWebgl = async ({
     renderer.setSize(bounds.width, bounds.height, false);
     camera.aspect = bounds.width / bounds.height;
     camera.updateProjectionMatrix();
+  };
+
+  // Coalesce bursts of resize events (mobile orientation change fires twice)
+  // so we reallocate GPU buffers once rather than per event. Same end result.
+  let resizeTimer = 0;
+  const onResize = () => {
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
+    resizeTimer = window.setTimeout(resize, 120);
   };
 
   const renderFrame = (time) => {
@@ -467,28 +480,65 @@ export const initHeroWebgl = async ({
   // Pause the dolly along with the render loop — otherwise camera.position.z
   // keeps mutating on scroll while we're not rendering, and the next time
   // the prologue comes into view the first frame can pop.
+  // Render only when the hero is both on-screen (IntersectionObserver) AND the
+  // tab is foregrounded (visibilitychange). isActive remains the single source
+  // of truth that renderFrame gates on; the dolly + reduced-motion single-render
+  // paths are preserved exactly as before.
+  const applyActiveState = () => {
+    const next = isOnscreen && isPageVisible;
+    if (next === isActive) {
+      return;
+    }
+    isActive = next;
+    if (isActive) {
+      dollyTrigger?.enable();
+      if (reducedMotion) {
+        renderer.render(scene, camera);
+      } else {
+        startLoop();
+      }
+    } else {
+      stopLoop();
+      dollyTrigger?.disable();
+    }
+  };
+
   let visibilityObserver = null;
   if ("IntersectionObserver" in window) {
     visibilityObserver = new IntersectionObserver(
       ([entry]) => {
-        isActive = !!entry?.isIntersecting;
-        if (isActive) {
-          dollyTrigger?.enable();
-          if (reducedMotion) {
-            renderer.render(scene, camera);
-          } else {
-            startLoop();
-          }
-        } else {
-          stopLoop();
-          dollyTrigger?.disable();
-        }
+        isOnscreen = !!entry?.isIntersecting;
+        applyActiveState();
       },
       { threshold: 0.1 }
     );
   }
 
-  window.addEventListener("resize", resize);
+  const onVisibilityChange = () => {
+    isPageVisible = !document.hidden;
+    applyActiveState();
+  };
+  document.addEventListener("visibilitychange", onVisibilityChange);
+
+  // Best-effort WebGL context-loss recovery. On mobile Safari / low-memory
+  // devices the OS can reclaim the context; without this the loop renders on a
+  // dead context and spams INVALID_OPERATION every frame.
+  const onContextLost = (event) => {
+    event.preventDefault();
+    stopLoop();
+  };
+  const onContextRestored = () => {
+    resize();
+    if (reducedMotion) {
+      renderer.render(scene, camera);
+    } else if (isActive) {
+      startLoop();
+    }
+  };
+  canvas.addEventListener("webglcontextlost", onContextLost, false);
+  canvas.addEventListener("webglcontextrestored", onContextRestored, false);
+
+  window.addEventListener("resize", onResize);
   host.addEventListener("pointermove", handlePointerMove, { passive: true });
   host.addEventListener("pointerleave", handlePointerLeave, { passive: true });
   visibilityObserver?.observe(host);
@@ -505,9 +555,15 @@ export const initHeroWebgl = async ({
 
   return () => {
     stopLoop();
+    if (resizeTimer) {
+      clearTimeout(resizeTimer);
+    }
     dollyTrigger?.kill();
     visibilityObserver?.disconnect();
-    window.removeEventListener("resize", resize);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
+    canvas.removeEventListener("webglcontextlost", onContextLost);
+    canvas.removeEventListener("webglcontextrestored", onContextRestored);
+    window.removeEventListener("resize", onResize);
     host.removeEventListener("pointermove", handlePointerMove);
     host.removeEventListener("pointerleave", handlePointerLeave);
 
@@ -519,6 +575,7 @@ export const initHeroWebgl = async ({
     hazeGeometry.dispose();
     hazeMaterial.dispose();
 
+    scene.clear();
     renderer.dispose();
     host.classList.remove("is-webgl-ready");
   };
