@@ -131,8 +131,11 @@ Shipped as a **full-bleed real koi-pond video** (CC0, Pexels — a calm, sparse
 top-down clip of a few koi drifting in dark water) covering the whole scene
 viewport. Sources are lazy/visibility-driven via `src/experience/koiVideo.js`
 (`preload="none"` → hydrate + play on approach, pause offscreen; reduced motion
-shows the poster only). Optimised to WebM (2.9 MB) + MP4 (3.5 MB) at 1080p/12s in
-`public/assets/video/`. Light title over a soft scrim; tint `#e8a24a` (koi gold).
+shows the poster only). Encoded at native **4K (3840×2160)/12s** from the Pexels
+4K master: WebM/VP9 9.2 MB (Chrome/Firefox/Android/desktop) + MP4/**HEVC** 5.6 MB
+(`hvc1` tag — Apple/iOS plays it natively at roughly half the h264 size). Source
+`type` carries explicit `codecs` so each client picks the right file without a
+wasted fetch. Light title over a soft scrim; tint `#e8a24a` (koi gold).
 
 **Dark-scene pattern (reusable):** the manifest carries `dark: true`, which
 `sceneTint.js` turns into `html.is-scene-dark`; `scenes.css` uses that to flip the

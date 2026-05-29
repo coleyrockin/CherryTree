@@ -29,7 +29,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 | 03 | **Drift** | Photographic wind path, parallax-deep motion preset |
 | 04 | **Triptych** | Three composite panels, parallax-deep motion preset |
 | 05 | **Color Field** | Triple bloom layers, slow drift, painterly transition |
-| 06 | **Koi** | Full-bleed living koi-pond video (1080p, lazy-loaded), light-chrome dark scene |
+| 06 | **Koi** | Full-bleed living koi-pond video (4K, VP9 + HEVC, lazy-loaded), light-chrome dark scene |
 | 07 | **Stillness** | Single still image, film-dust grain overlay |
 | 08 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
 
