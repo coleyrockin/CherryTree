@@ -6,6 +6,11 @@ const ROOT_DIR = process.cwd();
 const SOURCE_DIR = path.join(ROOT_DIR, "assets-source");
 const OUTPUT_DIR = path.join(ROOT_DIR, "public/assets/images/generated");
 const WIDTHS = [3840, 2560, 1920, 1280];
+// Per-image max-width caps. triptych-a is a tall 3:4 portrait (3840x5120 — ~2x
+// the megapixels of the landscape panels), shown in a <=33vw (100vw on mobile)
+// panel that never needs a 3840px tier. Capping it at 2560 drops a ~2.6MB JPEG /
+// ~1.35MB AVIF that was effectively never selected, with no visible quality loss.
+const MAX_WIDTH_OVERRIDES = { "triptych-a": 2560 };
 const MAX_INPUT_PIXELS = 50_000_000;
 const INPUT_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
@@ -59,8 +64,10 @@ const run = async () => {
   for (const entry of inputFiles) {
     const inputPath = path.join(SOURCE_DIR, entry.name);
     const baseName = path.parse(entry.name).name;
+    const maxWidth = MAX_WIDTH_OVERRIDES[baseName] ?? Infinity;
+    const widths = WIDTHS.filter((width) => width <= maxWidth);
 
-    for (const width of WIDTHS) {
+    for (const width of widths) {
       await writeFormatsForWidth(inputPath, baseName, width);
       console.log(`Generated ${baseName} at ${width}px (avif/webp/jpg)`);
     }

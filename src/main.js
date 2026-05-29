@@ -350,6 +350,14 @@ const boot = async () => {
     const { initKoiVideo } = await import("./experience/koiVideo");
     registerCleanup(initKoiVideo({ reducedMotion }));
 
+    // Reduced motion: sceneNav (which drives screen-reader announcements + the
+    // URL hash) is full-motion-only, so wire an IntersectionObserver-based
+    // announcer here for accessibility parity (WCAG 4.1.3).
+    if (reducedMotion) {
+      const { initSceneAnnouncer } = await import("./experience/sceneAnnouncer");
+      registerCleanup(initSceneAnnouncer({ manifest: sceneManifest }));
+    }
+
     if (isStale()) {
       disposeCollection(pendingCleanup);
       return;

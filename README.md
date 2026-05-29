@@ -127,6 +127,7 @@ src/
 │   ├── epilogueAnimations.js # Epilogue split-text + bloom reveals
 │   ├── koiVideo.js           # Koi-pond video lazy-load + visibility play/pause
 │   ├── pointerTilt.js        # Desktop pointer-reactive image tilt
+│   ├── sceneAnnouncer.js     # Reduced-motion aria-live + hash sync
 │   ├── sceneNav.js           # Right-rail numerals + active state
 │   ├── scrollEffects.js      # Marquee ribbons + cursor-glow
 │   ├── scrollVelocityFx.js   # Scroll-velocity blur + grain boost
