@@ -4,9 +4,10 @@ A practical guide for adding new nature-scenery scenes that fit the existing
 aesthetic and reuse the existing engine. No new runtime dependencies are ever
 needed to add a scene — the scroll/tint/parallax machinery is fully data-driven.
 
-> Status: planning doc. Nothing here is wired up yet. Pick a scene, follow the
-> playbook, ship it behind the same `npm run validate` + `npm run test:smoke`
-> gates as everything else.
+> Status: planning doc. **Koi (scene 06) shipped** — the first scene built from
+> this catalog. The rest are still on paper. Pick a scene, follow the playbook,
+> ship it behind the same `npm run validate` + `npm run test:smoke` gates as
+> everything else.
 
 ---
 
@@ -125,10 +126,12 @@ Blurred garden gradient + a `repeating-linear-gradient` streak overlay animated
 by `background-position`. Tint `#6688aa` (steel-blue — new hue). Gate the overlay
 animation behind `html[data-motion="reduced"] … { animation: none }`.
 
-**Koi — pond ripple** · `driftSlow` · *Medium*
-Teal water gradient + concentric `::before/::after` ripple rings expanding on
-`@keyframes rippleExpand`. Tint `#4a9080` (teal — new hue). Reuses the
-epilogue-petals pseudo-element technique.
+**Koi — pond ripple** · `driftSlow` · *Medium* · ✅ **SHIPPED (scene 06)**
+Teal water gradient + concentric `.koi-ripple` rings expanding on
+`@keyframes koiRippleExpand` (staggered delays, reduced-motion gated). Tint
+`#4a9080` (teal — new hue), `bgColor #dbe7e0`. Framed pond panel mirrors
+`.color-field`; ripple loop mirrors the epilogue-petals technique. Zero JS, zero
+asset. Sits after Color Field as the cool "rest" beat before Stillness/Epilogue.
 
 **Snow — winter branches** · `crossfadeLong` · *Easy*
 High-key grey-blue gradient + falling particles. Literally invert the existing

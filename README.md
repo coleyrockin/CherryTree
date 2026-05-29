@@ -1,6 +1,6 @@
 # Cherry Tree
 
-> A scroll-driven cinematic gallery — seven scenes, one continuous film.
+> A scroll-driven cinematic gallery — eight scenes, one continuous film.
 
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
@@ -16,11 +16,11 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of seven scenes carries its own color temperature — the whole thing transitions like a cut between shots.
+Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of eight scenes carries its own color temperature — the whole thing transitions like a cut between shots.
 
 Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline. Tuned across iPhone portrait, landscape, tablet, desktop, and ultrawide.
 
-## The Seven Scenes
+## The Eight Scenes
 
 | № | Scene | Treatment |
 |---|---|---|
@@ -29,8 +29,9 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 | 03 | **Drift** | Photographic wind path, parallax-deep motion preset |
 | 04 | **Triptych** | Three composite panels, parallax-deep motion preset |
 | 05 | **Color Field** | Triple bloom layers, slow drift, painterly transition |
-| 06 | **Stillness** | Single still image, film-dust grain overlay |
-| 07 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
+| 06 | **Koi** | Procedural teal pond, concentric CSS ripples, drift-slow preset |
+| 07 | **Stillness** | Single still image, film-dust grain overlay |
+| 08 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
 
 <table>
   <tr>
@@ -70,7 +71,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 - **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger.scrub`. Suppressed below 760px to keep mobile scrolling smooth.
 - **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows a contextual label.
 - **Audio controller** — toggleable ambient bed with crossfade, persistent across reloads via `localStorage`.
-- **Ghost nav + scene labels** — seven dot indicators along the right rail track the active scene; current scene name appears at lower-left.
+- **Ghost nav + scene labels** — eight dot indicators along the right rail track the active scene; current scene name appears at lower-left.
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
 - **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
 - **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.

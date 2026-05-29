@@ -70,9 +70,23 @@ export const sceneManifest = Object.freeze([
     grainTint: "rgba(76, 38, 48, 0.28)"
   },
   {
+    id: "koi",
+    label: "Koi",
+    numeral: "06",
+    type: "composite",
+    assets: ["koiRipple"],
+    motionPreset: "driftSlow",
+    heightVh: 100,
+    preload: false,
+    bgColor: "#dbe7e0",
+    tint: "#4a9080",
+    ink: "#22302b",
+    grainTint: "rgba(36, 64, 56, 0.24)"
+  },
+  {
     id: "stillness",
     label: "Stillness",
-    numeral: "06",
+    numeral: "07",
     type: "image",
     assets: ["stillnessHero", "filmDust01"],
     motionPreset: "crossfadeLong",
@@ -86,7 +100,7 @@ export const sceneManifest = Object.freeze([
   {
     id: "epilogue",
     label: "Epilogue",
-    numeral: "07",
+    numeral: "08",
     type: "composite",
     assets: ["epilogueGlow"],
     motionPreset: "driftSlow",
