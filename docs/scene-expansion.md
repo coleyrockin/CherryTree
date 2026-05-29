@@ -138,11 +138,14 @@ shows the poster only). Encoded at native **4K (3840×2160)/12s** from the Pexel
 wasted fetch. Light title over a soft scrim; tint `#e8a24a` (koi gold).
 
 **Dark-scene pattern (reusable):** the manifest carries `dark: true`, which
-`sceneTint.js` turns into `html.is-scene-dark`; `scenes.css` uses that to flip the
-persistent chrome (brand mark, editorial numeral/label, control buttons, nav dots)
-to light and drop the `mix-blend-mode: multiply` that would otherwise vanish over
-dark footage. This is the exact override Aurora (the catalog's other dark scene)
-will need. Note: this is the one scene that carries an asset — a deliberate
+`sceneTint.js` turns into `html.is-scene-dark` in full motion (synced with the
+tint cut); in reduced motion — where the tint observer never runs —
+`koiVideo.js`'s own visibility observer toggles the same class so the dark
+poster still gets light chrome. `scenes.css` uses `is-scene-dark` to flip the
+persistent chrome (brand mark, editorial numeral/label, control buttons, nav
+dots, cursor dot, film grain, focus rings) to light and drop the
+`mix-blend-mode: multiply` that would otherwise vanish over dark footage. This is
+the exact override Aurora (the catalog's other dark scene) will need. Note: this is the one scene that carries an asset — a deliberate
 exception for a photoreal centerpiece. (The zero-asset procedural ripple version
 lives in git history if a lighter variant is ever wanted.)
 
@@ -184,6 +187,6 @@ Tint `#8860b0` (violet — entirely new hue).
   Rain) as a "rest" between warm ones, or Aurora as a dramatic dark beat before
   the Epilogue's warm close.
 - Keep `preload: false` for any new scene (only prologue + bloom preload).
-- If a new scene changes the total count, the README ("seven scenes"), the
+- If a new scene changes the total count, the README ("eight scenes"), the
   `index.html` scene count, and `tests/smoke.spec.js` `SCENE_IDS` all must update
   together — `scripts/showcase-check.mjs` enforces index/manifest parity.

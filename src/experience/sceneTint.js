@@ -72,6 +72,9 @@ const applySceneTint = (scene, triggerBloom = null) => {
 };
 
 export const initSceneTintObserver = (manifest) => {
+  // Reset cross-init state so a motion-toggle re-init doesn't fire a spurious
+  // bloom flash for a scene the user is already on.
+  lastTintedSceneId = null;
   applySceneTint(manifest[0]);
   const bloomTrigger = createSceneBloomTrigger();
 

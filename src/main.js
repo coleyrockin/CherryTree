@@ -291,6 +291,10 @@ const boot = async () => {
     disposeCollection(motionCleanup);
     activeVelocityTracker = null;
 
+    // Clear dark-scene chrome so it can't stick across a motion toggle (the
+    // reduced-motion path re-evaluates it via koiVideo's own observer).
+    document.documentElement.classList.remove("is-scene-dark");
+
     // Remove stale state classes from scenes
     document.querySelectorAll(".scene").forEach((scene) => {
       scene.classList.remove("is-reduced", "is-in-view");

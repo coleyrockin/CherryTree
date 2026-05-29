@@ -38,6 +38,7 @@ None.
 - Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
 - Validation: `npm run build` passed after adding the header config; `vercel.json` parses as valid JSON; CSP inline allowances were checked against both `index.html` and `dist/index.html`.
 - 2026-05-28 hardening: removed a stale orphan hash (`'sha256-i9oAhtQaH0dZXNqHwY+w5xdjuzZaw24l/fWEyHD9pSI='`) that matched no inline script in either `index.html` or `dist/index.html`. Verified by recomputing SHA-256 over every inline `<script>` block in both files; the JSON-LD block is `type="application/ld+json"` (data, not governed by `script-src`) and needs no hash. Removing the orphan only tightens the policy and changes no live hash.
+- 2026-05-29 note: scene 06 ("Koi") added a full-bleed background `<video>` served from `public/assets/video/` (same-origin WebM/MP4). This is already covered by the existing `media-src 'self'` directive in `vercel.json` — no CSP change was needed. The sources load lazily via `koiVideo.js` (no inline script, no new hash).
 - False positive notes: Trusted Types enforcement is not enabled yet because the current app has no remaining raw HTML sink in source and the immediate fix is a deployable CSP baseline.
 
 ## Low Findings

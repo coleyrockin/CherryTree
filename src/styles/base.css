@@ -268,9 +268,9 @@ html[data-motion="reduced"] .marquee-ribbon {
 
 .sound-toggle.is-enabled,
 .motion-toggle.is-enabled {
-  background: rgba(220, 103, 137, 0.88);
+  background: #bb4168;
   color: #fff;
-  border-color: rgba(220, 103, 137, 0.9);
+  border-color: #bb4168;
 }
 
 .sound-toggle-state,

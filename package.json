@@ -1,7 +1,7 @@
 {
   "name": "cherry-tree",
   "version": "2.0.0",
-  "description": "A seven-scene, scroll-driven cinematic gallery with real-time WebGL petals.",
+  "description": "An eight-scene, scroll-driven cinematic gallery with real-time WebGL petals.",
   "private": true,
   "type": "module",
   "author": "Boyd Roberts",
