@@ -342,6 +342,10 @@ const boot = async () => {
       await initScrollEffects({ reducedMotion })
     );
 
+    // Koi scene background video — lazy, visibility-driven, reduced-motion aware
+    const { initKoiVideo } = await import("./experience/koiVideo");
+    registerCleanup(initKoiVideo({ reducedMotion }));
+
     if (isStale()) {
       disposeCollection(pendingCleanup);
       return;

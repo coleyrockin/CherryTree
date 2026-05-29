@@ -126,12 +126,16 @@ Blurred garden gradient + a `repeating-linear-gradient` streak overlay animated
 by `background-position`. Tint `#6688aa` (steel-blue — new hue). Gate the overlay
 animation behind `html[data-motion="reduced"] … { animation: none }`.
 
-**Koi — pond ripple** · `driftSlow` · *Medium* · ✅ **SHIPPED (scene 06)**
-Teal water gradient + concentric `.koi-ripple` rings expanding on
-`@keyframes koiRippleExpand` (staggered delays, reduced-motion gated). Tint
-`#4a9080` (teal — new hue), `bgColor #dbe7e0`. Framed pond panel mirrors
-`.color-field`; ripple loop mirrors the epilogue-petals technique. Zero JS, zero
-asset. Sits after Color Field as the cool "rest" beat before Stillness/Epilogue.
+**Koi — living pond** · `driftSlow` · *Medium* · ✅ **SHIPPED (scene 06)**
+Shipped as **real koi-pond video** (CC0, Pexels) in a framed dark water panel
+that mirrors `.color-field` sizing. Sources are lazy/visibility-driven via
+`src/experience/koiVideo.js` (`preload="none"` → hydrate + play on approach,
+pause offscreen; reduced motion shows the poster only). Optimised to WebM+MP4 at
+960×540/12s (~1.3–1.5 MB each) in `public/assets/video/`. Light title over a soft
+scrim; tint `#c75c3e` (koi vermilion). Note: this is the one scene that carries
+an asset — a deliberate exception for a photoreal centerpiece. (The original
+zero-asset procedural ripple version lives in git history if a lighter variant is
+ever wanted.)
 
 **Snow — winter branches** · `crossfadeLong` · *Easy*
 High-key grey-blue gradient + falling particles. Literally invert the existing

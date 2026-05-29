@@ -74,14 +74,14 @@ export const sceneManifest = Object.freeze([
     label: "Koi",
     numeral: "06",
     type: "composite",
-    assets: ["koiRipple"],
+    assets: ["koiVideo"],
     motionPreset: "driftSlow",
     heightVh: 100,
     preload: false,
-    bgColor: "#dbe7e0",
-    tint: "#4a9080",
+    bgColor: "#cfd9d3",
+    tint: "#c75c3e",
     ink: "#22302b",
-    grainTint: "rgba(36, 64, 56, 0.24)"
+    grainTint: "rgba(40, 60, 56, 0.24)"
   },
   {
     id: "stillness",
