@@ -48,6 +48,9 @@ const applySceneTint = (scene, triggerBloom = null) => {
   if (scene.ink) root.style.setProperty("--scene-ink", scene.ink);
   if (scene.grainTint) root.style.setProperty("--scene-grain", scene.grainTint);
 
+  // Dark scenes (e.g. full-bleed video) flip the persistent chrome to light.
+  root.classList.toggle("is-scene-dark", Boolean(scene.dark));
+
   const numeralNode = document.querySelector("[data-ct-numeral]");
   const labelNode = document.querySelector("[data-ct-scene-label]");
   if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;

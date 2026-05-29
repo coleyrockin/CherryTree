@@ -127,16 +127,21 @@ by `background-position`. Tint `#6688aa` (steel-blue — new hue). Gate the over
 animation behind `html[data-motion="reduced"] … { animation: none }`.
 
 **Koi — living pond** · `driftSlow` · *Medium* · ✅ **SHIPPED (scene 06)**
-Shipped as **real koi-pond video** (CC0, Pexels — a calm, sparse top-down clip of
-a few koi drifting in dark water) in a framed dark water panel that mirrors
-`.color-field` sizing. Sources are lazy/visibility-driven via
-`src/experience/koiVideo.js` (`preload="none"` → hydrate + play on approach,
-pause offscreen; reduced motion shows the poster only). Optimised to WebM+MP4 at
-960×540/12s (~1.3–1.5 MB each) in `public/assets/video/`. Light title over a soft
-scrim; tint `#c75c3e` (koi vermilion). Note: this is the one scene that carries
-an asset — a deliberate exception for a photoreal centerpiece. (The original
-zero-asset procedural ripple version lives in git history if a lighter variant is
-ever wanted.)
+Shipped as a **full-bleed real koi-pond video** (CC0, Pexels — a calm, sparse
+top-down clip of a few koi drifting in dark water) covering the whole scene
+viewport. Sources are lazy/visibility-driven via `src/experience/koiVideo.js`
+(`preload="none"` → hydrate + play on approach, pause offscreen; reduced motion
+shows the poster only). Optimised to WebM (2.9 MB) + MP4 (3.5 MB) at 1080p/12s in
+`public/assets/video/`. Light title over a soft scrim; tint `#e8a24a` (koi gold).
+
+**Dark-scene pattern (reusable):** the manifest carries `dark: true`, which
+`sceneTint.js` turns into `html.is-scene-dark`; `scenes.css` uses that to flip the
+persistent chrome (brand mark, editorial numeral/label, control buttons, nav dots)
+to light and drop the `mix-blend-mode: multiply` that would otherwise vanish over
+dark footage. This is the exact override Aurora (the catalog's other dark scene)
+will need. Note: this is the one scene that carries an asset — a deliberate
+exception for a photoreal centerpiece. (The zero-asset procedural ripple version
+lives in git history if a lighter variant is ever wanted.)
 
 **Snow — winter branches** · `crossfadeLong` · *Easy*
 High-key grey-blue gradient + falling particles. Literally invert the existing

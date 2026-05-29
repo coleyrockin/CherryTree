@@ -78,10 +78,11 @@ export const sceneManifest = Object.freeze([
     motionPreset: "driftSlow",
     heightVh: 100,
     preload: false,
-    bgColor: "#cfd9d3",
-    tint: "#c75c3e",
-    ink: "#22302b",
-    grainTint: "rgba(40, 60, 56, 0.24)"
+    dark: true,
+    bgColor: "#17211f",
+    tint: "#e8a24a",
+    ink: "#eef3f1",
+    grainTint: "rgba(180, 200, 192, 0.2)"
   },
   {
     id: "stillness",

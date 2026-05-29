@@ -248,23 +248,20 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
   background: radial-gradient(circle at 48% 40%, rgba(228, 164, 96, 0.68), rgba(228, 164, 96, 0));
 }
 
-/* ── Koi — living koi-pond video in a framed water panel ── */
+/* ── Koi — full-bleed living koi-pond video ───────────── */
 .scene-koi {
-  background:
-    radial-gradient(130% 120% at 50% 42%, #dfe8e3 0%, #c9d7d1 48%, #aebfb8 100%),
-    linear-gradient(200deg, rgba(58, 120, 110, 0.14), rgba(58, 120, 110, 0));
+  background: radial-gradient(circle at 50% 46%, #1d3530, #0e1917 92%);
 }
 
-.koi-pond {
-  position: relative;
-  z-index: 1;
-  width: min(1200px, 92vw);
-  height: min(82vh, 760px);
-  border-radius: clamp(24px, 3vw, 40px);
-  border: 1px solid rgba(28, 52, 48, 0.3);
+/* The video fills the entire scene viewport (not a framed panel). Oversized by
+   a few percent (and clipped by the scene's overflow) so the velocity-parallax
+   drift (±2% / 0.5°) can never expose a bare edge. */
+.scene-koi .koi-pond {
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 46%, #1d3530, #111f1d 90%);
-  box-shadow: 0 28px 80px rgba(24, 44, 40, 0.32);
+  background: radial-gradient(circle at 50% 46%, #1d3530, #0e1917 92%);
 }
 
 .koi-video {
@@ -276,15 +273,17 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
   display: block;
 }
 
-/* Inner vignette for depth + edge framing over the footage */
+/* Full-bleed vignette: darkens edges/corners so the light chrome and the
+   centered title both stay legible over the footage. */
 .koi-pond::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border-radius: inherit;
   z-index: 1;
-  background: radial-gradient(circle at 50% 48%, rgba(0, 0, 0, 0), rgba(8, 18, 16, 0.46));
+  background:
+    radial-gradient(120% 120% at 50% 46%, rgba(0, 0, 0, 0) 38%, rgba(6, 14, 12, 0.5) 100%),
+    linear-gradient(180deg, rgba(6, 14, 12, 0.28) 0%, rgba(6, 14, 12, 0) 22%, rgba(6, 14, 12, 0) 78%, rgba(6, 14, 12, 0.34) 100%);
 }
 
 /* Light text sits above the dark footage with a soft scrim for legibility.
@@ -316,6 +315,41 @@ html[data-motion="reduced"] .scene-bloom .scene-media {
 
 .scene-koi .scene-subtitle {
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Dark-scene chrome (active when a `dark:true` scene is in view) ──────
+   The persistent UI chrome is dark-ink (some with mix-blend-mode: multiply),
+   which disappears over a full-bleed dark video. Flip it to light. Toggled by
+   `html.is-scene-dark` from sceneTint.js. Transitions piggyback the existing
+   color/border transitions on each element, so the flip eases in on the cut. */
+html.is-scene-dark .brand-mark {
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 10px 28px rgba(0, 0, 0, 0.4);
+}
+
+html.is-scene-dark .editorial-chrome {
+  mix-blend-mode: normal;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+html.is-scene-dark .motion-toggle,
+html.is-scene-dark .sound-toggle {
+  color: rgba(255, 255, 255, 0.84);
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(14, 22, 20, 0.3);
+}
+
+html.is-scene-dark .motion-toggle:hover,
+html.is-scene-dark .motion-toggle:focus-visible,
+html.is-scene-dark .sound-toggle:hover,
+html.is-scene-dark .sound-toggle:focus-visible {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(14, 22, 20, 0.52);
+}
+
+html.is-scene-dark .scene-nav-dot::before {
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .scene-stillness {
@@ -506,8 +540,7 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
     min-height: 56vh;
   }
 
-  .color-field,
-  .koi-pond {
+  .color-field {
     width: min(1000px, 94vw);
     height: min(74vh, 620px);
   }
@@ -718,8 +751,7 @@ html[data-motion="reduced"] .epilogue-subtitle {
   .epilogue-title { letter-spacing: 0.04em; }
   .scene-kicker { letter-spacing: 0.22em; }
   .triptych-panel img { min-height: 38vh; }
-  .color-field,
-  .koi-pond { height: 56vh; }
+  .color-field { height: 56vh; }
 }
 
 /* Landscape mobile — constrain by height, not width */

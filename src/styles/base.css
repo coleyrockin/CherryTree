@@ -208,6 +208,9 @@ html[data-motion="reduced"] .marquee-ribbon {
     0 10px 28px rgba(247, 233, 224, 0.76),
     0 1px 0 rgba(255, 249, 243, 0.54);
   pointer-events: none;
+  transition:
+    color 900ms var(--ease-gallery),
+    text-shadow 900ms var(--ease-gallery);
 }
 
 .control-stack {
