@@ -26,7 +26,7 @@ export const initEpilogueAnimations = (gsap) => {
         { scale: 0.6, opacity: 0, rotate: index % 2 === 0 ? -12 : 10 },
         {
           scale: 1.15,
-          opacity: 0.45,
+          opacity: 0.68,
           rotate: index % 2 === 0 ? 8 : -6,
           ease: "elastic.out(1, 0.6)",
           scrollTrigger: {
