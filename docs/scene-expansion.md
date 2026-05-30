@@ -4,12 +4,12 @@ A practical guide for adding new nature-scenery scenes that fit the existing
 aesthetic and reuse the existing engine. No new runtime dependencies are ever
 needed to add a scene — the scroll/tint/parallax machinery is fully data-driven.
 
-> Status: planning doc. **Koi (scene 06) and Lanterns (scene 08) shipped** —
-> Koi was the first scene built from this catalog; Lanterns is a procedural dark
-> scene (rising paper-lantern glows + drifting gold petals) that reuses the same
-> `is-scene-dark` chrome pattern Aurora was sketched for. The rest are still on
-> paper. Pick a scene, follow the playbook, ship it behind the same
-> `npm run validate` + `npm run test:smoke` gates as everything else.
+> Status: planning doc. **Koi (scene 06) shipped** — the first scene built from
+> this catalog. A Lanterns scene was attempted (procedural, then a real-photo
+> sprite) and **pulled** — CSS read cheap and the sprite version was unstable.
+> Lesson: dark "real light" scenes need real video (Koi-style) or a rendered
+> sprite, not CSS. The rest of the catalog is still on paper. Pick a scene,
+> follow the playbook, ship it behind `npm run validate` + `npm run test:smoke`.
 
 ---
 

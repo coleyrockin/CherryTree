@@ -5,13 +5,13 @@ import { test, expect } from "@playwright/test";
  *
  * Asserts that:
  *   a. The page loads with the expected title and no console errors.
- *   b. All nine scenes are present in the DOM.
+ *   b. All eight scenes are present in the DOM.
  *   c. With prefers-reduced-motion: reduce, the WebGL hero is suppressed
  *      and the static fallback image is in the DOM.
  *
- * NOTE: the nine scene IDs live in `data-ct-scene` and correspond to the
+ * NOTE: the eight scene IDs live in `data-ct-scene` and correspond to the
  * URL deep-link hashes — `prologue-webgl`, `bloom-wash`, `drift`, `triptych`,
- * `color-field`, `koi`, `stillness`, `lanterns`, `epilogue`.
+ * `color-field`, `koi`, `stillness`, `epilogue`.
  */
 
 const SCENE_IDS = [
@@ -22,7 +22,6 @@ const SCENE_IDS = [
   "color-field",
   "koi",
   "stillness",
-  "lanterns",
   "epilogue"
 ];
 
@@ -50,7 +49,7 @@ test.describe("Cherry Tree smoke", () => {
     expect(errors, errors.join("\n")).toEqual([]);
   });
 
-  test("all nine scenes are present in the DOM", async ({ page }) => {
+  test("all eight scenes are present in the DOM", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 

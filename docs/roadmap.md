@@ -1,13 +1,15 @@
 # Cherry Tree — Visual Improvement Roadmap
 
 > Living document. Update when scope shifts.
-> Current baseline: nine scenes, petal spine, rebuilt Epilogue, deployed at cherry-tree-psi.vercel.app.
+> Current baseline: eight scenes, deployed at cherry-tree-psi.vercel.app.
 
 ---
 
 ## Where we are
 
-The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Nine scenes are shipped — Lanterns being the newest (procedural dark scene, paper-lantern barrel shapes, water reflection, filmic depth). Color Field is a full-bleed Rothko-in-motion wash. A global petal spine threads all nine scenes with color-shifting cherry blossoms. The Epilogue was rebuilt with rich blooms and real rising petal shapes. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
+The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Eight scenes are shipped. Color Field is a full-bleed Rothko-in-motion wash. The Epilogue was rebuilt with rich blooms and real rising petal shapes. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
+
+> A Lanterns scene (procedural, then a real-photo sprite) was attempted and **pulled** — it read cheap and was unstable. A global 2D petal-spine was also tried and removed. If lanterns return, do them as real video (Koi-style) or a Blender-rendered sprite, not CSS.
 
 ---
 
