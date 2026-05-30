@@ -274,68 +274,23 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
   overflow: hidden;
 }
 
-/* A paper sky lantern: barrel-shaped, lit from below by the fuel cell. */
+/* A real paper sky lantern (Pexels CC0 sprite). The near-black surround drops
+   out under screen blend over the dark scene, leaving the glowing lantern. The
+   photo carries its own paper texture, creases, and internal flame glow;
+   per-instance hue/saturation/blur add depth and break the clone look. */
 .lantern {
   position: absolute;
-  /* Barrel silhouette — wider equator, tapered bottom, flat-ish wire-cap top */
-  border-radius: 50% 50% 44% 44% / 62% 62% 36% 36%;
   opacity: var(--o, 0.9);
   mix-blend-mode: screen;
   will-change: transform, opacity, filter;
-  /* Offset flame: bright core near bottom-interior (fuel cell), top is darker
-     (cap + wire structure above the flame). Top-darkening layer sits first. */
-  background:
-    linear-gradient(180deg, rgba(10, 6, 2, 0.28) 0%, rgba(10, 6, 2, 0) 28%),
-    radial-gradient(circle at 48% 66%,
-      rgba(255, 253, 238, 1) 0%,
-      rgba(255, 222, 148, 0.97) 10%,
-      rgba(252, 176, 88, 0.68) 26%,
-      rgba(238, 142, 64, 0.36) 44%,
-      rgba(248, 166, 90, 0.38) 58%,
-      rgba(228, 120, 52, 0.14) 72%,
-      rgba(222, 116, 52, 0) 84%);
-  filter: drop-shadow(0 0 var(--glow, 16px) rgba(255, 176, 96, 0.5));
+  background-image: url("/assets/lanterns/lantern.webp");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) hue-rotate(var(--hue, 0deg)) blur(var(--blur, 0px));
   animation:
     lanternRise var(--dur, 30s) ease-in-out var(--delay, 0s) infinite,
     lanternBreathe var(--breathe, 5.4s) ease-in-out var(--bdelay, 0s) infinite;
-}
-
-/* Bamboo/wire ring cap at the top — the structural tell that makes it a lantern */
-.lantern::before {
-  content: "";
-  position: absolute;
-  top: -3%; left: 10%; right: 10%; height: 13%;
-  border-radius: 50%;
-  background: linear-gradient(180deg, rgba(36, 20, 8, 0.5) 0%, rgba(36, 20, 8, 0.06) 100%);
-  border-top: 1px solid rgba(90, 58, 22, 0.26);
-  pointer-events: none;
-}
-
-/* Paper fiber + equatorial structural hoop.
-   Uses ::after not filter — filter is owned by lanternBreathe and can't share.
-   The horizontal hoop sits at ~48% height (widest point of the barrel) and reads
-   as the bamboo/wire ring that holds the paper panels together. */
-.lantern::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background:
-    /* Equatorial hoop — single dark band at the barrel's widest point */
-    linear-gradient(180deg,
-      transparent 43%,
-      rgba(20, 10, 4, 0.22) 46%,
-      rgba(20, 10, 4, 0.14) 48%,
-      transparent 51%
-    ),
-    /* Paper fiber bands */
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 220, 160, 0.04) 0px, rgba(255, 220, 160, 0) 3px,
-      rgba(0, 0, 0, 0.03) 5px, rgba(0, 0, 0, 0) 8px
-    );
-  mix-blend-mode: overlay;
-  pointer-events: none;
 }
 
 @keyframes lanternRise {
@@ -347,17 +302,18 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
   100% { transform: translate(0, -116vh) scale(1.05); opacity: 0; }
 }
 
-/* Flame life: a slow brightness + glow pulse, desynced per lantern. Animates
-   only `filter`, never transform/opacity (owned by lanternRise), so the two
-   never conflict. In reduced motion both stop and the base glow remains. */
+/* Flame life: a slow brightness pulse, desynced per lantern. Animates only
+   `filter`, never transform/opacity (owned by lanternRise), so the two never
+   conflict. The per-instance sat/con/hue/blur ride along so depth + warmth
+   variation survive the animation. In reduced motion it stops at full glow. */
 @keyframes lanternBreathe {
-  0%, 100% { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) brightness(0.86) drop-shadow(0 0 calc(var(--glow, 16px) * 0.66) rgba(255, 168, 90, 0.4)); }
-  50%      { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) brightness(1.18) drop-shadow(0 0 var(--glow, 16px) rgba(255, 202, 124, 0.62)); }
+  0%, 100% { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) hue-rotate(var(--hue, 0deg)) blur(var(--blur, 0px)) brightness(0.9); }
+  50%      { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) hue-rotate(var(--hue, 0deg)) blur(var(--blur, 0px)) brightness(1.16); }
 }
 
-.lantern:nth-child(3n)   { --breathe: 4.4s; --bdelay: -1.2s; }
-.lantern:nth-child(3n+1) { --breathe: 5.9s; --bdelay: -3.1s; }
-.lantern:nth-child(3n+2) { --breathe: 6.8s; --bdelay: -2.2s; }
+.lantern:nth-child(3n)   { --breathe: 4.4s; --bdelay: -1.2s; --hue: -7deg; }
+.lantern:nth-child(3n+1) { --breathe: 5.9s; --bdelay: -3.1s; --hue: 6deg; }
+.lantern:nth-child(3n+2) { --breathe: 6.8s; --bdelay: -2.2s; --hue: -2deg; }
 
 .lantern--1  { left: 12%; top: 74%; width: 82px;  height: 94px;  --o: .95; --dur: 30s; --delay: -3s;  --sway: 18px;  --glow: 26px; }
 .lantern--2  { left: 24%; top: 90%; width: 42px;  height: 48px;  --o: .74; --dur: 40s; --delay: -12s; --sway: -12px; --glow: 14px; }
@@ -382,12 +338,14 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
 .lantern--21 { left: 8%;  top: 56%; width: 38px;  height: 44px;  --o: .7;  --dur: 38s; --delay: -31s; --sway: 12px;  --glow: 13px; }
 .lantern--22 { left: 80%; top: 34%; width: 22px;  height: 26px;  --o: .58; --dur: 31s; --delay: -13s; --sway: 14px;  --glow: 9px; }
 
-/* Far/high lanterns (small) — desaturated + lower contrast to sell Z-depth.
-   --sat/--con are consumed inside lanternBreathe so they survive animation. */
+/* Far/high lanterns (small) — softened + slightly desaturated + faint blur to
+   sell Z-depth (depth-of-field). All ride inside the filter chain so they
+   survive the breathe animation. */
 .lantern--4, .lantern--8, .lantern--10,
 .lantern--13, .lantern--16, .lantern--19, .lantern--22 {
-  --sat: 0.68;
-  --con: 0.82;
+  --sat: 0.78;
+  --con: 0.9;
+  --blur: 1px;
 }
 
 /* The tinted-petal debut: a few gold cherry petals falling against the rise. */
@@ -905,12 +863,13 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
 .scene-text-hero::before {
   content: "";
   position: absolute;
-  inset: -10% -20%;
+  inset: -16% -28%;
   background: radial-gradient(
-    ellipse at center,
-    rgba(255, 238, 230, 0.32) 0%,
-    rgba(255, 238, 230, 0.14) 35%,
-    rgba(255, 238, 230, 0) 65%
+    ellipse 72% 58% at center,
+    rgba(252, 240, 233, 0.5) 0%,
+    rgba(252, 240, 233, 0.34) 30%,
+    rgba(252, 240, 233, 0.12) 56%,
+    rgba(252, 240, 233, 0) 76%
   );
   z-index: -1;
   pointer-events: none;
@@ -978,6 +937,19 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
   font-size: clamp(0.9rem, 2vw, 1.25rem);
   letter-spacing: 0.12em;
   color: rgba(49, 30, 33, 0.82);
+}
+
+/* Small hero text is the weakest against the bright petal field — give the
+   kicker + subtitle a soft cream halo so they read without dimming the petals. */
+.scene-text-hero .scene-kicker {
+  color: rgba(49, 30, 33, 0.84);
+  text-shadow: 0 1px 12px rgba(252, 240, 233, 0.92);
+}
+
+.scene-text-hero .scene-subtitle {
+  text-shadow:
+    0 2px 22px rgba(252, 240, 233, 0.95),
+    0 1px 0 rgba(255, 249, 243, 0.5);
 }
 
 /* Character split spans */

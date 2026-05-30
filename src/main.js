@@ -400,10 +400,6 @@ const boot = async () => {
       // Micro-interactions (spring hover)
       const { initMicroInteractions } = await import("./experience/microInteractions");
       registerCleanup(initMicroInteractions({ gsap }));
-
-      // Global petal spine — 25 petals drifting across every scene, tinted per scene
-      const { initPetalSpine } = await import("./experience/petalSpine");
-      registerCleanup(initPetalSpine());
     }
 
     if (isStale()) {
