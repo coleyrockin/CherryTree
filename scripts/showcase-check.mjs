@@ -7,7 +7,7 @@ import { sceneManifest } from "../src/content/sceneManifest.js";
 
 const ROOT_DIR = path.resolve(fileURLToPath(new URL("..", import.meta.url)));
 const EXPECTED_DESCRIPTION =
-  "An eight-scene, scroll-driven cinematic gallery with real-time WebGL petals.";
+  "A nine-scene, scroll-driven cinematic gallery with real-time WebGL petals.";
 
 let checkCount = 0;
 const failures = [];
@@ -140,9 +140,9 @@ const checkSceneConsistency = () => {
     check(uniqueSceneIds.has(scene.id), `index.html is missing scene ${scene.id}`);
   });
 
-  check(readme.includes("eight scenes"), "README should describe eight scenes");
-  check(!manifest.description.includes("seven scenes"), "manifest should not describe seven scenes");
-  check(manifest.description.includes("eight scenes"), "manifest should describe eight scenes");
+  check(readme.includes("nine scenes"), "README should describe nine scenes");
+  check(!manifest.description.includes("eight scenes"), "manifest should not describe eight scenes");
+  check(manifest.description.includes("nine scenes"), "manifest should describe nine scenes");
 };
 
 const checkPublicMetadata = () => {

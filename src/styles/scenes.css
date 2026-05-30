@@ -252,6 +252,108 @@
 
 html[data-motion="reduced"] .color-bloom { animation: none; }
 
+/* ── Lanterns — full-bleed night, lights rising (dark scene) ──────────────
+   Warm paper-lanterns drift up through deep indigo; a few gold petals fall
+   the other way (the tinted-petal debut). All lights use screen blend so they
+   glow additively over the dark sky. The .scene-lanterns base gradient always
+   sits behind the oversized field, so driftSlow never exposes an edge. */
+.scene-lanterns {
+  background:
+    radial-gradient(150% 100% at 50% 120%, rgba(204, 128, 58, 0.55), rgba(204, 128, 58, 0) 56%),
+    radial-gradient(120% 80% at 50% 84%, rgba(150, 96, 70, 0.22), rgba(150, 96, 70, 0) 60%),
+    radial-gradient(96% 74% at 76% 22%, rgba(64, 78, 140, 0.36), rgba(64, 78, 140, 0) 64%),
+    linear-gradient(180deg, #08070f 0%, #0e0c22 46%, #16132e 100%);
+}
+
+.lantern-field {
+  position: absolute;
+  inset: -6%;
+  width: auto;
+  height: auto;
+  overflow: hidden;
+}
+
+/* A single warm light: bright core, soft amber halo feathering to nothing. */
+.lantern {
+  position: absolute;
+  border-radius: 50%;
+  opacity: var(--o, 0.9);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  background: radial-gradient(circle at 50% 45%,
+    rgba(255, 248, 220, 0.98) 0%,
+    rgba(255, 210, 138, 0.9) 14%,
+    rgba(248, 162, 78, 0.55) 28%,
+    rgba(224, 120, 54, 0.18) 48%,
+    rgba(224, 120, 54, 0) 72%);
+  animation: lanternRise var(--dur, 30s) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes lanternRise {
+  0%   { transform: translate(0, 6vh) scale(0.96); opacity: 0; }
+  7%   { opacity: var(--o, 0.9); }
+  40%  { transform: translate(calc(var(--sway, 14px) * 0.6), -38vh) scale(1); }
+  70%  { transform: translate(calc(var(--sway, 14px) * -0.3), -76vh) scale(1.02); }
+  93%  { opacity: var(--o, 0.9); }
+  100% { transform: translate(0, -116vh) scale(1.05); opacity: 0; }
+}
+
+.lantern--1  { left: 12%; top: 74%; width: 82px;  height: 94px;  --o: .95; --dur: 30s; --delay: -3s;  --sway: 18px; }
+.lantern--2  { left: 24%; top: 90%; width: 42px;  height: 48px;  --o: .74; --dur: 40s; --delay: -12s; --sway: -12px; }
+.lantern--3  { left: 36%; top: 60%; width: 110px; height: 124px; --o: 1;   --dur: 26s; --delay: -19s; --sway: 24px; }
+.lantern--4  { left: 50%; top: 80%; width: 30px;  height: 34px;  --o: .66; --dur: 44s; --delay: -7s;  --sway: -16px; }
+.lantern--5  { left: 62%; top: 68%; width: 62px;  height: 72px;  --o: .9;  --dur: 32s; --delay: -23s; --sway: 14px; }
+.lantern--6  { left: 74%; top: 86%; width: 48px;  height: 54px;  --o: .78; --dur: 36s; --delay: -33s; --sway: -20px; }
+.lantern--7  { left: 84%; top: 72%; width: 94px;  height: 108px; --o: .95; --dur: 28s; --delay: -11s; --sway: 22px; }
+.lantern--8  { left: 6%;  top: 48%; width: 26px;  height: 30px;  --o: .62; --dur: 42s; --delay: -27s; --sway: -10px; }
+.lantern--9  { left: 30%; top: 42%; width: 54px;  height: 62px;  --o: .82; --dur: 34s; --delay: -5s;  --sway: 16px; }
+.lantern--10 { left: 42%; top: 64%; width: 22px;  height: 26px;  --o: .6;  --dur: 38s; --delay: -16s; --sway: -14px; }
+.lantern--11 { left: 58%; top: 46%; width: 40px;  height: 46px;  --o: .74; --dur: 30s; --delay: -37s; --sway: 12px; }
+.lantern--12 { left: 68%; top: 56%; width: 74px;  height: 84px;  --o: .92; --dur: 24s; --delay: -21s; --sway: -22px; }
+.lantern--13 { left: 92%; top: 62%; width: 28px;  height: 32px;  --o: .64; --dur: 40s; --delay: -9s;  --sway: 18px; }
+.lantern--14 { left: 18%; top: 66%; width: 50px;  height: 58px;  --o: .82; --dur: 33s; --delay: -29s; --sway: -16px; }
+.lantern--15 { left: 46%; top: 36%; width: 44px;  height: 50px;  --o: .7;  --dur: 29s; --delay: -8s;  --sway: 20px; }
+.lantern--16 { left: 64%; top: 30%; width: 20px;  height: 24px;  --o: .56; --dur: 33s; --delay: -20s; --sway: 16px; }
+.lantern--17 { left: 52%; top: 88%; width: 88px;  height: 100px; --o: .9;  --dur: 27s; --delay: -25s; --sway: -18px; }
+.lantern--18 { left: 90%; top: 50%; width: 52px;  height: 60px;  --o: .8;  --dur: 35s; --delay: -17s; --sway: -14px; }
+.lantern--19 { left: 34%; top: 24%; width: 24px;  height: 28px;  --o: .6;  --dur: 36s; --delay: -26s; --sway: -18px; }
+.lantern--20 { left: 26%; top: 50%; width: 70px;  height: 80px;  --o: .88; --dur: 31s; --delay: -14s; --sway: 16px; }
+.lantern--21 { left: 8%;  top: 56%; width: 38px;  height: 44px;  --o: .7;  --dur: 38s; --delay: -31s; --sway: 12px; }
+.lantern--22 { left: 80%; top: 34%; width: 22px;  height: 26px;  --o: .58; --dur: 31s; --delay: -13s; --sway: 14px; }
+
+/* The tinted-petal debut: a few gold cherry petals falling against the rise. */
+.lantern-petal {
+  position: absolute;
+  border-radius: 66% 66% 60% 60% / 100% 100% 46% 46%;
+  background: linear-gradient(155deg, rgba(255, 201, 128, 0.96) 0%, rgba(236, 150, 78, 0.74) 100%);
+  opacity: var(--o, 0.78);
+  filter: blur(0.3px);
+  will-change: transform, opacity;
+  animation: lanternPetalFall var(--dur, 34s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes lanternPetalFall {
+  0%   { transform: translate(0, -16vh) rotate(0deg); opacity: 0; }
+  12%  { opacity: var(--o, 0.7); }
+  88%  { opacity: var(--o, 0.7); }
+  100% { transform: translate(var(--sway, 24px), 120vh) rotate(220deg); opacity: 0; }
+}
+
+.lantern-petal--1 { left: 22%; top: 40%; width: 26px; height: 20px; --o: .8;  --dur: 30s; --delay: -4s;  --sway: 28px; }
+.lantern-petal--2 { left: 58%; top: 32%; width: 22px; height: 17px; --o: .7;  --dur: 34s; --delay: -18s; --sway: -24px; }
+.lantern-petal--3 { left: 78%; top: 46%; width: 28px; height: 22px; --o: .78; --dur: 32s; --delay: -26s; --sway: 30px; }
+.lantern-petal--4 { left: 40%; top: 36%; width: 24px; height: 19px; --o: .72; --dur: 36s; --delay: -11s; --sway: -22px; }
+
+.scene-lanterns .scene-kicker { color: rgba(246, 224, 196, 0.82); }
+.scene-lanterns .scene-title {
+  color: #f7efe4;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.55), 0 0 42px rgba(255, 176, 96, 0.3);
+}
+.scene-lanterns .scene-subtitle { color: rgba(243, 232, 220, 0.86); }
+
+html[data-motion="reduced"] .lantern,
+html[data-motion="reduced"] .lantern-petal { animation: none; }
+
 /* ── Koi — full-bleed living koi-pond video ───────────── */
 .scene-koi {
   background: radial-gradient(circle at 50% 46%, #1d3530, #0e1917 92%);

@@ -1,7 +1,7 @@
 {
   "name": "Cherry Tree",
   "short_name": "Cherry Tree",
-  "description": "A scroll-driven cinematic gallery — eight scenes, one continuous film.",
+  "description": "A scroll-driven cinematic gallery — nine scenes, one continuous film.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f2e2d8",

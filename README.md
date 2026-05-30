@@ -1,6 +1,6 @@
 # Cherry Tree
 
-> A scroll-driven cinematic gallery — eight scenes, one continuous film.
+> A scroll-driven cinematic gallery — nine scenes, one continuous film.
 
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
@@ -16,11 +16,11 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of eight scenes carries its own color temperature — the whole thing transitions like a cut between shots.
+Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of nine scenes carries its own color temperature — the whole thing transitions like a cut between shots.
 
 Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline. Tuned across iPhone portrait, landscape, tablet, desktop, and ultrawide.
 
-## The Eight Scenes
+## The Nine Scenes
 
 | № | Scene | Treatment |
 |---|---|---|
@@ -28,10 +28,11 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 | 02 | **Bloom** | Photographic hero, long crossfade, saturation lift on scrub |
 | 03 | **Drift** | Photographic wind path, parallax-deep motion preset |
 | 04 | **Triptych** | Three composite panels, parallax-deep motion preset |
-| 05 | **Color Field** | Triple bloom layers, slow drift, painterly transition |
+| 05 | **Color Field** | Full-bleed chromatic wash — three color fields drifting (Rothko-in-motion) |
 | 06 | **Koi** | Full-bleed living koi-pond video (4K, VP9 + HEVC, lazy-loaded), light-chrome dark scene |
 | 07 | **Stillness** | Single still image, film-dust grain overlay |
-| 08 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
+| 08 | **Lanterns** | Full-bleed night, rising paper-lantern glows + drifting gold petals, light-chrome dark scene |
+| 09 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
 
 <table>
   <tr>
@@ -71,11 +72,11 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
 - **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger.scrub`. Suppressed below 760px to keep mobile scrolling smooth.
 - **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows a contextual label.
 - **Audio controller** — toggleable ambient bed with crossfade, persistent across reloads via `localStorage`.
-- **Ghost nav + scene labels** — eight dot indicators along the right rail track the active scene; current scene name appears at lower-left.
+- **Ghost nav + scene labels** — nine dot indicators along the right rail track the active scene; current scene name appears at lower-left.
 - **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
 - **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
 - **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.
-- **Keyboard navigation** — `PageDown` / `J` next scene, `PageUp` / `K` previous, `Home` / `End` jump to first / last, `1`–`8` jump to a specific scene.
+- **Keyboard navigation** — `PageDown` / `J` next scene, `PageUp` / `K` previous, `Home` / `End` jump to first / last, `1`–`9` jump to a specific scene.
 - **Deep links** — every scene has its own URL hash (`/#bloom`, `/#drift`, …). The URL updates as you scroll, and visiting a `#scene-id` link jumps there on load.
 - **Screen-reader announcements** — an `aria-live="polite"` region announces the current scene as you move through the gallery.
 
@@ -126,6 +127,7 @@ src/
 │   ├── velocityParallax.js   # Per-scene media/text parallax presets
 │   ├── epilogueAnimations.js # Epilogue split-text + bloom reveals
 │   ├── koiVideo.js           # Koi-pond video lazy-load + visibility play/pause
+│   ├── darkSceneChrome.js    # Reduced-motion dark-scene chrome (is-scene-dark)
 │   ├── pointerTilt.js        # Desktop pointer-reactive image tilt
 │   ├── sceneAnnouncer.js     # Reduced-motion aria-live + hash sync
 │   ├── sceneNav.js           # Right-rail numerals + active state

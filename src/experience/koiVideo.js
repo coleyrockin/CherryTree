@@ -6,36 +6,10 @@
  * data-src sources + data-poster are hydrated and playback starts; when the
  * scene leaves, playback pauses (mirroring the hero's offscreen-pause ethos).
  *
- * Reduced motion keeps the poster only — the video is never played, and the
- * dark-scene chrome (html.is-scene-dark) is driven here, because the tint
- * observer in sceneTint.js does not run in reduced motion.
+ * Reduced motion keeps the poster only — the video is never played. The
+ * dark-scene chrome (html.is-scene-dark) is handled centrally by
+ * darkSceneChrome.js in reduced motion, so this controller no longer touches it.
  */
-
-/**
- * Toggle the light-chrome treatment while the dark koi scene dominates the
- * viewport. In FULL motion sceneTint.js already does this (synced with the tint
- * cut); this covers the REDUCED-motion path where the tint observer is absent
- * but the dark poster is still on screen and the chrome would be illegible.
- */
-const observeDarkChrome = (sceneEl) => {
-  const root = document.documentElement;
-  if (!("IntersectionObserver" in window)) {
-    return () => { };
-  }
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        root.classList.toggle("is-scene-dark", entry.intersectionRatio >= 0.5);
-      });
-    },
-    { threshold: [0, 0.5, 1] }
-  );
-  observer.observe(sceneEl);
-  return () => {
-    observer.disconnect();
-    root.classList.remove("is-scene-dark");
-  };
-};
 
 export const initKoiVideo = ({ reducedMotion = false } = {}) => {
   const video = document.querySelector(".koi-video");
@@ -46,11 +20,11 @@ export const initKoiVideo = ({ reducedMotion = false } = {}) => {
   const scene = video.closest(".scene") || video;
 
   // Reduced motion: poster only — never fetch or play the footage. Show the
-  // still frame and drive the dark-scene chrome (tint observer is inactive).
+  // still frame; dark-scene chrome is handled by darkSceneChrome.js.
   if (reducedMotion) {
     if (video.dataset.poster) video.poster = video.dataset.poster;
     try { video.pause(); } catch { /* no-op */ }
-    return observeDarkChrome(scene);
+    return () => { };
   }
 
   let hydrated = false;

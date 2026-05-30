@@ -291,8 +291,8 @@ const boot = async () => {
     disposeCollection(motionCleanup);
     activeVelocityTracker = null;
 
-    // Clear dark-scene chrome so it can't stick across a motion toggle (the
-    // reduced-motion path re-evaluates it via koiVideo's own observer).
+    // Clear dark-scene chrome so it can't stick across a motion toggle. Full
+    // motion re-evaluates it via sceneTint; reduced motion via darkSceneChrome.
     document.documentElement.classList.remove("is-scene-dark");
 
     // Remove stale state classes from scenes
@@ -356,6 +356,11 @@ const boot = async () => {
     if (reducedMotion) {
       const { initSceneAnnouncer } = await import("./experience/sceneAnnouncer");
       registerCleanup(initSceneAnnouncer({ manifest: sceneManifest }));
+
+      // Dark-scene chrome: sceneTint drives this in full motion only, so the
+      // reduced path needs its own observer over every dark scene.
+      const { initDarkSceneChrome } = await import("./experience/darkSceneChrome");
+      registerCleanup(initDarkSceneChrome({ manifest: sceneManifest }));
     }
 
     if (isStale()) {

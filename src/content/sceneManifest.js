@@ -99,9 +99,24 @@ export const sceneManifest = Object.freeze([
     grainTint: "rgba(60, 44, 58, 0.24)"
   },
   {
+    id: "lanterns",
+    label: "Lanterns",
+    numeral: "08",
+    type: "composite",
+    assets: ["lanterns"],
+    motionPreset: "driftSlow",
+    heightVh: 110,
+    preload: false,
+    dark: true,
+    bgColor: "#0d0b1c",
+    tint: "#f6b352",
+    ink: "#f3eee9",
+    grainTint: "rgba(214, 188, 150, 0.18)"
+  },
+  {
     id: "epilogue",
     label: "Epilogue",
-    numeral: "08",
+    numeral: "09",
     type: "composite",
     assets: ["epilogueGlow"],
     motionPreset: "driftSlow",

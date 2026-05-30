@@ -1,13 +1,13 @@
 # Cherry Tree — Project Roadmap
 
 > Living document. Update when scope shifts.
-> Current baseline: eight scenes, green validate + smoke, deployed at cherry-tree-psi.vercel.app.
+> Current baseline: nine scenes, green validate + smoke, deployed at cherry-tree-psi.vercel.app.
 
 ---
 
 ## Where we are
 
-The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Eight scenes are shipped. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
+The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Nine scenes are shipped — the newest is **Lanterns**, a full-bleed night of rising paper-lantern glows with a few drifting gold petals (the second dark scene after Koi). Color Field was reworked from a boxed card into a full-bleed Rothko-in-motion wash. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
 
 The scene-expansion playbook in `docs/scene-expansion.md` documents the add-a-scene path — no new runtime deps required, just manifest + markup + CSS + optional one JPG.
 
