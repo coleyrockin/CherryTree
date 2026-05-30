@@ -176,70 +176,81 @@
     linear-gradient(200deg, rgba(237, 177, 197, 0.2), rgba(237, 177, 197, 0));
 }
 
+/* Full-bleed chromatic wash — soft color fields drifting (Rothko-in-motion).
+   The .scene-color base gradient always shows behind, so the oversized inset
+   (covering the driftSlow rotate/translate) can never expose a hard edge. */
 .color-field {
-  position: relative;
-  width: min(1200px, 92vw);
-  height: min(82vh, 760px);
-  border-radius: clamp(24px, 3vw, 40px);
-  border: 1px solid rgba(96, 59, 69, 0.26);
-  background:
-    linear-gradient(120deg, rgba(255, 239, 229, 0.75), rgba(230, 203, 193, 0.65)),
-    radial-gradient(circle at 28% 30%, rgba(232, 125, 158, 0.23), rgba(232, 125, 158, 0) 56%);
-  box-shadow: 0 28px 80px rgba(80, 46, 56, 0.16);
+  position: absolute;
+  inset: -6%;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  overflow: hidden;
 }
 
-.color-field::before,
-.color-field::after {
+.color-field::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  border-radius: inherit;
-}
-
-.color-field::before {
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0), rgba(39, 17, 22, 0.3));
-}
-
-.color-field::after {
-  opacity: 0.3;
-  mix-blend-mode: multiply;
-  background-image: radial-gradient(rgba(71, 44, 52, 0.42) 0.8px, transparent 0.95px);
-  background-size: 5px 5px;
+  background: radial-gradient(circle at 50% 48%, rgba(20, 10, 16, 0) 46%, rgba(33, 16, 22, 0.2) 100%);
 }
 
 .color-bloom {
   position: absolute;
-  filter: blur(2px);
-  opacity: 0.82;
   border-radius: 50%;
+  filter: blur(36px);
+  opacity: 0.8;
   transform-origin: center;
-  mix-blend-mode: screen;
+  will-change: transform;
 }
 
 .color-bloom-a {
-  width: 52%;
-  height: 58%;
-  left: 4%;
-  top: 18%;
-  background: radial-gradient(circle at 60% 45%, rgba(217, 87, 123, 0.78), rgba(217, 87, 123, 0));
+  width: 78%;
+  height: 92%;
+  left: -8%;
+  top: -10%;
+  background: radial-gradient(circle at 50% 50%, rgba(220, 84, 122, 0.92), rgba(220, 84, 122, 0) 68%);
+  animation: colorWashA 27s var(--ease-gallery) infinite alternate;
 }
 
 .color-bloom-b {
-  width: 44%;
-  height: 56%;
-  right: 5%;
-  top: 5%;
-  background: radial-gradient(circle at 30% 48%, rgba(96, 134, 84, 0.74), rgba(96, 134, 84, 0));
+  width: 74%;
+  height: 88%;
+  right: -10%;
+  top: 4%;
+  background: radial-gradient(circle at 50% 50%, rgba(120, 152, 100, 0.86), rgba(120, 152, 100, 0) 68%);
+  animation: colorWashB 33s var(--ease-gallery) infinite alternate;
 }
 
 .color-bloom-c {
-  width: 58%;
-  height: 62%;
-  right: 24%;
-  bottom: -10%;
-  background: radial-gradient(circle at 48% 40%, rgba(228, 164, 96, 0.68), rgba(228, 164, 96, 0));
+  width: 94%;
+  height: 96%;
+  left: 6%;
+  bottom: -22%;
+  background: radial-gradient(circle at 50% 50%, rgba(230, 166, 96, 0.82), rgba(230, 166, 96, 0) 70%);
+  animation: colorWashC 39s var(--ease-gallery) infinite alternate;
 }
+
+@keyframes colorWashA {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(9%, 7%, 0) scale(1.14); }
+}
+
+@keyframes colorWashB {
+  from { transform: translate3d(0, 0, 0) scale(1.08); }
+  to   { transform: translate3d(-8%, 5%, 0) scale(1); }
+}
+
+@keyframes colorWashC {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(6%, -8%, 0) scale(1.12); }
+}
+
+html[data-motion="reduced"] .color-bloom { animation: none; }
 
 /* ── Koi — full-bleed living koi-pond video ───────────── */
 .scene-koi {
@@ -558,11 +569,6 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
   .triptych-panel img {
     min-height: 56vh;
   }
-
-  .color-field {
-    width: min(1000px, 94vw);
-    height: min(74vh, 620px);
-  }
 }
 
 @media (max-width: 760px) {
@@ -573,11 +579,6 @@ html[data-motion="reduced"] .epilogue-petals { display: none; }
 
   .triptych-panel img {
     min-height: 45vh;
-  }
-
-  .color-field {
-    width: 96vw;
-    height: 62vh;
   }
 }
 
@@ -766,7 +767,6 @@ html[data-motion="reduced"] .epilogue-subtitle {
   .epilogue-title { letter-spacing: 0.04em; }
   .scene-kicker { letter-spacing: 0.22em; }
   .triptych-panel img { min-height: 38vh; }
-  .color-field { height: 56vh; }
 }
 
 /* Landscape mobile — constrain by height, not width */
