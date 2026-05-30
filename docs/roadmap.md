@@ -1,88 +1,73 @@
-# Cherry Tree — Project Roadmap
+# Cherry Tree — Visual Improvement Roadmap
 
 > Living document. Update when scope shifts.
-> Current baseline: nine scenes, green validate + smoke, deployed at cherry-tree-psi.vercel.app.
+> Current baseline: nine scenes, petal spine, rebuilt Epilogue, deployed at cherry-tree-psi.vercel.app.
 
 ---
 
 ## Where we are
 
-The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Nine scenes are shipped — the newest is **Lanterns**, a full-bleed night of rising paper-lantern glows with a few drifting gold petals (the second dark scene after Koi). Color Field was reworked from a boxed card into a full-bleed Rothko-in-motion wash. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
-
-The scene-expansion playbook in `docs/scene-expansion.md` documents the add-a-scene path — no new runtime deps required, just manifest + markup + CSS + optional one JPG.
+The core engine is complete and hardened: scroll-driven tint system, lazy media hydration, WebGL petal shader, velocity parallax, magnetic cursor, audio bed, reduced-motion parity, screen-reader announcements, URL hash sync, keyboard navigation. Nine scenes are shipped — Lanterns being the newest (procedural dark scene, paper-lantern barrel shapes, water reflection, filmic depth). Color Field is a full-bleed Rothko-in-motion wash. A global petal spine threads all nine scenes with color-shifting cherry blossoms. The Epilogue was rebuilt with rich blooms and real rising petal shapes. The pipeline (`optimize-assets`, `validate`, `smoke`) is repeatable.
 
 ---
 
-## Horizon 1 — Gallery completion (next 2–4 scenes)
+## Near-term — finish the current visual pass
 
-Goal: fill the hue range with scenes that cost little and pay off visually. Add no runtime dependencies. Ship each scene behind `npm run validate` + `npm run test:smoke`.
+**Prologue text legibility**
+The hero title fights with WebGL petals for legibility on certain frames. A faint scrim behind the text anchors it without dimming the petal field. One-time petal dispersion on load adds a sense of arrival.
 
-### Candidates (ordered by effort, lowest first)
+**Scene transition polish**
+The tint cut and bloom flash work. The moment of cut — especially dark↔light (Koi→Stillness, Lanterns→Epilogue) — could feel more cinematic. A brief desaturation + scale micro-pulse on the media layer on cut gives it shot-change energy.
 
-| Scene | Type | Effort | New hue introduced |
+---
+
+## Medium-term — raise the ceiling
+
+### WebGL petal-spine upgrade
+The current petal spine is 2D canvas — lightweight, present, correct. The real version uses the existing Three.js petal shader from the Prologue: same depth-of-field, same cursor repulsion, same color-shift. Running global, tinted per scene. This is the difference between "petals are present" and "it genuinely feels like a cherry tree." The biggest quality jump available without new assets. Half-day of work.
+
+### Per-scene audio transitions
+The ambient bed is global and uniform. Swapping the source on `ct:scene-enter` — water sounds for Koi, silence for Stillness, a low resonance for Lanterns — adds an entirely new sensory layer. The crossfade system is already built in `audioController.js`. This is curation work (source CC0 clips) + one new `audio` manifest field per scene.
+
+### New scenes — hue gaps to fill
+
+| Scene | Type | New hue | Notes |
 |---|---|---|---|
-| **Snow** | Procedural | ~2h | Cool grey-blue `#9aaccb` — winter beat |
-| **Dusk** | Procedural | ~3h | Amber `#d4853a` — warmest scene in gallery |
-| **Rain** | Procedural | ~3h | Steel-blue `#6688aa` — first cool/wet scene |
-| **Mist** | Photographic | ~4h | Celadon `#7aabb0` — pale fog, curtain reveal |
-| **Canopy** | Photographic | ~4h | Forest green `#5c8f52` — second green, upward angle |
-| **Wisteria** | Photographic | ~5h | Violet `#8860b0` — most novel hue, side-curtain reveal |
-| **Aurora** | Procedural/dark | ~6h | Teal-green `#40c888` — second dark scene, dramatic beat |
+| **Wisteria** | Photographic | Violet `#8860b0` | Perspective tunnel, side-curtain clip reveal. Most novel hue missing from the arc. |
+| **Aurora** | Procedural/dark | Teal-green `#40c888` | Animated aurora bands, screen-blend. Third dark scene. `is-scene-dark` chrome pattern already reusable. |
+| **Snow** | Procedural | Cool grey-blue `#9aaccb` | Invert existing petal keyframe direction. Near-zero cost. |
 
-**Recommended arc:** Snow → Dusk → Wisteria. Snow costs nearly nothing (invert existing petal keyframe), Dusk closes the warm loop, Wisteria introduces violet and a new clip-path reveal pattern. That brings the count to eleven scenes with full hue coverage (rose, green, amber, grey-blue, violet). Aurora can follow if a second dark scene feels earned.
-
-**Sequencing principle:** aim for a temperature arc rather than arbitrary insertion. A cool scene (Mist/Rain) between warm ones reads as a "breath." The current warm-rose sequence broken only by koi-gold and olive could use an earlier cool interruption.
+Sequencing principle: aim for a deliberate temperature arc. The gallery runs warm-rose with green (Triptych) and gold (Koi/Lanterns) interruptions. Wisteria introduces violet; Aurora closes the dark thread; Snow gives a cool rest between warm beats.
 
 ---
 
-## Horizon 2 — Experience depth
+## Longer-term — platform decisions
 
-Core interactions are solid. These deepen what's already there without adding scenes.
+### Mobile-native experience
+Below 760px the gallery is gracefully degraded — no parallax, no cursor, stripped chrome. Correct for now. A real mobile pass (scroll-snap per scene, swipe-native transitions) would make CherryTree feel intentional on iPhone rather than reduced. A week of work. Worth doing if the portfolio audience is mobile-first.
 
-### Audio (medium effort)
-The ambient bed is global and uniform. Per-scene audio transitions — same crossfade system, just swap the source file on `ct:scene-enter` — would make the gallery feel alive in a completely new way. Koi scene deserves water/nature ambience; Epilogue a fadeout. Cost: curate CC0 clips, extend `audioController.js` to accept a manifest `audio` field.
-
-### Mobile experience (medium effort)
-Below 760px the experience is intentionally stripped: no parallax, no cursor, no scroll rail. That's correct for the current build. A dedicated mobile pass — scroll-snap per scene, full-screen swipe, touch-tuned transitions — could make CherryTree feel native on iPhone rather than gracefully degraded. Not urgent; the desktop experience is the main showcase.
-
-### Performance ceiling (low effort, high leverage)
-- LCP is dominated by the hero image (Bloom). Add `fetchpriority="high"` to its `<img>` if not already set.
-- The koi video poster is served on first load. Verify the poster JPEG is ≤80 KB (current encoded size unknown) — if it's heavier, re-encode at lower quality.
-- Consider `modulepreload` for the Three.js chunk; it's already deferred behind IntersectionObserver but module evaluation still costs ~100ms.
-
-### Visual regression testing (low effort, high confidence)
-Playwright smoke tests check load and scene existence. A visual-diff pass — screenshot each scene at 1280×800, diff against a golden set — would catch CSS regressions that smoke currently misses. `@playwright/test` already installed; just add a `visual.spec.js` suite with `toHaveScreenshot`.
-
----
-
-## Horizon 3 — Platform evolution
-
-Further out. Only worthwhile if the project grows beyond a portfolio piece.
-
-### Case study / writing layer
-The engineering decisions here (FLIP preloader, tint observer vs ScrollTrigger, WAAPI over CSS animation, lazy video hydration pattern) are genuinely interesting and worth documenting as a devlog or series of posts. Could live at `/log` as a minimal second page or as external writing that links back.
+### Devlog / case study
+The engineering decisions here are worth publishing: FLIP preloader, tint observer vs ScrollTrigger, WAAPI over CSS animation, lazy video hydration, procedural lanterns without assets. Could live at `/log` or as external writing linking back to the live experience.
 
 ### Headless content model
-All copy is hardcoded in `index.html`. If the gallery ever grows past ~15 scenes or needs non-developer editing, moving scene copy + manifest data to a headless CMS (Notion, Contentful, or even a JSON file fetched at build time) and generating `index.html` via a build-step template would de-risk future edits.
-
-### Versioning / alternate themes
-The tint system is fully data-driven — it would take a single JSON swap to render the gallery in a night-mode or high-contrast palette. A user-facing theme picker (in addition to the existing motion/sound toggles) could expose this as a genuine accessibility and aesthetic feature.
+All copy is hardcoded in `index.html`. If the gallery grows past ~15 scenes or needs non-developer editing, moving scene copy + manifest to a JSON file (or headless CMS) fetched at build time would de-risk future edits.
 
 ---
 
 ## What to skip (permanently deprioritized)
 
-- **Framework migration** — the zero-framework constraint is load-bearing for performance and showcaseability. No React/Svelte.
-- **Build-time SSR** — this is a client-side gallery. SSR adds complexity for zero benefit (no SEO-critical content beyond the landing page).
-- **API routes / backend** — no user data, no auth. Nothing to serve.
-- **CI beyond validate + smoke** — the current local pipeline is fast and reliable. GitHub Actions adds friction for a solo project.
+- **Framework migration** — zero-framework is load-bearing for performance and the showcase story. No React/Svelte.
+- **SSR** — client-side gallery, no SEO-critical dynamic content, no benefit.
+- **API routes / backend** — no user data, no auth.
+- **CI beyond validate + smoke** — solo project, GitHub Actions adds friction for nothing.
+- **Real footage for Lanterns** — procedural CSS is the right call. Control > realism here.
 
 ---
 
 ## Principles that stay fixed
 
-1. `npm run validate` + `npm run test:smoke` must stay green before every push.
+1. `npm run validate` + `npm run test:smoke` green before every push.
 2. No new runtime dependencies without a clear performance budget justification.
-3. `preload: false` on every scene except prologue + bloom.
-4. Every scene must degrade gracefully under `prefers-reduced-motion`.
-5. `ALL agent-generated output → ~/agents/` — no exceptions.
+3. `preload: false` on every scene except Prologue + Bloom.
+4. Every scene degrades gracefully under `prefers-reduced-motion`.
+5. No assets outside `~/agents/` from agent sessions.
