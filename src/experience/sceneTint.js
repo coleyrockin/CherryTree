@@ -27,7 +27,7 @@ const createSceneBloomTrigger = () => {
 
     bloomTimer = window.setTimeout(() => {
       bloom.classList.remove("is-blooming");
-    }, 400);
+    }, 650);
   };
 
   const dispose = () => {

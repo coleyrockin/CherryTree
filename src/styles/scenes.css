@@ -659,6 +659,39 @@ html.is-scene-dark .film-grain {
   transform: scale(1.03);
 }
 
+/* Atmospheric fog vignette — pulls depth from the edges, softens the image */
+.scene-stillness::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 80% at 50% 46%, transparent 40%, rgba(234, 214, 204, 0.38) 100%),
+    linear-gradient(180deg, rgba(234, 214, 204, 0.22) 0%, transparent 18%, transparent 82%, rgba(218, 196, 186, 0.28) 100%);
+}
+
+/* Second slow-drift grain layer — adds movement depth in stillness */
+.scene-stillness .scene-media::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  opacity: 0.12;
+  background-image: radial-gradient(var(--scene-grain) 0.6px, transparent 0.7px);
+  background-size: 5px 5px;
+  animation: stillnessDustDrift 18s linear infinite;
+}
+
+@keyframes stillnessDustDrift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50px); }
+}
+
+html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: none; }
+
 .scene-epilogue {
   background:
     radial-gradient(ellipse 80% 60% at 50% 42%, rgba(238, 168, 186, 0.38), rgba(238, 168, 186, 0) 58%),

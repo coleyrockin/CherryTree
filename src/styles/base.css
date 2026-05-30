@@ -71,19 +71,30 @@ body::before {
   inset: 0;
   z-index: -3;
   pointer-events: none;
-  background: radial-gradient(
-    ellipse at center,
-    var(--scene-tint) 0%,
-    transparent 70%
-  );
   opacity: 0;
-  mix-blend-mode: soft-light;
-  transition: opacity 650ms var(--ease-gallery);
   will-change: opacity;
+  transition: opacity 650ms var(--ease-gallery);
+}
+
+/* Central color bloom — the outward tint burst */
+.scene-tint-flash::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at center, var(--scene-tint) 0%, transparent 72%);
+  mix-blend-mode: soft-light;
+}
+
+/* Edge vignette pulse — briefly darkens edges, then releases */
+.scene-tint-flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 42%, rgba(20, 10, 14, 0.18) 100%);
 }
 
 .scene-tint-flash.is-blooming {
-  opacity: 0.55;
+  opacity: 0.72;
 }
 
 html[data-motion="reduced"] .scene-tint-flash {
