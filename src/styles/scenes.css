@@ -274,25 +274,68 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
   overflow: hidden;
 }
 
-/* A single warm light: bright core, soft amber halo feathering to nothing. */
+/* A paper sky lantern: barrel-shaped, lit from below by the fuel cell. */
 .lantern {
   position: absolute;
-  border-radius: 50%;
+  /* Barrel silhouette — wider equator, tapered bottom, flat-ish wire-cap top */
+  border-radius: 50% 50% 44% 44% / 62% 62% 36% 36%;
   opacity: var(--o, 0.9);
   mix-blend-mode: screen;
   will-change: transform, opacity, filter;
-  background: radial-gradient(circle at 50% 44%,
-    rgba(255, 252, 236, 1) 0%,
-    rgba(255, 219, 148, 0.97) 12%,
-    rgba(252, 173, 89, 0.66) 30%,
-    rgba(236, 140, 66, 0.34) 48%,
-    rgba(248, 168, 92, 0.42) 60%,
-    rgba(228, 122, 56, 0.16) 70%,
-    rgba(222, 116, 52, 0) 82%);
+  /* Offset flame: bright core near bottom-interior (fuel cell), top is darker
+     (cap + wire structure above the flame). Top-darkening layer sits first. */
+  background:
+    linear-gradient(180deg, rgba(10, 6, 2, 0.28) 0%, rgba(10, 6, 2, 0) 28%),
+    radial-gradient(circle at 48% 66%,
+      rgba(255, 253, 238, 1) 0%,
+      rgba(255, 222, 148, 0.97) 10%,
+      rgba(252, 176, 88, 0.68) 26%,
+      rgba(238, 142, 64, 0.36) 44%,
+      rgba(248, 166, 90, 0.38) 58%,
+      rgba(228, 120, 52, 0.14) 72%,
+      rgba(222, 116, 52, 0) 84%);
   filter: drop-shadow(0 0 var(--glow, 16px) rgba(255, 176, 96, 0.5));
   animation:
     lanternRise var(--dur, 30s) ease-in-out var(--delay, 0s) infinite,
     lanternBreathe var(--breathe, 5.4s) ease-in-out var(--bdelay, 0s) infinite;
+}
+
+/* Bamboo/wire ring cap at the top — the structural tell that makes it a lantern */
+.lantern::before {
+  content: "";
+  position: absolute;
+  top: -3%; left: 10%; right: 10%; height: 13%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(36, 20, 8, 0.5) 0%, rgba(36, 20, 8, 0.06) 100%);
+  border-top: 1px solid rgba(90, 58, 22, 0.26);
+  pointer-events: none;
+}
+
+/* Paper fiber + equatorial structural hoop.
+   Uses ::after not filter — filter is owned by lanternBreathe and can't share.
+   The horizontal hoop sits at ~48% height (widest point of the barrel) and reads
+   as the bamboo/wire ring that holds the paper panels together. */
+.lantern::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    /* Equatorial hoop — single dark band at the barrel's widest point */
+    linear-gradient(180deg,
+      transparent 43%,
+      rgba(20, 10, 4, 0.22) 46%,
+      rgba(20, 10, 4, 0.14) 48%,
+      transparent 51%
+    ),
+    /* Paper fiber bands */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 220, 160, 0.04) 0px, rgba(255, 220, 160, 0) 3px,
+      rgba(0, 0, 0, 0.03) 5px, rgba(0, 0, 0, 0) 8px
+    );
+  mix-blend-mode: overlay;
+  pointer-events: none;
 }
 
 @keyframes lanternRise {
@@ -308,8 +351,8 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
    only `filter`, never transform/opacity (owned by lanternRise), so the two
    never conflict. In reduced motion both stop and the base glow remains. */
 @keyframes lanternBreathe {
-  0%, 100% { filter: brightness(0.86) drop-shadow(0 0 calc(var(--glow, 16px) * 0.66) rgba(255, 168, 90, 0.4)); }
-  50%      { filter: brightness(1.18) drop-shadow(0 0 var(--glow, 16px) rgba(255, 202, 124, 0.62)); }
+  0%, 100% { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) brightness(0.86) drop-shadow(0 0 calc(var(--glow, 16px) * 0.66) rgba(255, 168, 90, 0.4)); }
+  50%      { filter: saturate(var(--sat, 1)) contrast(var(--con, 1)) brightness(1.18) drop-shadow(0 0 var(--glow, 16px) rgba(255, 202, 124, 0.62)); }
 }
 
 .lantern:nth-child(3n)   { --breathe: 4.4s; --bdelay: -1.2s; }
@@ -338,6 +381,14 @@ html[data-motion="reduced"] .color-bloom { animation: none; }
 .lantern--20 { left: 26%; top: 50%; width: 70px;  height: 80px;  --o: .88; --dur: 31s; --delay: -14s; --sway: 16px;  --glow: 22px; }
 .lantern--21 { left: 8%;  top: 56%; width: 38px;  height: 44px;  --o: .7;  --dur: 38s; --delay: -31s; --sway: 12px;  --glow: 13px; }
 .lantern--22 { left: 80%; top: 34%; width: 22px;  height: 26px;  --o: .58; --dur: 31s; --delay: -13s; --sway: 14px;  --glow: 9px; }
+
+/* Far/high lanterns (small) — desaturated + lower contrast to sell Z-depth.
+   --sat/--con are consumed inside lanternBreathe so they survive animation. */
+.lantern--4, .lantern--8, .lantern--10,
+.lantern--13, .lantern--16, .lantern--19, .lantern--22 {
+  --sat: 0.68;
+  --con: 0.82;
+}
 
 /* The tinted-petal debut: a few gold cherry petals falling against the rise. */
 .lantern-petal {
