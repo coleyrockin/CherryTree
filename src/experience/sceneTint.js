@@ -50,6 +50,8 @@ const applySceneTint = (scene, triggerBloom = null) => {
 
   // Dark scenes (e.g. full-bleed video) flip the persistent chrome to light.
   root.classList.toggle("is-scene-dark", Boolean(scene.dark));
+  // Bright photographic scenes lift the dark chrome's contrast (see scenes.css).
+  root.classList.toggle("is-scene-bright", Boolean(scene.bright));
 
   const numeralNode = document.querySelector("[data-ct-numeral]");
   const labelNode = document.querySelector("[data-ct-scene-label]");

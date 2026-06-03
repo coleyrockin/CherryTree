@@ -386,6 +386,34 @@ html.is-scene-dark .film-grain {
   mix-blend-mode: screen;
 }
 
+/* ── Bright-scene chrome (active when a `bright:true` photographic scene is in
+   view) ─────────────────────────────────────────────────────────────────────
+   Photographic scenes (Bloom, Drift, Stillness) carry high-key, busy imagery
+   under the top chrome. The dark-ink chrome is tuned for the calm cream page,
+   so over a bright textured canopy it goes muddy. Lift its contrast without
+   losing the minimal feel: the cream glow halo does nothing over bright imagery,
+   so trade it for a soft dark halo, drop the editorial multiply, and make the
+   frosted control pills a touch more present. The flip eases in on the cut via
+   the existing color/text-shadow transitions. Toggled by `html.is-scene-bright`
+   from sceneTint.js. Designed scenes (wash/gradient/webgl) keep minimal chrome. */
+html.is-scene-bright .brand-mark {
+  text-shadow:
+    0 1px 3px rgba(40, 23, 30, 0.45),
+    0 2px 12px rgba(40, 23, 30, 0.3);
+}
+
+html.is-scene-bright .editorial-chrome {
+  mix-blend-mode: normal;
+  color: rgba(45, 27, 33, 0.72);
+}
+
+html.is-scene-bright .motion-toggle,
+html.is-scene-bright .sound-toggle {
+  color: rgba(40, 25, 31, 0.92);
+  border-color: rgba(45, 27, 33, 0.42);
+  background: rgba(252, 245, 240, 0.46);
+}
+
 .scene-stillness {
   background: linear-gradient(180deg, #ead6cc 0%, #dfc4bb 100%);
 }
@@ -447,15 +475,12 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
   margin-inline: auto;
 }
 
-/* Soft vignette — frames the title lockup without crushing the scene */
-.epilogue-lockup::before {
-  content: "";
-  position: absolute;
-  inset: -40% -60%;
-  background: radial-gradient(ellipse at center, transparent 36%, rgba(49, 24, 28, 0.12) 100%);
-  pointer-events: none;
-  z-index: -1;
-}
+/* No background vignette behind the lockup: a radial centered on the title
+   projects its upper/lower arc across the viewport as a horizontal shade band,
+   and because the lockup drifts (driftSlow) that band sweeps the scene. The
+   dark serif title already has ample contrast over the warm gradient, so it
+   needs no backing wash — a hair of text-shadow on the title does the framing
+   (see `.epilogue-title`) without any full-width artifact. */
 
 /* ── Epilogue decorative blooms ─── */
 
