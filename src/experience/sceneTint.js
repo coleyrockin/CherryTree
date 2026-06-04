@@ -55,11 +55,35 @@ const applySceneTint = (scene, triggerBloom = null) => {
 
   const numeralNode = document.querySelector("[data-ct-numeral]");
   const labelNode = document.querySelector("[data-ct-scene-label]");
-  if (numeralNode && scene.numeral) numeralNode.textContent = scene.numeral;
+
+  if (numeralNode && scene.numeral) {
+    const isFirstLoad = !lastTintedSceneId;
+    if (!isFirstLoad && numeralNode.textContent !== scene.numeral) {
+      // Roll the new numeral up from below
+      numeralNode.textContent = scene.numeral;
+      numeralNode.classList.remove("is-rolling");
+      void numeralNode.offsetWidth; // force reflow so animation restarts
+      numeralNode.classList.add("is-rolling");
+      numeralNode.addEventListener(
+        "animationend",
+        () => numeralNode.classList.remove("is-rolling"),
+        { once: true }
+      );
+    } else {
+      numeralNode.textContent = scene.numeral;
+    }
+  }
+
   if (labelNode && scene.label) labelNode.textContent = scene.label;
 
   // Per-scene document title
   document.title = scene.label ? `${scene.label} — Cherry Tree` : "Cherry Tree";
+
+  // Per-scene browser chrome color (mobile tab bar / PWA title bar)
+  const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+  if (themeColorMeta && scene.bgColor) {
+    themeColorMeta.setAttribute("content", scene.bgColor);
+  }
 
   // Color-bloom flash on scene transition (not on initial load)
   if (lastTintedSceneId && lastTintedSceneId !== scene.id) {

@@ -94,7 +94,7 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
   //   PageUp   / K  — previous scene
   //   Home          — first scene
   //   End           — last scene
-  //   1–7           — jump to scene index (clamped to manifest length)
+  //   1–8           — jump to scene index (clamped to manifest length)
   // Arrow keys are deliberately left alone so users keep native fine-grained
   // scrolling. Skipped when focus is in an editable field or a modifier is held.
   const isEditableTarget = (target) => {

@@ -53,16 +53,32 @@ const createPetalTexture = () => {
     return null;
   }
 
-  const gradient = ctx.createRadialGradient(128, 128, 20, 128, 128, 116);
-  gradient.addColorStop(0, "rgba(255, 244, 248, 0.96)");
-  gradient.addColorStop(0.35, "rgba(255, 178, 205, 0.88)");
-  gradient.addColorStop(0.65, "rgba(237, 116, 151, 0.75)");
-  gradient.addColorStop(1, "rgba(237, 116, 151, 0)");
+  const cx = 128;
 
+  // Luminous fill: a near-white core fading to translucent rose at the thin
+  // edges — gives the petal volume and the sense of catching light.
+  const gradient = ctx.createRadialGradient(cx, 150, 8, cx, 138, 118);
+  gradient.addColorStop(0, "rgba(255, 247, 250, 0.98)");
+  gradient.addColorStop(0.42, "rgba(255, 184, 210, 0.92)");
+  gradient.addColorStop(0.78, "rgba(236, 118, 154, 0.66)");
+  gradient.addColorStop(1, "rgba(232, 116, 151, 0)");
+
+  // Soft edges keep each petal ghostly rather than a hard clip-art cutout.
+  ctx.filter = "blur(2.6px)";
   ctx.fillStyle = gradient;
+
+  // A cherry-blossom petal: a tapered base (the attachment point, bottom),
+  // widening into two rounded lobes with the characteristic sakura notch — the
+  // cleft at the wide top that reads unmistakably as a petal, not a dot.
   ctx.beginPath();
-  ctx.ellipse(128, 128, 84, 104, Math.PI / 8, 0, Math.PI * 2);
+  ctx.moveTo(cx, 232);                              // base tip
+  ctx.bezierCurveTo(58, 206, 46, 104, 104, 76);     // left flank up to left lobe
+  ctx.quadraticCurveTo(122, 64, cx, 100);           // left lobe crown into the notch
+  ctx.quadraticCurveTo(134, 64, 152, 76);           // notch up to right lobe crown
+  ctx.bezierCurveTo(210, 104, 198, 206, cx, 232);   // right flank back to base
+  ctx.closePath();
   ctx.fill();
+  ctx.filter = "none";
 
   const texture = new CanvasTexture(canvas);
   texture.anisotropy = 4;

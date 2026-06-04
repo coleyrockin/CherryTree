@@ -84,7 +84,7 @@ export const sceneManifest = Object.freeze([
     bgColor: "#17211f",
     tint: "#e8a24a",
     ink: "#eef3f1",
-    grainTint: "rgba(180, 200, 192, 0.2)"
+    grainTint: "rgba(146, 122, 104, 0.2)"
   },
   {
     id: "stillness",

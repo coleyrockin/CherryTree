@@ -78,7 +78,9 @@
 }
 
 .scene-drift .scene-media img {
-  filter: saturate(1.06) contrast(1.04);
+  /* Calm the stock-photo chartreuse grass and warm the grade a touch so Drift
+     reads filmic rather than off-the-shelf — lower saturation, slight contrast. */
+  filter: saturate(0.9) contrast(1.06) brightness(1.01);
 }
 
 .scene-drift .scene-kicker {
@@ -222,7 +224,7 @@
   height: 88%;
   right: -10%;
   top: 4%;
-  background: radial-gradient(circle at 50% 50%, rgba(120, 152, 100, 0.86), rgba(120, 152, 100, 0) 68%);
+  background: radial-gradient(circle at 50% 50%, rgba(228, 130, 112, 0.86), rgba(228, 130, 112, 0) 68%);
   animation: colorWashB 33s var(--ease-gallery) infinite alternate;
 }
 
@@ -580,6 +582,18 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
 .epilogue-petal--6 { left: 78%; width: 22px; height: 17px; background: linear-gradient(155deg, rgba(252,172,200,0.90), rgba(224,108,150,0.58)); --o:.68; --dur:34s; --delay:-9s;  --sway:-18px; }
 .epilogue-petal--7 { left: 34%; width: 16px; height: 12px; background: linear-gradient(155deg, rgba(255,194,216,0.84), rgba(236,124,164,0.54)); --o:.58; --dur:36s; --delay:-29s; --sway:20px; }
 .epilogue-petal--8 { left: 88%; width: 24px; height: 18px; background: linear-gradient(155deg, rgba(240,140,174,0.92), rgba(210,88,132,0.62)); --o:.70; --dur:29s; --delay:-15s; --sway:-22px; }
+/* Second, denser tier: smaller + slower petals for depth and an airier, fuller
+   shower that reads as a closing release rather than a sparse debug state. */
+.epilogue-petal--9  { left: 6%;  width: 12px; height: 9px;  background: linear-gradient(155deg, rgba(255,190,212,0.82), rgba(232,120,160,0.5)); --o:.50; --dur:40s; --delay:-4s;  --sway:16px; }
+.epilogue-petal--10 { left: 18%; width: 10px; height: 8px;  background: linear-gradient(155deg, rgba(248,160,190,0.80), rgba(220,100,142,0.5)); --o:.46; --dur:44s; --delay:-25s; --sway:-14px; }
+.epilogue-petal--11 { left: 32%; width: 14px; height: 11px; background: linear-gradient(155deg, rgba(244,148,180,0.86), rgba(214,92,134,0.54)); --o:.56; --dur:36s; --delay:-13s; --sway:22px; }
+.epilogue-petal--12 { left: 46%; width: 9px;  height: 7px;  background: linear-gradient(155deg, rgba(255,196,218,0.78), rgba(236,126,166,0.48)); --o:.44; --dur:48s; --delay:-31s; --sway:-12px; }
+.epilogue-petal--13 { left: 58%; width: 13px; height: 10px; background: linear-gradient(155deg, rgba(242,144,178,0.86), rgba(216,92,138,0.54)); --o:.54; --dur:38s; --delay:-7s;  --sway:20px; }
+.epilogue-petal--14 { left: 70%; width: 11px; height: 8px;  background: linear-gradient(155deg, rgba(252,172,200,0.82), rgba(224,108,150,0.5)); --o:.48; --dur:42s; --delay:-19s; --sway:-18px; }
+.epilogue-petal--15 { left: 82%; width: 15px; height: 11px; background: linear-gradient(155deg, rgba(238,138,170,0.88), rgba(208,84,128,0.56)); --o:.58; --dur:34s; --delay:-27s; --sway:24px; }
+.epilogue-petal--16 { left: 92%; width: 10px; height: 8px;  background: linear-gradient(155deg, rgba(255,186,210,0.80), rgba(228,112,152,0.5)); --o:.46; --dur:46s; --delay:-10s; --sway:-16px; }
+.epilogue-petal--17 { left: 48%; width: 8px;  height: 6px;  background: linear-gradient(155deg, rgba(255,200,220,0.74), rgba(238,130,168,0.46)); --o:.40; --dur:50s; --delay:-22s; --sway:14px; }
+.epilogue-petal--18 { left: 72%; width: 12px; height: 9px;  background: linear-gradient(155deg, rgba(246,150,182,0.84), rgba(218,96,140,0.52)); --o:.52; --dur:37s; --delay:-15s; --sway:-20px; }
 
 html[data-motion="reduced"] .epilogue-petal { display: none; }
 

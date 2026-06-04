@@ -130,7 +130,7 @@ const initHeroTextAnimation = (gsap) => {
 
 /* ── Scene title scroll-reveal animations ─────────────────── */
 
-const SCENE_TEXT_IDS = ["bloom", "triptych", "color-field", "stillness"];
+const SCENE_TEXT_IDS = ["bloom", "drift", "triptych", "color-field", "koi", "stillness"];
 
 const initSceneTextAnimations = (gsap, ScrollTrigger) => {
   const animations = [];

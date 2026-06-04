@@ -55,6 +55,17 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
     );
   });
 
+  // scrollWidth above is measured during boot, before the webfont swaps in. The
+  // fallback font is narrower, so the wrap width would be frozen too small and
+  // the loop would show a seam every revolution. Re-measure once fonts settle.
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => {
+      tracks.forEach((t) => {
+        t.trackWidth = t.track.scrollWidth / 2;
+      });
+    });
+  }
+
   let sharedTick = null;
   if (tracks.length) {
     sharedTick = () => {

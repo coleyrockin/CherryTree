@@ -38,6 +38,11 @@ html[data-motion="reduced"] {
   box-sizing: border-box;
 }
 
+::selection {
+  background: rgba(204, 95, 135, 0.22);
+  color: inherit;
+}
+
 html,
 body {
   margin: 0;
@@ -219,7 +224,8 @@ html[data-motion="reduced"] .marquee-ribbon {
     0 1px 2px rgba(40, 23, 30, 0.22),
     0 10px 28px rgba(247, 233, 224, 0.76),
     0 1px 0 rgba(255, 249, 243, 0.54);
-  pointer-events: none;
+  /* pointer-events: auto so the sakura easter egg can listen for clicks */
+  pointer-events: auto;
   transition:
     color 900ms var(--ease-gallery),
     text-shadow 900ms var(--ease-gallery);
@@ -342,6 +348,23 @@ html[data-motion="reduced"] .marquee-ribbon {
   background:
     radial-gradient(circle at 50% 52%, rgba(20, 10, 16, 0) 42%, rgba(20, 10, 16, 0.28) 100%),
     linear-gradient(180deg, rgba(247, 236, 228, 0.02), rgba(247, 236, 228, 0.18));
+}
+
+/* Global cinematic vignette — one fixed lens-edge darkening over the whole film
+   so the flat UI scenes (Prologue, Triptych, Color Field, Epilogue) get the same
+   framed depth the photographic scenes get for free from their imagery. Subtle
+   enough to sit over photos without muddying them; above scene content, below
+   chrome (so it also lifts chrome contrast on the bright scenes). */
+.cinematic-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 76% at 50% 48%,
+    rgba(18, 9, 14, 0) 56%,
+    rgba(18, 9, 14, 0.24) 100%
+  );
 }
 
 .visually-hidden {
@@ -543,6 +566,28 @@ body.is-loading .scroll-progress {
   pointer-events: none;
 }
 
+/* ── Cinematic arrival ──────────────────────────────────────
+   On first load at the hero, the persistent chrome holds back so the Prologue
+   opens on nothing but the title and the petals. `is-immersive-hero` is set by
+   heroImmersion.js and removed the instant the visitor engages (scroll/key), so
+   the UI quietly assembles as they enter. !important cleanly overrides the nav's
+   is-visible and the editorial reveal. The scroll-hint deliberately stays — it's
+   the one invitation the opening frame should keep. */
+.ui-chrome {
+  transition: opacity 1100ms var(--ease-gallery);
+}
+
+html.is-immersive-hero .ui-chrome,
+html.is-immersive-hero .editorial-chrome,
+html.is-immersive-hero .scene-nav {
+  opacity: 0 !important;
+}
+
+html.is-immersive-hero .control-stack,
+html.is-immersive-hero .scene-nav {
+  pointer-events: none !important;
+}
+
 /* Custom cursor override */
 .has-custom-cursor,
 .has-custom-cursor * {
@@ -583,6 +628,21 @@ body:not(.is-loading) .editorial-chrome {
   font-variant-numeric: tabular-nums;
   color: var(--scene-tint);
   transition: color 900ms var(--ease-gallery);
+  /* Clip the roll animation — inner span slides up on scene change */
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.35;
+  vertical-align: middle;
+}
+
+@keyframes numeralRoll {
+  from { transform: translateY(105%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+[data-ct-numeral].is-rolling {
+  display: inline-block;
+  animation: numeralRoll 380ms var(--ease-gallery) both;
 }
 
 .editorial-divider {
@@ -605,4 +665,54 @@ body:not(.is-loading) .editorial-chrome {
     letter-spacing: 0.28em;
     gap: 10px;
   }
+}
+
+/* ── Idle invitation ─────────────────────────────────────────
+   After 45s of no interaction on the hero, the scroll-hint line
+   brightens to gently remind the visitor to begin. Only the
+   line animation is touched — GSAP owns the parent opacity.   */
+
+@keyframes idleLinePulse {
+  0%, 100% { opacity: 0.5;  transform: scaleY(0.55) translateZ(0); transform-origin: top; }
+  50%       { opacity: 1;    transform: scaleY(1)    translateZ(0); transform-origin: top; }
+}
+
+html.is-idle .scroll-hint-line {
+  animation: idleLinePulse 1.05s ease-in-out infinite;
+}
+
+/* ── Sakura Easter Egg ───────────────────────────────────────
+   Click the CHERRY TREE brand-mark five times to summon a brief
+   golden-hour petal shower. Petals are created in JS, then
+   cleaned up after the animation completes.                   */
+
+@keyframes sakuraFall {
+  0%   { transform: translate(0, -14vh) rotate(0deg)                        translateZ(0); opacity: 0; }
+  8%   { opacity: 1; }
+  88%  { opacity: 0.72; }
+  100% { transform: translate(var(--sakura-drift, 60px), 110vh) rotate(var(--sakura-spin, 220deg)) translateZ(0); opacity: 0; }
+}
+
+.sakura-rain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sakura-rain-petal {
+  position: absolute;
+  top: 0;
+  border-radius: 50% 0 50% 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 60% 55% at 42% 38%,
+    rgba(255, 232, 150, 0.96),
+    rgba(242, 175, 85,  0.84) 52%,
+    rgba(218, 118, 52,  0.38) 100%
+  );
+  box-shadow: inset 0 0 6px rgba(255, 248, 195, 0.55);
+  will-change: transform, opacity;
+  animation: sakuraFall var(--sakura-dur, 8s) ease-in var(--sakura-delay, 0s) both;
 }

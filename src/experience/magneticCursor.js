@@ -12,8 +12,10 @@ const INTERACTIVE_SELECTOR = "button, a, [data-magnetic]";
 const SCENE_CURSOR_LABELS = {
   "prologue-webgl": "scroll",
   "bloom-wash": "look",
+  "drift": "wander",
   "triptych": "explore",
   "color-field": "breathe",
+  "koi": "watch",
   "stillness": "wait",
   "epilogue": "fall"
 };

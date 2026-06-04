@@ -7,6 +7,9 @@ import "./styles/nav.css";
 import { sceneManifest } from "./content/sceneManifest";
 import { initAudioController } from "./experience/audioController";
 import { initPreloader } from "./experience/preloader";
+import { initHeroImmersion } from "./experience/heroImmersion";
+import { initTabWhisper } from "./experience/tabWhisper";
+import { initSakuraEgg } from "./experience/sakuraEgg";
 import { safeStorageGet, safeStorageSet } from "./utils/storage";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
@@ -268,6 +271,15 @@ const boot = async () => {
   // Stable cleanup array for resources that survive motion toggles
   const stableCleanup = [];
 
+  // Cinematic arrival — hold the chrome back until the visitor first engages.
+  stableCleanup.push(initHeroImmersion({ reducedMotion: motion.reduced }));
+
+  // Tab-away whisper — title changes when the visitor leaves, calls them back.
+  stableCleanup.push(initTabWhisper());
+
+  // Sakura easter egg — click the brand-mark 5× for a golden-hour shower.
+  stableCleanup.push(initSakuraEgg({ reducedMotion: motion.reduced }));
+
   // Mutable cleanup array for motion-dependent resources
   let motionCleanup = [];
   let motionInitToken = 0;
@@ -294,6 +306,10 @@ const boot = async () => {
     // Clear dark-scene chrome so it can't stick across a motion toggle. Full
     // motion re-evaluates it via sceneTint; reduced motion via darkSceneChrome.
     document.documentElement.classList.remove("is-scene-dark");
+    // is-scene-bright is only (re)applied by the full-motion tint observer, so
+    // clear it too — otherwise toggling to reduced motion on a bright scene
+    // leaves the lifted-contrast chrome stuck on for the whole session.
+    document.documentElement.classList.remove("is-scene-bright");
 
     // Remove stale state classes from scenes
     document.querySelectorAll(".scene").forEach((scene) => {
@@ -382,6 +398,10 @@ const boot = async () => {
     // Wire up motion-dependent enhancement modules
     if (!reducedMotion && sceneResult.gsap) {
       const { gsap, ScrollTrigger, lenis, velocityTracker } = sceneResult;
+
+      // Idle invitation — gently amplifies the scroll-hint after 45 s of stillness.
+      const { initIdleInvitation } = await import("./experience/idleInvitation");
+      registerCleanup(initIdleInvitation());
 
       // Scroll velocity visual effects
       const { initScrollVelocityFx } = await import("./experience/scrollVelocityFx");

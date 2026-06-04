@@ -44,13 +44,20 @@ export const splitByChars = (element) => {
   }
 
   const originalText = element.textContent || "";
+  const priorAriaLabel = element.hasAttribute("aria-label")
+    ? element.getAttribute("aria-label")
+    : null;
   const chars = wrapNodes(element, "chars");
 
   return {
     chars,
     revert: () => {
       element.textContent = originalText;
-      element.removeAttribute("aria-label");
+      if (priorAriaLabel === null) {
+        element.removeAttribute("aria-label");
+      } else {
+        element.setAttribute("aria-label", priorAriaLabel);
+      }
     }
   };
 };
@@ -61,13 +68,20 @@ export const splitByWords = (element) => {
   }
 
   const originalText = element.textContent || "";
+  const priorAriaLabel = element.hasAttribute("aria-label")
+    ? element.getAttribute("aria-label")
+    : null;
   const words = wrapNodes(element, "words");
 
   return {
     words,
     revert: () => {
       element.textContent = originalText;
-      element.removeAttribute("aria-label");
+      if (priorAriaLabel === null) {
+        element.removeAttribute("aria-label");
+      } else {
+        element.setAttribute("aria-label", priorAriaLabel);
+      }
     }
   };
 };
