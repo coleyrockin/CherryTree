@@ -1,6 +1,6 @@
 # Cherry Tree
 
-> A scroll-driven cinematic gallery — eight scenes, one continuous film.
+A scroll-driven gallery of eight photographic scenes stitched together and scored like a continuous film.
 
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
@@ -16,22 +16,22 @@
 
 ---
 
-Cherry Tree is a zero-framework, hand-authored web experience. Real-time WebGL petals fall through a Three.js hero scene. Scroll scrubs every animation through GSAP `ScrollTrigger`. Lenis shares a frame clock with GSAP so smoothing and animation never drift. Each of eight scenes carries its own color temperature — the whole thing transitions like a cut between shots.
+This is a portfolio piece and a stress test: how far can vanilla JavaScript go before a framework earns its place? No React, no abstraction layer — just ES modules, a custom Three.js shader, GSAP timelines scrubbed against scroll position, and a lot of tuning.
 
-Built on vanilla ES modules. No React, no framework overhead — just full control over the browser, the render loop, and the timeline. Tuned across iPhone portrait, landscape, tablet, desktop, and ultrawide.
+If you're studying scroll-driven animation patterns or building something similar, the implementation is worth reading. Most of the interesting decisions live in `src/experience/`.
 
 ## The Eight Scenes
 
 | № | Scene | Treatment |
 |---|---|---|
-| 01 | **Prologue** | Real-time WebGL petal field, depth-of-field shader, cursor repulsion |
+| 01 | **Prologue** | Real-time WebGL petal field — depth-of-field shader, cursor repulsion, 400 particles |
 | 02 | **Bloom** | Photographic hero, long crossfade, saturation lift on scrub |
-| 03 | **Drift** | Photographic wind path, parallax-deep motion preset |
-| 04 | **Triptych** | Three composite panels, parallax-deep motion preset |
-| 05 | **Color Field** | Full-bleed chromatic wash — three color fields drifting (Rothko-in-motion) |
-| 06 | **Koi** | Full-bleed living koi-pond video (4K, VP9 + HEVC, lazy-loaded), light-chrome dark scene |
-| 07 | **Stillness** | Single still image, film-dust grain overlay |
-| 08 | **Epilogue** | Ambient glow, drift-slow preset, closing title |
+| 03 | **Drift** | Wind-path photography, deep parallax |
+| 04 | **Triptych** | Three composite panels, split parallax |
+| 05 | **Color Field** | Three chromatic fields drifting simultaneously (Rothko-in-motion) |
+| 06 | **Koi** | Full-bleed 4K koi-pond video, lazy-loaded, dark chrome |
+| 07 | **Stillness** | Single still, film-dust grain overlay |
+| 08 | **Epilogue** | Ambient glow, closing title |
 
 <table>
   <tr>
@@ -52,45 +52,7 @@ Built on vanilla ES modules. No React, no framework overhead — just full contr
   </tr>
 </table>
 
-## Stack
-
-| Layer | Technology |
-|---|---|
-| 3D / WebGL | Three.js r181, custom `ShaderMaterial` |
-| Animation | GSAP 3.13 + ScrollTrigger |
-| Smooth scroll | Lenis 1.3 (shared frame clock with GSAP) |
-| Build | Vite 8, manual vendor chunking |
-| Images | Sharp — AVIF / WebP / JPEG + LQIP |
-| Language | Vanilla ES2021, no framework |
-
-## What's under the hood
-
-- **Custom WebGL petal shader** — per-petal UV rotation, depth-of-field color shift, additive light-speck layer; 400 particles on desktop, 200 on mobile. Cursor repulsion is a vertex-shader visual displacement (the physics buffer stays untouched).
-- **FLIP preloader** — brand text measures its own position, then animates directly into the hero title via `expo.inOut`. No clone hack. Hard 6-second safety timeout guarantees the loader can never hang.
-- **Scene tinting** — an `IntersectionObserver` tracks which scene occupies the most viewport and dispatches `--scene-tint`, `--scene-ink`, and `--scene-grain` CSS variables in real time. The body inherits, so chrome and grain re-paint instantly on cut.
-- **Velocity parallax** — scene text layers scrub `yPercent` against scroll direction via `ScrollTrigger.scrub`. Suppressed below 760px to keep mobile scrolling smooth.
-- **Magnetic cursor** — ring snaps to interactive elements, morphs size, shows a contextual label.
-- **Audio controller** — toggleable ambient bed with crossfade, persistent across reloads via `localStorage`.
-- **Ghost nav + scene labels** — eight dot indicators along the right rail track the active scene; current scene name appears at lower-left.
-- **Reduced motion** — full fallback: static image, no scrub, no WebGL. User-overridable runtime toggle (no reload).
-- **Responsive typography** — hero and epilogue titles use `clamp()` ceilings to stay on a single line from 375px through 1920px.
-- **Lazy media hydration** — only the prologue and bloom scenes preload. Everything else hydrates 280px ahead of the viewport via `IntersectionObserver`.
-- **Keyboard navigation** — `PageDown` / `J` next scene, `PageUp` / `K` previous, `Home` / `End` jump to first / last, `1`–`8` jump to a specific scene.
-- **Deep links** — every scene has its own URL hash (`/#bloom`, `/#drift`, …). The URL updates as you scroll, and visiting a `#scene-id` link jumps there on load.
-- **Screen-reader announcements** — an `aria-live="polite"` region announces the current scene as you move through the gallery.
-
-## Performance
-
-Current build output (Vite 8, gzipped): Three.js ~128 KB · GSAP ~44 KB · Lenis ~5 KB · main app ~5.7 KB (~15 KB raw).
-Three.js defers behind `IntersectionObserver` + `requestIdleCallback` — it never touches first paint.
-
-## Mobile
-
-<img src="./.github/preview/cherrytree-mobile.png" alt="Cherry Tree on iPhone" width="280" />
-
-Polished pass across all iPhone sizes. The hero title is constrained by viewport height in landscape, by clamp ceilings in portrait. Velocity parallax, magnetic cursor, and the desktop scene-rail are suppressed below 760px.
-
-## Local setup
+## Installation
 
 ```bash
 git clone https://github.com/coleyrockin/CherryTree.git
@@ -101,45 +63,55 @@ npm run dev
 
 | Script | |
 |---|---|
-| `npm run dev` | Vite dev server at 127.0.0.1:5173 |
+| `npm run dev` | Dev server at 127.0.0.1:5173 |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Serve the production build locally |
-| `npm run optimize-assets` | Regenerate responsive image sets from source files |
+| `npm run validate` | Full gate: showcase checks + build + `npm audit` |
+| `npm run test:smoke` | Playwright smoke tests |
+| `npm run optimize-assets` | Regenerate image sets from source files |
 
-Dev and preview bind to localhost by default. For LAN or tunnel testing, opt in explicitly:
+For LAN or tunnel testing, opt in explicitly — the dev server binds to localhost by default:
 
 ```bash
 CHERRYTREE_EXPOSE_DEV_SERVER=true npm run dev
 ```
 
-## Project structure
+## Usage
 
-```
-src/
-├── content/
-│   └── sceneManifest.js      # Scene definitions, tints, motion presets
-├── experience/
-│   ├── heroWebgl.js          # Three.js petal field + custom shader
-│   ├── preloader.js          # FLIP brand → hero title transition
-│   ├── sceneController.js    # Orchestrator: lazy media, presence, clip-path reveals, triptych
-│   ├── sceneTint.js          # IntersectionObserver tint dispatch + bg-color blend
-│   ├── velocityParallax.js   # Per-scene media/text parallax presets
-│   ├── epilogueAnimations.js # Epilogue split-text + bloom reveals
-│   ├── koiVideo.js           # Koi-pond video lazy-load + visibility play/pause
-│   ├── darkSceneChrome.js    # Reduced-motion dark-scene chrome (is-scene-dark)
-│   ├── pointerTilt.js        # Desktop pointer-reactive image tilt
-│   ├── sceneAnnouncer.js     # Reduced-motion aria-live + hash sync
-│   ├── sceneNav.js           # Right-rail numerals + active state
-│   ├── scrollEffects.js      # Marquee ribbons + cursor-glow
-│   ├── scrollVelocityFx.js   # Scroll-velocity blur + grain boost
-│   ├── magneticCursor.js     # Custom cursor with contextual labels
-│   ├── microInteractions.js  # Hover, focus, scroll-hint micro-anims
-│   ├── textAnimations.js     # Char/word splits and reveals
-│   └── audioController.js    # Ambient bed, crossfade, persistence
-├── styles/                   # base, scenes, preloader, cursor, nav
-├── utils/                    # splitText, scrollVelocity, storage
-└── main.js                   # Composition root
-```
+Scroll to move through the gallery. Each scene has a URL hash (`/#bloom`, `/#koi`, etc.) — the URL updates live, so linking to a specific scene works.
+
+**Keyboard navigation:** `J` / `K` or `PageDown` / `PageUp` step forward and back. `1`–`8` jump to a scene directly. `Home` and `End` go to the first and last.
+
+**Audio:** The speaker toggle enables an ambient sound bed. It never autoplays. Preference persists across reloads.
+
+**Reduced motion:** A footer toggle switches between full and reduced motion without a page reload. Picks up your system preference (`prefers-reduced-motion`) by default.
+
+## Tech Stack
+
+| Layer | Technology | Notes |
+|---|---|---|
+| 3D / WebGL | Three.js r181, custom `ShaderMaterial` | Deferred behind `IntersectionObserver` — never touches first paint |
+| Animation | GSAP 3.13 + ScrollTrigger | Shared frame clock with Lenis |
+| Smooth scroll | Lenis 1.3 | Synced to GSAP ticker so smoothing and animation never drift |
+| Build | Vite 8, manual vendor chunking | Gzip: Three.js ~128 KB · GSAP ~44 KB · app ~5.7 KB |
+| Images | Sharp | AVIF / WebP / JPEG + LQIP; regenerated via `optimize-assets` |
+| Language | Vanilla ES2021 | No framework |
+
+A few implementation details worth knowing about if you're studying the codebase:
+
+- **Scene tinting** uses an `IntersectionObserver` on each scene element, not `ScrollTrigger`. It tracks which scene holds the most viewport and dispatches `--scene-tint`, `--scene-ink`, and `--scene-grain` CSS variables to `:root`. The whole chrome re-paints from that one write.
+- **The FLIP preloader** measures the brand text's position, then animates it directly into the hero title on load. No clone. A hard 6-second safety timeout guarantees the preloader can never hang the UI.
+- **Reduced motion** is a first-class path, not a fallback — every module has its own reduced-motion branch. The runtime toggle re-initializes motion-dependent systems without a reload.
+- **Lazy media hydration** — only Prologue and Bloom preload. Everything else wakes up 280 px ahead of the viewport.
+
+## Contributing
+
+This is a solo portfolio project. That said:
+
+- **Bug reports** — open an issue with steps to reproduce, browser, and OS.
+- **Bug fixes** — PRs welcome. Run `npm run validate && npm run test:smoke` before submitting; both need to pass.
+- **Feature ideas** — open an issue first. Most new work is planned in [`ROADMAP.md`](./ROADMAP.md).
+- **Unsolicited refactors or dependency upgrades** — these won't be merged.
 
 ## License
 
