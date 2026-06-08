@@ -7,6 +7,8 @@
  * that already have their own treatment (prologue WebGL, triptych pin/reveal).
  */
 
+import { lerp } from "../utils/math";
+
 const MAX_DEG = 1.5;
 const SMOOTH = 0.06;
 const SKIP_IDS = new Set(["prologue-webgl", "triptych"]);
@@ -62,8 +64,8 @@ export const initPointerTilt = (scenes, gsap) => {
 
   const onTick = () => {
     tiltTargets.forEach(({ media, state }) => {
-      state.currentX += (state.targetX - state.currentX) * SMOOTH;
-      state.currentY += (state.targetY - state.currentY) * SMOOTH;
+      state.currentX = lerp(state.currentX, state.targetX, SMOOTH);
+      state.currentY = lerp(state.currentY, state.targetY, SMOOTH);
 
       const rotY = Number((state.currentX * MAX_DEG).toFixed(3));
       const rotX = Number((-state.currentY * MAX_DEG).toFixed(3));

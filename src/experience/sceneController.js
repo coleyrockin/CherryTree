@@ -334,7 +334,7 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
 
   cleanup.push(initSceneColorTransitions(manifest, gsap, ScrollTrigger));
   cleanup.push(initSceneCrossfade(scenes, gsap));
-  cleanup.push(initVelocityParallax({ scenes, gsap, velocityTracker }));
+  cleanup.push(initVelocityParallax({ scenes, gsap }));
   cleanup.push(initTriptychTimeline(gsap));
   cleanup.push(initColorFieldBloom(gsap));
   cleanup.push(initClipPathReveals(gsap));

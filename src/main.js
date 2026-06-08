@@ -12,6 +12,7 @@ import { initHeroImmersion } from "./experience/heroImmersion";
 import { initTabWhisper } from "./experience/tabWhisper";
 import { initSakuraEgg } from "./experience/sakuraEgg";
 import { safeStorageGet, safeStorageSet } from "./utils/storage";
+import { canUseWebGL } from "./utils/webgl";
 
 const MOTION_STORAGE_KEY = "cherrytree.motion.reduced";
 const HERO_SCENE_SELECTOR = '[data-ct-scene="prologue-webgl"]';
@@ -30,15 +31,6 @@ const getMotionPreference = () => {
     mode === "reduced" || (mode === "auto" && prefersReduced);
 
   return { mode, reduced, prefersReduced };
-};
-
-const supportsWebGLContext = () => {
-  try {
-    const canvas = document.createElement("canvas");
-    return !!(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-  } catch {
-    return false;
-  }
 };
 
 const applySceneManifest = (manifest) => {
@@ -132,7 +124,7 @@ const initDeferredHeroWebgl = ({
     return;
   }
 
-  if (reducedMotion || !supportsWebGLContext()) {
+  if (reducedMotion || !canUseWebGL()) {
     heroHost.classList.add("is-webgl-fallback");
     onProgress?.(1);
     return;

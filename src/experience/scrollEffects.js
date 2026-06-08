@@ -1,5 +1,7 @@
 /* ── Horizontal marquee ribbons (scroll-velocity driven) ───── */
 
+import { lerp } from "../utils/math";
+
 const initMarqueeRibbons = (gsap, ScrollTrigger) => {
   const ribbons = document.querySelectorAll("[data-ct-marquee]");
   if (!ribbons.length) {
@@ -114,8 +116,8 @@ const initCursorGlow = () => {
   };
 
   const animate = () => {
-    currentX += (targetX - currentX) * 0.08;
-    currentY += (targetY - currentY) * 0.08;
+    currentX = lerp(currentX, targetX, 0.08);
+    currentY = lerp(currentY, targetY, 0.08);
     paint();
 
     // Stop the loop once we've caught up to the pointer — restarts on move.

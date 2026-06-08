@@ -13,6 +13,8 @@
  * preserved exactly — chrome and grain layers inherit and re-paint on cut.
  */
 
+import { pickHighestRatio } from "../utils/intersection";
+
 const createSceneBloomTrigger = () => {
   let bloomTimer = null;
 
@@ -97,7 +99,7 @@ const applySceneTint = (scene, triggerBloom = null) => {
   );
 };
 
-export const initSceneTintObserver = (manifest) => {
+const initSceneTintObserver = (manifest) => {
   // Reset cross-init state so a motion-toggle re-init doesn't fire a spurious
   // bloom flash for a scene the user is already on.
   lastTintedSceneId = null;
@@ -128,14 +130,7 @@ export const initSceneTintObserver = (manifest) => {
         ratios.set(entry.target, entry.intersectionRatio);
       });
 
-      let bestEl = null;
-      let bestRatio = 0;
-      ratios.forEach((ratio, el) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio;
-          bestEl = el;
-        }
-      });
+      const bestEl = pickHighestRatio(ratios);
 
       if (bestEl) {
         const scene = sceneByEl.get(bestEl);

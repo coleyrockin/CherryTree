@@ -11,6 +11,8 @@
  * sceneNav. The highest-visibility selection mirrors sceneTint.js.
  */
 
+import { pickHighestRatio } from "../utils/intersection";
+
 export const initSceneAnnouncer = ({ manifest }) => {
   const announceRegion = document.querySelector("[data-ct-scene-announce]");
 
@@ -48,16 +50,10 @@ export const initSceneAnnouncer = ({ manifest }) => {
       (entries) => {
         entries.forEach((entry) => ratios.set(entry.target, entry.intersectionRatio));
 
-        let bestEl = null;
-        let bestRatio = 0;
-        ratios.forEach((ratio, el) => {
-          if (ratio > bestRatio) {
-            bestRatio = ratio;
-            bestEl = el;
-          }
-        });
-
-        if (bestEl && bestRatio > 0) {
+        // pickHighestRatio returns null when every ratio is 0, so the prior
+        // `bestRatio > 0` guard is implicit.
+        const bestEl = pickHighestRatio(ratios);
+        if (bestEl) {
           const match = scenes.find((entry) => entry.el === bestEl);
           if (match) setActive(match.scene.id);
         }

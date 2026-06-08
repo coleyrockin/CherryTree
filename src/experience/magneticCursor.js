@@ -3,6 +3,8 @@
  * Ring snaps toward interactive elements on hover and reveals a per-target label.
  */
 
+import { lerp } from "../utils/math";
+
 const LERP_DOT = 0.2;
 const LERP_RING = 0.09;
 
@@ -122,10 +124,10 @@ export const initMagneticCursor = ({ gsap }) => {
   mutationObserver.observe(document.body, { childList: true, subtree: true });
 
   const onTick = () => {
-    dotX += (mouseX - dotX) * LERP_DOT;
-    dotY += (mouseY - dotY) * LERP_DOT;
-    ringX += (ringTargetX - ringX) * LERP_RING;
-    ringY += (ringTargetY - ringY) * LERP_RING;
+    dotX = lerp(dotX, mouseX, LERP_DOT);
+    dotY = lerp(dotY, mouseY, LERP_DOT);
+    ringX = lerp(ringX, ringTargetX, LERP_RING);
+    ringY = lerp(ringY, ringTargetY, LERP_RING);
 
     dot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0)`;
     ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;

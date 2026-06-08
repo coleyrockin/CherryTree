@@ -20,6 +20,7 @@ import {
   Vector2,
   WebGLRenderer
 } from "three";
+import { canUseWebGL } from "../utils/webgl";
 
 const PETAL_COUNT_DESKTOP = 400;
 const PETAL_COUNT_MOBILE = 200;
@@ -30,18 +31,6 @@ const WORLD_HEIGHT = 8;
 
 const isMobileDevice = () =>
   window.matchMedia("(max-width: 760px)").matches || navigator.maxTouchPoints > 1;
-
-const supportsWebGL = () => {
-  try {
-    const canvas = document.createElement("canvas");
-    return !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext("webgl2") || canvas.getContext("webgl"))
-    );
-  } catch {
-    return false;
-  }
-};
 
 const createPetalTexture = () => {
   const canvas = document.createElement("canvas");
@@ -285,7 +274,7 @@ export const initHeroWebgl = async ({
   gsap = null,
   ScrollTrigger = null
 }) => {
-  if (!canvas || !host || !supportsWebGL()) {
+  if (!canvas || !host || !canUseWebGL()) {
     host?.classList.add("is-webgl-fallback");
     return () => { };
   }
