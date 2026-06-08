@@ -10,7 +10,7 @@
 
 CherryTree is a static Vite site built with vanilla browser JavaScript, Three.js, GSAP, Lenis, and a Node/Sharp asset optimization script. There is no backend, authentication, database, upload route, API route, or server-side secret boundary in this repository.
 
-No critical or high-severity best-practice failures were found. The remaining recommendations are defense-in-depth and future-proofing: reduce reliance on third-party hosted font CSS if the site becomes privacy-sensitive, and keep Trusted Types in mind if future raw HTML sinks are introduced.
+No critical or high-severity best-practice failures were found. The remaining recommendations are defense-in-depth and future-proofing: keep Trusted Types in mind if future raw HTML sinks are introduced. (The earlier third-party-font recommendation has since been actioned — fonts are self-hosted.)
 
 `npm audit --json` was run with current registry access and reported 0 vulnerabilities across 103 dependencies.
 
@@ -52,13 +52,15 @@ None.
 ### SBP-002: Third-party Google Fonts CSS is not pinned with integrity
 
 - Severity: Low
-- Status: Accepted
-- Location: `index.html:39-43`
+- Status: Resolved (superseded) — fonts are now self-hosted; the third-party
+  Google Fonts dependency no longer exists, and the CSP drops the Google origins.
+- Location (historical): `index.html` Google Fonts `<link>` (since removed)
 - Rule: JS-SUPPLY-001, JS-SRI-001
-- Evidence: The page loads CSS from `https://fonts.googleapis.com/...` without `integrity`.
-- Impact: Third-party CSS is lower risk than third-party JavaScript, but it is still an external production dependency and privacy/supply-chain surface.
-- Fix: Prefer self-hosting the required font files and CSS in `public/`, or document why Google Fonts remains acceptable. SRI is often impractical for Google Fonts CSS because responses can vary; self-hosting is the cleaner control.
-- Decision: Accepted for this public portfolio site because the dependency is CSS/font-only, no third-party JavaScript is loaded, and the CSP restricts remote execution. Revisit self-hosting if the site becomes privacy-sensitive or needs zero third-party production requests.
+- Evidence (historical): The page loaded CSS from `https://fonts.googleapis.com/...` without `integrity`.
+- Resolution: The two font families are self-hosted as first-party WOFF2
+  (`public/assets/fonts/`, `src/styles/fonts.css`). `font-src`, `style-src`, and
+  `connect-src` are now `'self'` only — no external font origin remains, so SRI is
+  moot.
 - False positive notes: No remote third-party JavaScript was found.
 
 ### SBP-003: `innerHTML` helper should stay trusted-markup-only
@@ -105,7 +107,7 @@ None.
 ## Recommended Fix Order
 
 1. Fixed: production CSP and baseline security headers are defined in `vercel.json`.
-2. Accepted: Google Fonts remains documented as a CSS/font-only third-party dependency behind a restrictive CSP.
+2. Resolved: fonts are self-hosted (no third-party Google Fonts dependency); CSP `font-src`/`style-src`/`connect-src` are `'self'` only.
 3. Fixed: `splitText.js` is trusted-plain-text-only and scene nav clearing uses `replaceChildren()`.
 4. Fixed: tunnel-enabled Vite hosting is opt-in.
 5. Fixed: `scripts/optimize-assets.mjs` has explicit input format and pixel limits.
