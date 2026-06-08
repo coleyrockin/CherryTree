@@ -88,7 +88,7 @@ CHERRYTREE_EXPOSE_DEV_SERVER=true npm run dev
 
 Scroll to move through the gallery. Each scene has a URL hash (`/#bloom`, `/#koi`, etc.) — the URL updates live, so linking to a specific scene works.
 
-**Keyboard navigation:** `J` / `K` or `PageDown` / `PageUp` step forward and back. `1`–`8` jump to a scene directly. `Home` and `End` go to the first and last.
+**Keyboard navigation:** `J` / `K` or `PageDown` / `PageUp` step forward and back. `1`–`8` jump to a scene directly. `Home` and `End` go to the first and last. Press `?` to toggle the single-key shortcuts off (the `PageDown`/`PageUp`/`Home`/`End` keys always work).
 
 **Audio:** The speaker toggle enables an ambient sound bed. It never autoplays. Preference persists across reloads.
 

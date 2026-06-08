@@ -56,7 +56,7 @@ export const initEpilogueAnimations = (gsap) => {
 
       animations.push(
         gsap.to(titleSplit.chars, {
-          opacity: 0.84,
+          opacity: 0.92,
           rotateX: 0,
           y: 0,
           duration: 0.8,

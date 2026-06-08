@@ -187,10 +187,13 @@ const initTriptychTimeline = (gsap) => {
     timeline.fromTo(
       panel,
       {
+        // Start visible enough that the scene never reads as blank cream on
+        // arrival or quick scroll — the convergence from 0.34 -> 1 still carries
+        // the reveal. (Was 0.15, which looked empty before the user scrubbed.)
         yPercent: 28 - index * 6,
         xPercent: index === 1 ? 0 : index === 0 ? -14 : 14,
-        opacity: 0.15,
-        scale: 0.88
+        opacity: 0.34,
+        scale: 0.92
       },
       { yPercent: 0, xPercent: 0, opacity: 1, scale: 1 },
       index * 0.22

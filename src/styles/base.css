@@ -185,8 +185,8 @@ html[data-motion="reduced"] .scene-tint-flash {
   font-size: clamp(1.4rem, 3.5vw, 2.8rem);
   font-weight: 400;
   font-style: italic;
-  letter-spacing: 0.06em;
-  color: rgba(49, 30, 33, 0.2);
+  letter-spacing: 0.14em;
+  color: rgba(49, 30, 33, 0.14);
   padding: 0 2em;
   text-transform: none;
 }
@@ -199,6 +199,22 @@ html[data-motion="reduced"] .scene-tint-flash {
 
 html[data-motion="reduced"] .marquee-ribbon {
   display: none;
+}
+
+/* Pre-JS safety net. Until main.js resolves the motion preference and sets
+   data-motion, honor the OS setting directly so reduced-motion users never see
+   the ambient animations flash during boot. The JS path (html[data-motion=...])
+   stays the full, runtime-toggleable source of truth once it runs. */
+@media (prefers-reduced-motion: reduce) {
+  .film-grain,
+  .marquee-track,
+  .epilogue-petals,
+  .epilogue-petal,
+  .color-bloom,
+  .epilogue-bloom,
+  .scroll-hint-line {
+    animation: none !important;
+  }
 }
 
 .ui-chrome {
@@ -566,6 +582,15 @@ body.is-loading .scroll-progress {
   pointer-events: none;
 }
 
+/* opacity:0 alone keeps the buttons/nav-dots in the tab order while invisible
+   (a focus-order trap — WCAG 2.4.3/2.4.7). visibility:hidden removes them from
+   focus while hidden; it reverts to visible automatically once the state clears,
+   and the opacity transition still carries the fade-in. */
+body.is-loading .ui-chrome,
+body.is-loading .scene-nav {
+  visibility: hidden;
+}
+
 /* ── Cinematic arrival ──────────────────────────────────────
    On first load at the hero, the persistent chrome holds back so the Prologue
    opens on nothing but the title and the petals. `is-immersive-hero` is set by
@@ -581,11 +606,31 @@ html.is-immersive-hero .ui-chrome,
 html.is-immersive-hero .editorial-chrome,
 html.is-immersive-hero .scene-nav {
   opacity: 0 !important;
+  /* Also drop the hidden controls + nav-dots out of the tab order while the
+     immersive opening holds them back (WCAG 2.4.3/2.4.7). */
+  visibility: hidden !important;
 }
 
 html.is-immersive-hero .control-stack,
 html.is-immersive-hero .scene-nav {
   pointer-events: none !important;
+}
+
+@media (max-width: 760px) {
+  /* On mobile the immersive opening shows only centered title text — no brand-mark
+     anchors the frame, so it reads as an uncredited image. Keep the brand-mark
+     visible as a quiet signature while the interactive controls stay held back.
+     (ui-chrome is transparent + pointer-events:none, so revealing it surfaces
+     only the wordmark.) */
+  html.is-immersive-hero .ui-chrome {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  html.is-immersive-hero .control-stack {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 /* Custom cursor override */
@@ -609,7 +654,7 @@ html.is-immersive-hero .scene-nav {
   font-weight: 600;
   letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.52);
+  color: rgba(49, 30, 33, 0.72);
   mix-blend-mode: multiply;
   pointer-events: none;
   opacity: 0;

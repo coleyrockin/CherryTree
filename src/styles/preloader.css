@@ -26,12 +26,14 @@
   will-change: transform, opacity;
 }
 
-.preloader-progress {
-  width: min(260px, 50vw);
-  height: 1px;
-  background: rgba(45, 30, 36, 0.08);
+/* Matches the .preloader-bar-track element in index.html. (Previously named
+   .preloader-progress, which matched nothing — the track rendered unstyled.) */
+.preloader-bar-track {
+  width: min(300px, 56vw);
+  height: 2px;
+  background: rgba(45, 30, 36, 0.14);
   overflow: hidden;
-  border-radius: 1px;
+  border-radius: 2px;
 }
 
 .preloader-bar {

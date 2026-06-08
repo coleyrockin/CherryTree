@@ -2,6 +2,10 @@
  * Floating side navigation dots driven by scroll position.
  */
 
+import { safeStorageGet, safeStorageSet } from "../utils/storage";
+
+const SHORTCUTS_STORAGE_KEY = "cherrytree.shortcuts.enabled";
+
 export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
   const nav = document.querySelector("[data-ct-scene-nav]");
   const list = nav?.querySelector(".scene-nav-list");
@@ -97,6 +101,12 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
   //   1–8           — jump to scene index (clamped to manifest length)
   // Arrow keys are deliberately left alone so users keep native fine-grained
   // scrolling. Skipped when focus is in an editable field or a modifier is held.
+  //
+  // WCAG 2.1.4: single-character shortcuts (J/K/1–9) must be turn-off-able. They
+  // default on, persist, and toggle with "?" (announced via the live region).
+  // PageUp/PageDown/Home/End are navigation keys, exempt from 2.1.4, always live.
+  let shortcutsEnabled = safeStorageGet(SHORTCUTS_STORAGE_KEY) !== "false";
+
   const isEditableTarget = (target) => {
     if (!target || target.nodeType !== 1) return false;
     if (target.matches("input, textarea, select")) return true;
@@ -144,10 +154,31 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
       return;
     }
 
+    // "?" toggles the single-key shortcuts on/off (the 2.1.4 turn-off mechanism).
+    if (event.key === "?") {
+      shortcutsEnabled = !shortcutsEnabled;
+      safeStorageSet(SHORTCUTS_STORAGE_KEY, String(shortcutsEnabled));
+      if (announceRegion) {
+        announceRegion.textContent = `Keyboard scene shortcuts ${shortcutsEnabled ? "on" : "off"}`;
+      }
+      event.preventDefault();
+      return;
+    }
+
     const activeIndex = Array.from(dots).findIndex((dot) =>
       dot.hasAttribute("aria-current")
     );
     const currentIndex = activeIndex === -1 ? inferIndexFromScroll() : activeIndex;
+
+    // Single-character shortcuts (letters/digits) honor the turn-off; the
+    // PageUp/PageDown/Home/End navigation keys stay active regardless.
+    const isCharShortcut =
+      event.key === "j" || event.key === "J" ||
+      event.key === "k" || event.key === "K" ||
+      /^[1-9]$/.test(event.key);
+    if (isCharShortcut && !shortcutsEnabled) {
+      return;
+    }
 
     let nextIndex = null;
     if (event.key === "PageDown" || event.key === "j" || event.key === "J") {

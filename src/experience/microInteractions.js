@@ -3,7 +3,10 @@
  */
 
 export const initMicroInteractions = ({ gsap }) => {
-  const buttons = document.querySelectorAll(".sound-toggle, .motion-toggle, .scene-nav-dot");
+  // Nav dots are intentionally excluded: they own a CSS "breathe" keyframe + a
+  // scale(1.3) hover. A GSAP inline transform here would overwrite the keyframe
+  // and the breathe never restarts after the first hover. Pills only.
+  const buttons = document.querySelectorAll(".sound-toggle, .motion-toggle");
   const abortController = new AbortController();
   const signal = abortController.signal;
 

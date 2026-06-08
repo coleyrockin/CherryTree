@@ -84,8 +84,11 @@
 }
 
 .scene-drift .scene-kicker {
-  color: rgba(255, 244, 240, 0.82);
-  border-bottom-color: rgba(255, 244, 240, 0.42);
+  color: rgba(255, 246, 242, 0.94);
+  border-bottom-color: rgba(255, 244, 240, 0.5);
+  text-shadow:
+    0 1px 10px rgba(140, 42, 70, 0.65),
+    0 2px 18px rgba(40, 14, 24, 0.5);
 }
 
 .scene-drift .scene-title {
@@ -121,19 +124,21 @@
   content: "";
   position: absolute;
   left: 50%;
-  top: 50%;
-  width: min(82%, 56ch);
-  height: 46%;
+  top: 52%;
+  width: min(86%, 60ch);
+  height: 64%;
   transform: translate(-50%, -50%);
   z-index: -1;
   pointer-events: none;
+  /* Deeper, taller pool so white title AND the kicker above it clear 4.5:1 (AA)
+     over bright sky/blossom regions, without re-muting the whole photo. */
   background: radial-gradient(
     ellipse at center,
-    rgba(22, 10, 16, 0.3) 0%,
-    rgba(22, 10, 16, 0.14) 42%,
-    rgba(22, 10, 16, 0) 72%
+    rgba(20, 9, 14, 0.56) 0%,
+    rgba(20, 9, 14, 0.34) 48%,
+    rgba(20, 9, 14, 0) 78%
   );
-  filter: blur(22px);
+  filter: blur(26px);
 }
 
 .scene-triptych {
@@ -534,7 +539,7 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
   font-style: italic;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.88);
+  color: rgba(49, 30, 33, 0.92);
   text-shadow:
     0 18px 45px rgba(255, 244, 234, 0.66),
     0 30px 90px rgba(81, 44, 56, 0.22);
@@ -546,7 +551,7 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
   font-style: italic;
   font-size: clamp(0.85rem, 1.6vw, 1.05rem);
   letter-spacing: 0.35em;
-  color: rgba(49, 30, 33, 0.42);
+  color: rgba(49, 30, 33, 0.68);
 }
 
 /* Upward-drifting petals — real ellipse shapes, reverse-time rising */
@@ -708,6 +713,15 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
     0 4px 30px rgba(247, 233, 224, 0.8),
     0 1px 0 rgba(255, 249, 243, 0.5);
   line-height: 1.1;
+}
+
+/* Color Field: dark ink over a saturated, animated warm gradient. The base cream
+   glow lowers contrast here (a light bloom haloing dark text). Swap it for a dark
+   offset shadow so the ink stays crisp even when the coral bloom sits centered. */
+.scene-color .scene-title {
+  text-shadow:
+    0 2px 12px rgba(22, 10, 14, 0.26),
+    0 4px 28px rgba(22, 10, 14, 0.16);
 }
 
 .scene-text-hero .scene-title {
