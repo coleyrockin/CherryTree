@@ -1,6 +1,6 @@
 # Cherry Tree
 
-A scroll-driven gallery of eight photographic scenes stitched together and scored like a continuous film.
+A scroll-driven gallery of eight scenes, stitched together and scored like a continuous film.
 
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
