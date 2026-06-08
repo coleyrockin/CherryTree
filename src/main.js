@@ -1,3 +1,4 @@
+import "./styles/fonts.css";
 import "./styles/base.css";
 import "./styles/scenes.css";
 import "./styles/preloader.css";

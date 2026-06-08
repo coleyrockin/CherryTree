@@ -39,11 +39,10 @@
     }
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
-    rel="stylesheet" />
+  <!-- Self-hosted fonts (see src/styles/fonts.css). Preload the display serif used
+       by the preloader + hero so it's ready for the first meaningful paint. -->
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/bodoni-moda-latin.woff2"
+    crossorigin="anonymous" />
   <!-- LCP hero preload. Typed AVIF matches what <picture> serves to the vast
        majority of browsers, so the preload is the exact resource rendered (no
        wasted JPEG fetch). Non-AVIF browsers ignore this and discover the WebP/

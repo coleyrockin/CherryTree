@@ -1,5 +1,11 @@
 # CherryTree Security Best Practices Report
 
+> **Historical record — reflects the codebase as of the review date below and is
+> not maintained going forward.** For the vulnerability-disclosure policy see
+> [`SECURITY.md`](../SECURITY.md). Live security headers are enforced via
+> [`vercel.json`](../vercel.json). _Update note: the third-party font CSS called
+> out below has since been removed — fonts are now self-hosted._
+
 ## Executive Summary
 
 CherryTree is a static Vite site built with vanilla browser JavaScript, Three.js, GSAP, Lenis, and a Node/Sharp asset optimization script. There is no backend, authentication, database, upload route, API route, or server-side secret boundary in this repository.
@@ -16,7 +22,7 @@ No critical or high-severity best-practice failures were found. The remaining re
 - Static HTML entrypoint: `index.html:1-51`
 - Vite dev/preview server config: `vite.config.js:14-24`
 
-Guidance used: `/Users/boydroberts/.codex/skills/security-best-practices/references/javascript-general-web-frontend-security.md`
+Guidance used: OWASP Top Ten (2021) and general web frontend security best practices.
 
 ## Critical Findings
 
