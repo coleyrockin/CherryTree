@@ -11,6 +11,15 @@ const WIDTHS = [3840, 2560, 1920, 1280];
 // panel that never needs a 3840px tier. Capping it at 2560 drops a ~2.6MB JPEG /
 // ~1.35MB AVIF that was effectively never selected, with no visible quality loss.
 const MAX_WIDTH_OVERRIDES = { "triptych-a": 2560 };
+// The JPEG tier is a last-resort fallback, served only to browsers without AVIF
+// *and* WebP support (~3% of traffic). AVIF/WebP already cover up to 3840px; the
+// 3840 JPEGs were 6+ MB no modern browser ever fetched. Cap the JPEG fallback at
+// 2560 — a legacy browser on a 4K display upscales an excellent 2560 JPEG,
+// visually indistinguishable for full-bleed photography. AVIF/WebP stay at 3840.
+const JPEG_FALLBACK_MAX_WIDTH = 2560;
+// Scenes whose full image is eager/preloaded never use an LQIP blur-up (the real
+// image is requested immediately), so skip generating an orphan placeholder.
+const SKIP_LQIP = new Set(["prologue-fallback", "bloom-wash"]);
 const MAX_INPUT_PIXELS = 50_000_000;
 const INPUT_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
@@ -27,7 +36,7 @@ const writeFormatsForWidth = async (inputPath, baseName, width) => {
     withoutEnlargement: true
   });
 
-  await Promise.all([
+  const tasks = [
     image
       .clone()
       .avif({ quality: 52, effort: 5 })
@@ -35,12 +44,19 @@ const writeFormatsForWidth = async (inputPath, baseName, width) => {
     image
       .clone()
       .webp({ quality: 74, effort: 5 })
-      .toFile(buildOutputPath(baseName, width, "webp")),
-    image
-      .clone()
-      .jpeg({ quality: 82, mozjpeg: true })
-      .toFile(buildOutputPath(baseName, width, "jpg"))
-  ]);
+      .toFile(buildOutputPath(baseName, width, "webp"))
+  ];
+
+  if (width <= JPEG_FALLBACK_MAX_WIDTH) {
+    tasks.push(
+      image
+        .clone()
+        .jpeg({ quality: 82, mozjpeg: true })
+        .toFile(buildOutputPath(baseName, width, "jpg"))
+    );
+  }
+
+  await Promise.all(tasks);
 };
 
 const writeLqip = async (inputPath, baseName) => {
@@ -72,8 +88,10 @@ const run = async () => {
       console.log(`Generated ${baseName} at ${width}px (avif/webp/jpg)`);
     }
 
-    await writeLqip(inputPath, baseName);
-    console.log(`Generated ${baseName} LQIP`);
+    if (!SKIP_LQIP.has(baseName)) {
+      await writeLqip(inputPath, baseName);
+      console.log(`Generated ${baseName} LQIP`);
+    }
   }
 
   console.log("Asset optimization complete.");

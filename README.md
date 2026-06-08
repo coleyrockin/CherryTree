@@ -12,7 +12,7 @@ A scroll-driven gallery of eight scenes, stitched together and scored like a con
 
 ---
 
-![Cherry Tree — Prologue](./.github/preview/cherrytree-hero.png)
+![Cherry Tree — Prologue](./.github/preview/cherrytree-hero.webp)
 
 ---
 
@@ -35,20 +35,28 @@ If you're studying scroll-driven animation patterns or building something simila
 
 <table>
   <tr>
-    <td><img src="./.github/preview/cherrytree-bloom.png" alt="Bloom scene" /></td>
-    <td><img src="./.github/preview/cherrytree-drift.png" alt="Drift scene" /></td>
+    <td><img src="./.github/preview/cherrytree-bloom.webp" alt="Bloom scene — photographic hero with long crossfade" /></td>
+    <td><img src="./.github/preview/cherrytree-drift.webp" alt="Drift scene — wind-path blossom photography with deep parallax" /></td>
   </tr>
   <tr>
     <td align="center"><sub>02 — Bloom</sub></td>
     <td align="center"><sub>03 — Drift</sub></td>
   </tr>
   <tr>
-    <td><img src="./.github/preview/cherrytree-triptych.png" alt="Triptych scene" /></td>
-    <td><img src="./.github/preview/cherrytree-stillness.png" alt="Stillness scene" /></td>
+    <td><img src="./.github/preview/cherrytree-triptych.webp" alt="Triptych scene — three composite panels with split parallax" /></td>
+    <td><img src="./.github/preview/cherrytree-color-field.webp" alt="Color Field scene — three chromatic fields drifting" /></td>
   </tr>
   <tr>
     <td align="center"><sub>04 — Triptych</sub></td>
+    <td align="center"><sub>05 — Color Field</sub></td>
+  </tr>
+  <tr>
+    <td><img src="./.github/preview/cherrytree-stillness.webp" alt="Stillness scene — single still with film-dust grain" /></td>
+    <td><img src="./.github/preview/cherrytree-epilogue.webp" alt="Epilogue scene — ambient glow and closing title" /></td>
+  </tr>
+  <tr>
     <td align="center"><sub>07 — Stillness</sub></td>
+    <td align="center"><sub>08 — Epilogue</sub></td>
   </tr>
 </table>
 
