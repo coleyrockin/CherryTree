@@ -263,11 +263,17 @@
 
 /* Iridescent shimmer: a slow-rotating conic wash blended soft-light over the
    blooms. Transform-only rotation — the blur is computed once per layer, not
-   per frame. Oversized so the spin never exposes an edge. */
+   per frame. MUST be a true circle, not an inset ellipse: a rotating ellipse
+   sweeps its rim through the field and the whole scene reads as wobbling.
+   160vmax diameter keeps the edge far outside the frame at every angle. */
 .color-field::after {
   content: "";
   position: absolute;
-  inset: -35%;
+  left: 50%;
+  top: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  margin: -80vmax 0 0 -80vmax;
   border-radius: 50%;
   pointer-events: none;
   background: conic-gradient(from 0deg at 50% 50%,
