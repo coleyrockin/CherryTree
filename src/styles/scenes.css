@@ -217,30 +217,49 @@
 
 .color-bloom {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(36px);
   opacity: 0.8;
   transform-origin: center;
   will-change: transform;
 }
 
 /* ── Living chroma ──────────────────────────────────────────
-   Each bloom carries a second gradient in a counter-color that crossfades
-   over the base on its own clock (opacity-only — compositor-cheap; the
-   parent blur covers both layers in one pass). Mismatched periods mean the
-   three blooms never repeat the same combination — the field keeps shifting
-   between rose/violet, coral/teal, and amber/magenta states. */
+   Each bloom is two gradients on pseudo-elements — base color on ::before,
+   a counter-color on ::after that crossfades on its own clock. Mismatched
+   periods (11s/17s/21s) mean the three blooms never repeat a combination.
+
+   CRITICAL: each pseudo carries its OWN blur and the parent has NONE. A
+   filter on the parent re-rasterizes (re-blurs) the whole group every frame
+   a descendant's opacity ticks — that per-frame re-blur was the Color Field
+   jitter. With static content under each blur, the opacity morph and the
+   parent's colorWash transforms are pure compositor work. */
+.color-bloom::before,
 .color-bloom::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 50%;
+  filter: blur(36px);
+}
+
+.color-bloom::after {
   opacity: 0;
 }
 
 @keyframes chromaMorph {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
+}
+
+.color-bloom-a::before {
+  background: radial-gradient(circle at 50% 50%, rgba(220, 84, 122, 0.92), rgba(220, 84, 122, 0) 68%);
+}
+
+.color-bloom-b::before {
+  background: radial-gradient(circle at 50% 50%, rgba(228, 130, 112, 0.86), rgba(228, 130, 112, 0) 68%);
+}
+
+.color-bloom-c::before {
+  background: radial-gradient(circle at 50% 50%, rgba(230, 166, 96, 0.82), rgba(230, 166, 96, 0) 70%);
 }
 
 .color-bloom-a::after {
@@ -250,8 +269,7 @@
 
 .color-bloom-b::after {
   /* Gold, not teal — coral↔teal crossfades through complementary grey-mud;
-     coral↔gold stays luminous the whole way. The cool note lives in the
-     conic shimmer at soft-light, where it can't desaturate the field. */
+     coral↔gold stays luminous the whole way. */
   background: radial-gradient(circle at 50% 50%, rgba(238, 178, 72, 0.85), rgba(238, 178, 72, 0) 68%);
   animation: chromaMorph 17s ease-in-out -8s infinite;
 }
@@ -261,45 +279,11 @@
   animation: chromaMorph 21s ease-in-out -5s infinite;
 }
 
-/* Iridescent shimmer: a slow-rotating conic wash blended soft-light over the
-   blooms. Transform-only rotation — the blur is computed once per layer, not
-   per frame. MUST be a true circle, not an inset ellipse: a rotating ellipse
-   sweeps its rim through the field and the whole scene reads as wobbling.
-   160vmax diameter keeps the edge far outside the frame at every angle. */
-.color-field::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 160vmax;
-  height: 160vmax;
-  margin: -80vmax 0 0 -80vmax;
-  border-radius: 50%;
-  pointer-events: none;
-  background: conic-gradient(from 0deg at 50% 50%,
-    rgba(220, 84, 122, 0.5),
-    rgba(150, 88, 200, 0.42),
-    rgba(88, 176, 168, 0.38),
-    rgba(230, 166, 96, 0.5),
-    rgba(228, 130, 112, 0.44),
-    rgba(220, 84, 122, 0.5));
-  mix-blend-mode: soft-light;
-  filter: blur(56px);
-  opacity: 0.6;
-  will-change: transform;
-  animation: chromaSpin 44s linear infinite;
-}
-
-@keyframes chromaSpin {
-  to { transform: rotate(360deg); }
-}
-
 .color-bloom-a {
   width: 78%;
   height: 92%;
   left: -8%;
   top: -10%;
-  background: radial-gradient(circle at 50% 50%, rgba(220, 84, 122, 0.92), rgba(220, 84, 122, 0) 68%);
   animation: colorWashA 27s var(--ease-gallery) infinite alternate;
 }
 
@@ -308,7 +292,6 @@
   height: 88%;
   right: -10%;
   top: 4%;
-  background: radial-gradient(circle at 50% 50%, rgba(228, 130, 112, 0.86), rgba(228, 130, 112, 0) 68%);
   animation: colorWashB 33s var(--ease-gallery) infinite alternate;
 }
 
@@ -317,7 +300,6 @@
   height: 96%;
   left: 6%;
   bottom: -22%;
-  background: radial-gradient(circle at 50% 50%, rgba(230, 166, 96, 0.82), rgba(230, 166, 96, 0) 70%);
   animation: colorWashC 39s var(--ease-gallery) infinite alternate;
 }
 
@@ -337,8 +319,7 @@
 }
 
 html[data-motion="reduced"] .color-bloom,
-html[data-motion="reduced"] .color-bloom::after,
-html[data-motion="reduced"] .color-field::after { animation: none; }
+html[data-motion="reduced"] .color-bloom::after { animation: none; }
 
 /* Reduced motion still deserves the richer palette — hold the counter-colors
    at a static half-blend instead of hiding them. */

@@ -212,7 +212,6 @@ html[data-motion="reduced"] .marquee-ribbon {
   .epilogue-petal,
   .color-bloom,
   .color-bloom::after,
-  .color-field::after,
   .epilogue-bloom,
   .scroll-hint-line {
     animation: none !important;
