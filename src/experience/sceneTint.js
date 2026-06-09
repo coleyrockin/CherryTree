@@ -54,6 +54,11 @@ const applySceneTint = (scene, triggerBloom = null) => {
   root.classList.toggle("is-scene-dark", Boolean(scene.dark));
   // Bright photographic scenes lift the dark chrome's contrast (see scenes.css).
   root.classList.toggle("is-scene-bright", Boolean(scene.bright));
+  // Stamp the active scene id so late-initializing modules (e.g. the cursor
+  // label after a motion toggle) can read the current scene synchronously.
+  // NOT data-ct-scene — that attribute is the scene-section selector and
+  // adding it to <html> would shadow every `[data-ct-scene="…"]` query.
+  root.dataset.ctActiveScene = scene.id;
 
   const numeralNode = document.querySelector("[data-ct-numeral]");
   const labelNode = document.querySelector("[data-ct-scene-label]");

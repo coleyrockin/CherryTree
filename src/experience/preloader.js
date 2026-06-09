@@ -8,7 +8,12 @@ export const initPreloader = () => {
   const brandEl = el?.querySelector(".preloader-brand");
 
   if (!el) {
-    return { ready: Promise.resolve(), onProgress: () => {}, exit: () => Promise.resolve() };
+    return {
+      ready: Promise.resolve(),
+      onProgress: () => {},
+      exit: () => Promise.resolve(),
+      abort: () => {}
+    };
   }
 
   const split = splitByChars(brandEl);
@@ -73,7 +78,24 @@ export const initPreloader = () => {
     return true;
   };
 
+  // Safety-timeout path (main.js force-hides the preloader): stop the bar RAF
+  // and restore the split brand text so nothing leaks when exit() never runs.
+  let finished = false;
+  const abort = () => {
+    if (finished) {
+      return;
+    }
+    finished = true;
+    cancelAnimationFrame(rafId);
+    el.classList.add("is-done");
+    document.body.classList.remove("is-loading");
+    split.revert();
+  };
+
   const exit = async (gsap) => {
+    if (finished) {
+      return;
+    }
     const elapsed = performance.now() - startTime;
     if (elapsed < MIN_DISPLAY_MS) {
       await new Promise((resolve) => setTimeout(resolve, MIN_DISPLAY_MS - elapsed));
@@ -109,10 +131,11 @@ export const initPreloader = () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
+    finished = true;
     el.classList.add("is-done");
     document.body.classList.remove("is-loading");
     split.revert();
   };
 
-  return { onProgress, exit };
+  return { onProgress, exit, abort };
 };

@@ -108,10 +108,19 @@
 }
 
 .scene-drift .scene-matte {
-  background: linear-gradient(190deg,
-    rgba(254, 245, 237, 0.04) 0%,
-    rgba(246, 215, 216, 0.18) 55%,
-    rgba(58, 26, 36, 0.32) 100%);
+  /* Top band: a soft cream haze so the dark-ink chrome (brand-mark, toggles)
+     stays legible over the dense blossom canopy — the one photo whose top edge
+     is dark enough to swallow the bright-scene chrome treatment. Reads as
+     atmospheric light through the branches, not a UI scrim. */
+  background:
+    linear-gradient(180deg,
+      rgba(248, 233, 226, 0.62) 0%,
+      rgba(248, 233, 226, 0.3) 10%,
+      rgba(248, 233, 226, 0) 22%),
+    linear-gradient(190deg,
+      rgba(254, 245, 237, 0.04) 0%,
+      rgba(246, 215, 216, 0.18) 55%,
+      rgba(58, 26, 36, 0.32) 100%);
 }
 
 /* Text-only legibility halo for the white-title photo scenes. A soft, blurred
@@ -409,6 +418,18 @@ html.is-scene-bright .brand-mark {
     0 2px 12px rgba(40, 23, 30, 0.3);
 }
 
+/* Drift's canopy is the one bright-scene top edge that's actually dark, so the
+   scene-matte adds a cream top scrim there — and over cream, the bright-scene
+   dark halo muddies the ink. Trade it for a cream glow that lifts the dark
+   glyphs off the blossom. (data-ct-active-scene is stamped by sceneTint.) */
+html[data-ct-active-scene="drift"] .brand-mark {
+  color: rgba(40, 23, 30, 0.96);
+  text-shadow:
+    0 1px 0 rgba(255, 249, 243, 0.62),
+    0 1px 10px rgba(248, 233, 226, 0.92),
+    0 2px 24px rgba(248, 233, 226, 0.85);
+}
+
 html.is-scene-bright .editorial-chrome {
   mix-blend-mode: normal;
   color: rgba(45, 27, 33, 0.72);
@@ -659,6 +680,9 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
   .triptych-stage {
     grid-template-columns: 1fr;
     min-height: auto;
+    /* Stacked panels start below the title block — without this the first
+       blossom panel slides under "Triptych" and the dark ink drowns in pink. */
+    margin-top: clamp(150px, 22vh, 240px);
   }
 
   .triptych-panel img {
@@ -897,6 +921,19 @@ html[data-motion="reduced"] .epilogue-subtitle {
   .scene-text {
     gap: 0.3em;
   }
+}
+
+/* WebGL fallback (reduced motion / no GL): the hero text sits directly on the
+   photographic fallback, which is busier than the petal field — deepen the
+   cream pool so the kicker and "Scroll to begin." hold up over blossoms. */
+.scene-prologue.is-webgl-fallback .scene-text-hero::before {
+  background: radial-gradient(
+    ellipse 72% 58% at center,
+    rgba(252, 240, 233, 0.74) 0%,
+    rgba(252, 240, 233, 0.52) 30%,
+    rgba(252, 240, 233, 0.22) 56%,
+    rgba(252, 240, 233, 0) 78%
+  );
 }
 
 /* Reduced motion: clip-path reveals visible immediately */

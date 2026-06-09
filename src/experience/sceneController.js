@@ -172,7 +172,11 @@ const initTriptychTimeline = (gsap) => {
   }
 
   const timeline = gsap.timeline({
-    defaults: { ease: "power3.out", duration: 1.1 },
+    // Gentle ease for a scrubbed timeline — power3.out front-loaded the motion
+    // so hard the panels were visually settled by ~40% of the pin and the rest
+    // of the 170% scrolled past a static frame. power1.inOut + wider stagger
+    // spreads the convergence across the whole pin.
+    defaults: { ease: "power1.inOut", duration: 1.1 },
     scrollTrigger: {
       trigger: triptych,
       start: "top top",
@@ -196,11 +200,12 @@ const initTriptychTimeline = (gsap) => {
         scale: 0.92
       },
       { yPercent: 0, xPercent: 0, opacity: 1, scale: 1 },
-      index * 0.22
+      index * 0.38
     );
   });
 
-  timeline.to(stage, { rotate: -0.7, duration: 0.8, ease: "sine.inOut" }, 0);
+  // Stage drift runs the full timeline so something is always alive in-pin.
+  timeline.to(stage, { rotate: -0.7, duration: 1.86, ease: "sine.inOut" }, 0);
 
   return () => {
     timeline.kill();
@@ -326,8 +331,7 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   velocityTracker.attachTicker(gsap);
 
   cleanup.push(() => {
-    const tickFn = velocityTracker.destroy();
-    if (tickFn) gsap.ticker.remove(tickFn);
+    velocityTracker.destroy();
     gsap.ticker.remove(tick);
     lenis.destroy();
   });

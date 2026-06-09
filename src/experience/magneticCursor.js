@@ -55,11 +55,16 @@ export const initMagneticCursor = ({ gsap }) => {
   let ringTargetX = -100;
   let ringTargetY = -100;
   let isMagnetic = false;
+  let isPressed = false;
+  let pressScale = 1;
 
   const abortController = new AbortController();
   const signal = abortController.signal;
 
-  let currentSceneLabel = "scroll";
+  // sceneTint stamps the active scene id on <html> before this module runs, so
+  // a motion-toggle re-init picks up the correct label instead of "scroll".
+  let currentSceneLabel =
+    SCENE_CURSOR_LABELS[document.documentElement.dataset.ctActiveScene] ?? "scroll";
 
   const onSceneEnter = (e) => {
     currentSceneLabel = SCENE_CURSOR_LABELS[e.detail?.id] ?? "scroll";
@@ -101,8 +106,12 @@ export const initMagneticCursor = ({ gsap }) => {
     }
   };
 
-  const onPressDown = () => ring.classList.add("is-pressed");
-  const onPressUp = () => ring.classList.remove("is-pressed");
+  const onPressDown = () => {
+    isPressed = true;
+  };
+  const onPressUp = () => {
+    isPressed = false;
+  };
 
   const attachMagnetic = () => {
     document.querySelectorAll(INTERACTIVE_SELECTOR).forEach((el) => {
@@ -128,9 +137,12 @@ export const initMagneticCursor = ({ gsap }) => {
     dotY = lerp(dotY, mouseY, LERP_DOT);
     ringX = lerp(ringX, ringTargetX, LERP_RING);
     ringY = lerp(ringY, ringTargetY, LERP_RING);
+    // Press feedback must live in this inline transform — a CSS class can't
+    // win against a style written every tick.
+    pressScale = lerp(pressScale, isPressed ? 0.82 : 1, 0.28);
 
     dot.style.transform = `translate3d(${dotX}px, ${dotY}px, 0)`;
-    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0)`;
+    ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) scale(${pressScale.toFixed(4)})`;
   };
 
   gsap.ticker.add(onTick);

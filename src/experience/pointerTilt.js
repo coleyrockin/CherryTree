@@ -32,13 +32,33 @@ export const initPointerTilt = (scenes, gsap) => {
       return;
     }
 
-    const state = { targetX: 0, targetY: 0, currentX: 0, currentY: 0, lastRotY: null, lastRotX: null };
+    const state = {
+      targetX: 0, targetY: 0, currentX: 0, currentY: 0,
+      lastRotY: null, lastRotX: null,
+      bounds: null, boundsAt: 0
+    };
     tiltTargets.push({ media, state });
+
+    // getBoundingClientRect forces layout, so cache it and refresh at most
+    // every 250ms — the ±1.5° tilt can't visibly drift in that window even
+    // while scrolling under a held pointer.
+    const readBounds = () => {
+      state.bounds = scene.getBoundingClientRect();
+      state.boundsAt = performance.now();
+    };
+
+    scene.addEventListener("pointerenter", readBounds, {
+      passive: true,
+      signal: abortController.signal
+    });
 
     scene.addEventListener(
       "pointermove",
       (event) => {
-        const bounds = scene.getBoundingClientRect();
+        if (!state.bounds || performance.now() - state.boundsAt > 250) {
+          readBounds();
+        }
+        const bounds = state.bounds;
         if (!bounds.width || !bounds.height) {
           return;
         }

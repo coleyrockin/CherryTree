@@ -373,6 +373,7 @@ export const initAudioController = ({
   });
   window.addEventListener("keydown", unlockAudio, {
     once: true,
+    passive: true,
     signal: listenerController.signal
   });
 

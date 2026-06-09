@@ -1,8 +1,19 @@
 /* ── Character splitting utility ───────────────────────────── */
 
-const splitTextToChars = (element) => {
+const splitTextToChars = (element, reverts) => {
   const text = element.textContent || "";
   const chars = [];
+
+  // Re-init (motion toggle) must restore the original text node — otherwise a
+  // second split wraps the existing spans in new spans and the title nests
+  // deeper on every toggle. The revert collected here runs in dispose.
+  const hadAriaLabel = element.hasAttribute("aria-label");
+  reverts.push(() => {
+    element.textContent = text;
+    if (!hadAriaLabel) {
+      element.removeAttribute("aria-label");
+    }
+  });
 
   // Preserve the full text for assistive tech + scrapers (SEO, title tags, copy/paste)
   // by promoting it to an aria-label on the parent rather than duplicating a srOnly node.
@@ -37,7 +48,7 @@ const splitTextToChars = (element) => {
 
 /* ── Hero entrance animation (plays once on load) ─────────── */
 
-const initHeroTextAnimation = (gsap) => {
+const initHeroTextAnimation = (gsap, reverts) => {
   const heroText = document.querySelector('[data-ct-text="prologue"]');
   if (!heroText) {
     return [];
@@ -48,7 +59,7 @@ const initHeroTextAnimation = (gsap) => {
   const animations = [];
 
   if (titleEl) {
-    const chars = splitTextToChars(titleEl);
+    const chars = splitTextToChars(titleEl, reverts);
 
     // Entrance: characters cascade in
     const entranceTl = gsap.timeline({ delay: 0.6 });
@@ -132,7 +143,7 @@ const initHeroTextAnimation = (gsap) => {
 
 const SCENE_TEXT_IDS = ["bloom", "drift", "triptych", "color-field", "koi", "stillness"];
 
-const initSceneTextAnimations = (gsap, ScrollTrigger) => {
+const initSceneTextAnimations = (gsap, ScrollTrigger, reverts) => {
   const animations = [];
 
   SCENE_TEXT_IDS.forEach((id) => {
@@ -149,7 +160,7 @@ const initSceneTextAnimations = (gsap, ScrollTrigger) => {
     }
 
     if (titleEl) {
-      const chars = splitTextToChars(titleEl);
+      const chars = splitTextToChars(titleEl, reverts);
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -237,12 +248,14 @@ export const initTextAnimations = async ({ reducedMotion = false }) => {
 
   gsap.registerPlugin(ScrollTrigger);
 
+  const reverts = [];
   const animations = [
-    ...initHeroTextAnimation(gsap),
-    ...initSceneTextAnimations(gsap, ScrollTrigger)
+    ...initHeroTextAnimation(gsap, reverts),
+    ...initSceneTextAnimations(gsap, ScrollTrigger, reverts)
   ];
 
   return () => {
     animations.forEach((anim) => anim.kill());
+    reverts.forEach((revert) => revert());
   };
 };

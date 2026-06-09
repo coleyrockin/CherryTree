@@ -238,12 +238,17 @@ const initDeferredHeroWebgl = ({
 
 const HARD_PRELOADER_TIMEOUT_MS = 6000;
 
+// Set once initPreloader runs; lets the safety path also stop the bar RAF and
+// restore the split brand text instead of only hiding the overlay.
+let activePreloader = null;
+
 const forceHidePreloader = () => {
   document.body.classList.remove("is-loading");
   const preloaderEl = document.querySelector("[data-ct-preloader]");
   if (preloaderEl) {
     preloaderEl.classList.add("is-done");
   }
+  activePreloader?.abort();
 };
 
 const boot = async () => {
@@ -256,6 +261,7 @@ const boot = async () => {
 
   // Start preloader immediately
   const preloader = initPreloader();
+  activePreloader = preloader;
 
   applySceneManifest(sceneManifest);
 

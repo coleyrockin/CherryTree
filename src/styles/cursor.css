@@ -78,11 +78,6 @@
   transform: translateY(0) scale(1);
 }
 
-.cursor-ring.is-pressed {
-  transform-origin: center;
-  transform: scale(0.82) translate3d(var(--cursor-x, 0), var(--cursor-y, 0), 0);
-}
-
 /* Hide on touch and reduced motion */
 @media (pointer: coarse) {
   .cursor-dot,

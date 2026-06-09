@@ -60,8 +60,12 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
   // scrollWidth above is measured during boot, before the webfont swaps in. The
   // fallback font is narrower, so the wrap width would be frozen too small and
   // the loop would show a seam every revolution. Re-measure once fonts settle.
+  let disposed = false;
   if (document.fonts?.ready) {
     document.fonts.ready.then(() => {
+      if (disposed) {
+        return;
+      }
       tracks.forEach((t) => {
         t.trackWidth = t.track.scrollWidth / 2;
       });
@@ -84,6 +88,7 @@ const initMarqueeRibbons = (gsap, ScrollTrigger) => {
   }
 
   return () => {
+    disposed = true;
     velocityTracker.kill();
     if (sharedTick) gsap.ticker.remove(sharedTick);
     animations.forEach((a) => a.kill());

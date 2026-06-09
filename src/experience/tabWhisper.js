@@ -25,6 +25,8 @@ export const initTabWhisper = () => {
   };
 
   const onHidden = () => {
+    // Guard against a double visibilitychange-to-hidden leaking the old interval
+    clearInterval(timer);
     idx = 0;
     document.title = WHISPER_MESSAGES[0];
     timer = window.setInterval(() => {

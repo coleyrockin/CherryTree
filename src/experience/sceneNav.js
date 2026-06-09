@@ -227,10 +227,12 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
   window.addEventListener("hashchange", onHashChange);
   cleanup.push(() => window.removeEventListener("hashchange", onHashChange));
 
-  // Show nav after preloader
-  requestAnimationFrame(() => {
+  // Show nav after preloader. Tracked so a dispose racing this frame can't
+  // re-add is-visible after teardown removed it.
+  const visibleRafId = requestAnimationFrame(() => {
     nav.classList.add("is-visible");
   });
+  cleanup.push(() => cancelAnimationFrame(visibleRafId));
 
   return () => {
     cleanup.forEach((fn) => fn());
