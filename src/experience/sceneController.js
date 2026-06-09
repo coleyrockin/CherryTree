@@ -346,6 +346,16 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   cleanup.push(initPointerTilt(scenes, gsap));
   cleanup.push(initScrollProgress(ScrollTrigger));
 
+  // The crossfade/parallax/bg-blend loops register triggers for ALL scenes
+  // before the triptych pin trigger exists, so ScrollTrigger's refresh walks
+  // them in registration order and measures the post-pin scenes WITHOUT the
+  // ~170vh pin spacer — every scrub below the triptych ran ~1.7 viewports
+  // early and finished before the visitor arrived. sort() re-orders the
+  // internal refresh queue to document order so the pin distance is applied
+  // to everything beneath it; refresh() then re-measures the final layout.
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+
   return {
     gsap,
     ScrollTrigger,

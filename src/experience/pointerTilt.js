@@ -37,7 +37,14 @@ export const initPointerTilt = (scenes, gsap) => {
       lastRotY: null, lastRotX: null,
       bounds: null, boundsAt: 0
     };
-    tiltTargets.push({ media, state });
+    // Write rotation through GSAP's transform cache so it composes with the
+    // velocityParallax scrub (yPercent/scale) on the same element. A raw
+    // style.transform write here would wipe the parallax state on every
+    // pointer move — the same writer-collision bug the cursor ring had.
+    gsap.set(media, { transformPerspective: 1200 });
+    const setRotX = gsap.quickSetter(media, "rotationX", "deg");
+    const setRotY = gsap.quickSetter(media, "rotationY", "deg");
+    tiltTargets.push({ media, state, setRotX, setRotY });
 
     // getBoundingClientRect forces layout, so cache it and refresh at most
     // every 250ms — the ±1.5° tilt can't visibly drift in that window even
@@ -83,7 +90,7 @@ export const initPointerTilt = (scenes, gsap) => {
   }
 
   const onTick = () => {
-    tiltTargets.forEach(({ media, state }) => {
+    tiltTargets.forEach(({ state, setRotX, setRotY }) => {
       state.currentX = lerp(state.currentX, state.targetX, SMOOTH);
       state.currentY = lerp(state.currentY, state.targetY, SMOOTH);
 
@@ -98,8 +105,8 @@ export const initPointerTilt = (scenes, gsap) => {
       state.lastRotY = rotY;
       state.lastRotX = rotX;
 
-      media.style.transform =
-        `perspective(1200px) rotateY(${rotY}deg) rotateX(${rotX}deg)`;
+      setRotY(rotY);
+      setRotX(rotX);
     });
   };
 
@@ -109,7 +116,7 @@ export const initPointerTilt = (scenes, gsap) => {
     gsap.ticker.remove(onTick);
     abortController.abort();
     tiltTargets.forEach(({ media }) => {
-      media.style.transform = "";
+      gsap.set(media, { rotationX: 0, rotationY: 0 });
     });
   };
 };

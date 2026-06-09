@@ -26,8 +26,11 @@ const MOTION_PRESETS = {
     scrub: 1.2
   },
   crossfadeLong: {
-    from: { yPercent: 3, scale: 1.04, filter: "saturate(0.92)" },
-    to: { yPercent: -2, scale: 1, filter: "saturate(1)" },
+    // Ken Burns push-in for the photographic scenes (Bloom, Stillness): the
+    // media slowly breathes toward you across the whole scroll-through. Drift
+    // keeps parallaxDeep's settle-out — the contrast is the cinematography.
+    from: { yPercent: 3, scale: 1, filter: "saturate(0.92)" },
+    to: { yPercent: -2, scale: 1.08, filter: "saturate(1)" },
     scrub: 0.8
   },
   driftSlow: {
