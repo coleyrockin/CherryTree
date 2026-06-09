@@ -224,6 +224,70 @@
   will-change: transform;
 }
 
+/* ── Living chroma ──────────────────────────────────────────
+   Each bloom carries a second gradient in a counter-color that crossfades
+   over the base on its own clock (opacity-only — compositor-cheap; the
+   parent blur covers both layers in one pass). Mismatched periods mean the
+   three blooms never repeat the same combination — the field keeps shifting
+   between rose/violet, coral/teal, and amber/magenta states. */
+.color-bloom::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+@keyframes chromaMorph {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.color-bloom-a::after {
+  background: radial-gradient(circle at 50% 50%, rgba(150, 88, 200, 0.9), rgba(150, 88, 200, 0) 68%);
+  animation: chromaMorph 11s ease-in-out -3s infinite;
+}
+
+.color-bloom-b::after {
+  /* Gold, not teal — coral↔teal crossfades through complementary grey-mud;
+     coral↔gold stays luminous the whole way. The cool note lives in the
+     conic shimmer at soft-light, where it can't desaturate the field. */
+  background: radial-gradient(circle at 50% 50%, rgba(238, 178, 72, 0.85), rgba(238, 178, 72, 0) 68%);
+  animation: chromaMorph 17s ease-in-out -8s infinite;
+}
+
+.color-bloom-c::after {
+  background: radial-gradient(circle at 50% 50%, rgba(224, 94, 158, 0.88), rgba(224, 94, 158, 0) 70%);
+  animation: chromaMorph 21s ease-in-out -5s infinite;
+}
+
+/* Iridescent shimmer: a slow-rotating conic wash blended soft-light over the
+   blooms. Transform-only rotation — the blur is computed once per layer, not
+   per frame. Oversized so the spin never exposes an edge. */
+.color-field::after {
+  content: "";
+  position: absolute;
+  inset: -35%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(from 0deg at 50% 50%,
+    rgba(220, 84, 122, 0.5),
+    rgba(150, 88, 200, 0.42),
+    rgba(88, 176, 168, 0.38),
+    rgba(230, 166, 96, 0.5),
+    rgba(228, 130, 112, 0.44),
+    rgba(220, 84, 122, 0.5));
+  mix-blend-mode: soft-light;
+  filter: blur(56px);
+  opacity: 0.6;
+  will-change: transform;
+  animation: chromaSpin 44s linear infinite;
+}
+
+@keyframes chromaSpin {
+  to { transform: rotate(360deg); }
+}
+
 .color-bloom-a {
   width: 78%;
   height: 92%;
@@ -266,7 +330,13 @@
   to   { transform: translate3d(6%, -8%, 0) scale(1.12); }
 }
 
-html[data-motion="reduced"] .color-bloom { animation: none; }
+html[data-motion="reduced"] .color-bloom,
+html[data-motion="reduced"] .color-bloom::after,
+html[data-motion="reduced"] .color-field::after { animation: none; }
+
+/* Reduced motion still deserves the richer palette — hold the counter-colors
+   at a static half-blend instead of hiding them. */
+html[data-motion="reduced"] .color-bloom::after { opacity: 0.5; }
 
 /* ── Koi — full-bleed living koi-pond video ───────────── */
 .scene-koi {

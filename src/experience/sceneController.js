@@ -212,38 +212,6 @@ const initTriptychTimeline = (gsap) => {
   };
 };
 
-/* ── Color-field bloom animation ──────────────────────── */
-
-const initColorFieldBloom = (gsap) => {
-  const colorField = document.querySelector('[data-ct-scene="color-field"] .color-field');
-  if (!colorField) {
-    return () => { };
-  }
-
-  const animations = [];
-  const blooms = colorField.querySelectorAll(".color-bloom");
-  blooms.forEach((bloom, index) => {
-    animations.push(
-      gsap.to(bloom, {
-        scale: 1.25,
-        rotate: index % 2 === 0 ? 16 : -14,
-        duration: 1.5,
-        ease: "none",
-        scrollTrigger: {
-          trigger: colorField,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.2
-        }
-      })
-    );
-  });
-
-  return () => {
-    animations.forEach((a) => a.kill());
-  };
-};
-
 /* ── Per-scene crossfade (enter/exit) ─────────────────── */
 
 const initSceneCrossfade = (scenes, gsap) => {
@@ -340,7 +308,9 @@ export const initSceneController = async ({ manifest, reducedMotion = false }) =
   cleanup.push(initSceneCrossfade(scenes, gsap));
   cleanup.push(initVelocityParallax({ scenes, gsap }));
   cleanup.push(initTriptychTimeline(gsap));
-  cleanup.push(initColorFieldBloom(gsap));
+  // Color Field motion is pure CSS (see scenes.css chromaMorph/chromaSpin) —
+  // a GSAP scrub here would lose to the blooms' CSS transform animations
+  // (CSS animations beat inline styles in the cascade).
   cleanup.push(initClipPathReveals(gsap));
   cleanup.push(initEpilogueAnimations(gsap));
   cleanup.push(initPointerTilt(scenes, gsap));
