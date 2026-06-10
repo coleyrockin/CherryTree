@@ -160,7 +160,7 @@ const checkPublicMetadata = () => {
     check(indexHtml.includes(snippet), `index.html metadata is missing: ${snippet}`);
   });
 
-  check(sitemap.includes("<lastmod>2026-05-27</lastmod>"), "sitemap lastmod should be 2026-05-27");
+  check(sitemap.includes("<lastmod>2026-06-09</lastmod>"), "sitemap lastmod should be 2026-06-09");
 
   ["180x180", "192x192", "512x512"].forEach((size) => {
     check(iconSizes.has(size), `manifest should include a ${size} icon`);

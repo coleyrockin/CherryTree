@@ -9,12 +9,28 @@
   <meta name="robots" content="noindex" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
-    rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/bodoni-moda-latin.woff2"
+    crossorigin="anonymous" />
   <style>
+    /* Self-hosted fonts — same first-party WOFF2 files the main page uses.
+       (The CSP blocks third-party font origins, so Google Fonts would silently
+       fail here; this page must stay in-system on its own.) */
+    @font-face {
+      font-family: "Bodoni Moda";
+      font-style: normal;
+      font-weight: 400 700;
+      font-display: swap;
+      src: url("/assets/fonts/bodoni-moda-latin.woff2") format("woff2");
+    }
+
+    @font-face {
+      font-family: "Plus Jakarta Sans";
+      font-style: normal;
+      font-weight: 400 600;
+      font-display: swap;
+      src: url("/assets/fonts/plus-jakarta-sans-latin.woff2") format("woff2");
+    }
+
     *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;

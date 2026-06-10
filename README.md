@@ -101,7 +101,7 @@ Scroll to move through the gallery. Each scene has a URL hash (`/#bloom`, `/#koi
 | 3D / WebGL | Three.js r181, custom `ShaderMaterial` | Deferred behind `IntersectionObserver` — never touches first paint |
 | Animation | GSAP 3.13 + ScrollTrigger | Shared frame clock with Lenis |
 | Smooth scroll | Lenis 1.3 | Synced to GSAP ticker so smoothing and animation never drift |
-| Build | Vite 8, manual vendor chunking | Gzip: Three.js ~128 KB · GSAP ~44 KB · app ~5.7 KB |
+| Build | Vite 8, manual vendor chunking | Gzip: Three.js ~128 KB · GSAP ~44 KB · app ~7 KB |
 | Images | Sharp | AVIF / WebP / JPEG + LQIP; regenerated via `optimize-assets` |
 | Language | Vanilla ES2021 | No framework |
 

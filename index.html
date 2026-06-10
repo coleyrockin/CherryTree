@@ -16,21 +16,23 @@
   <meta property="og:title" content="Cherry Tree" />
   <meta property="og:description" content="An eight-scene, scroll-driven cinematic gallery with real-time WebGL petals." />
   <meta property="og:url" content="https://cherry-tree-psi.vercel.app/" />
-  <meta property="og:image" content="https://cherry-tree-psi.vercel.app/og-image.webp" />
-  <meta property="og:image:type" content="image/webp" />
+  <!-- JPEG, not WebP: LinkedIn and several link-preview crawlers still skip
+       WebP og:images. 74 KB at q88 — compatibility is the whole point here. -->
+  <meta property="og:image" content="https://cherry-tree-psi.vercel.app/og-image.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="Cherry Tree hero scene with floating petals." />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Cherry Tree" />
   <meta name="twitter:description" content="An eight-scene, scroll-driven cinematic gallery with real-time WebGL petals." />
-  <meta name="twitter:image" content="https://cherry-tree-psi.vercel.app/og-image.webp" />
+  <meta name="twitter:image" content="https://cherry-tree-psi.vercel.app/og-image.jpg" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Cherry Tree",
-    "url": "https://cherry-tree-psi.vercel.app",
+    "url": "https://cherry-tree-psi.vercel.app/",
     "description": "An eight-scene, scroll-driven cinematic gallery with real-time WebGL petals.",
     "author": {
       "@type": "Person",
