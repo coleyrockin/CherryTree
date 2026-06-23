@@ -83,7 +83,6 @@ const randomBetween = (min, max) => min + Math.random() * (max - min);
 
 const VERTEX_SHADER = `
   attribute float aPhase;
-  attribute float aSpeed;
   attribute float aRotSpeed;
   uniform float uTime;
   uniform float uSize;
@@ -176,7 +175,6 @@ const createPetalField = ({ petalCount, petalSize, useShader }) => {
 
   if (useShader && texture) {
     geometry.setAttribute("aPhase", new BufferAttribute(phases, 1));
-    geometry.setAttribute("aSpeed", new BufferAttribute(speeds, 1));
     geometry.setAttribute("aRotSpeed", new BufferAttribute(rotSpeeds, 1));
 
     material = new ShaderMaterial({

@@ -5,7 +5,7 @@ A scroll-driven gallery of eight scenes, stitched together and scored like a con
 **[cherry-tree-psi.vercel.app](https://cherry-tree-psi.vercel.app)**
 
 ![Three.js](https://img.shields.io/badge/Three.js-r181-000?style=flat&logo=threedotjs&logoColor=white)
-![GSAP](https://img.shields.io/badge/GSAP-3.13-88CE02?style=flat&logo=greensock&logoColor=black)
+![GSAP](https://img.shields.io/badge/GSAP-3.14-88CE02?style=flat&logo=greensock&logoColor=black)
 ![Lenis](https://img.shields.io/badge/Lenis-1.3-111?style=flat)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?style=flat&logo=vite&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
@@ -99,7 +99,7 @@ Scroll to move through the gallery. Each scene has a URL hash (`/#bloom`, `/#koi
 | Layer | Technology | Notes |
 |---|---|---|
 | 3D / WebGL | Three.js r181, custom `ShaderMaterial` | Deferred behind `IntersectionObserver` — never touches first paint |
-| Animation | GSAP 3.13 + ScrollTrigger | Shared frame clock with Lenis |
+| Animation | GSAP 3.14 + ScrollTrigger | Shared frame clock with Lenis |
 | Smooth scroll | Lenis 1.3 | Synced to GSAP ticker so smoothing and animation never drift |
 | Build | Vite 8, manual vendor chunking | Gzip: Three.js ~128 KB · GSAP ~44 KB · app ~7 KB |
 | Images | Sharp | AVIF / WebP / JPEG + LQIP; regenerated via `optimize-assets` |

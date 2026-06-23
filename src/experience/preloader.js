@@ -100,6 +100,7 @@ export const initPreloader = () => {
     if (elapsed < MIN_DISPLAY_MS) {
       await new Promise((resolve) => setTimeout(resolve, MIN_DISPLAY_MS - elapsed));
     }
+    if (finished) return; // the safety-timeout abort() fired during the wait
 
     progress = 1;
     if (bar) {
@@ -131,6 +132,7 @@ export const initPreloader = () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
+    if (finished) return; // abort() fired during an exit animation — don't double-revert
     finished = true;
     el.classList.add("is-done");
     document.body.classList.remove("is-loading");

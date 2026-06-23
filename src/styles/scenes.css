@@ -695,17 +695,17 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
 }
 
 .epilogue-subtitle {
-  margin: 0;
-  font-family: "Plus Jakarta Sans", sans-serif;
-  font-size: clamp(0.85rem, 2vw, 1.2rem);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.72);
+  margin: 0.4em 0 0;
+  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+  font-size: clamp(0.85rem, 1.8vw, 1.15rem);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: rgba(49, 30, 33, 0.6);
+  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.6);
+  /* Sentence case — "Every spring, again." (A duplicate block below used to
+     leave text-transform:uppercase bleeding in.) Revealed by epilogueAnimations
+     in full motion; reduced motion forces it visible via !important. */
   opacity: 0;
-}
-
-.epilogue-subtitle.is-visible {
-  opacity: 1;
 }
 
 .js .scene[data-motion-preset="driftSlow"] .epilogue-lockup {
@@ -879,20 +879,8 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
   width: 0.3em;
 }
 
-/* Epilogue subtitle */
-.epilogue-subtitle {
-  margin: 0.4em 0 0;
-  font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
-  font-size: clamp(0.85rem, 1.8vw, 1.15rem);
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  color: rgba(49, 30, 33, 0.6);
-  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.6);
-}
-
 /* Reduced motion: show all text immediately */
-html[data-motion="reduced"] .scene-text,
-html[data-motion="reduced"] .epilogue-subtitle {
+html[data-motion="reduced"] .scene-text {
   opacity: 1 !important;
 }
 
@@ -1002,10 +990,6 @@ html[data-motion="reduced"] .scene-stillness .scene-media {
 html[data-motion="reduced"] .epilogue-rule {
   width: min(280px, 60vw);
   opacity: 0.6;
-}
-
-html[data-motion="reduced"] .epilogue-subtitle {
-  opacity: 1;
 }
 
 /* ── Scroll hint ──────────────────────────────────────────── */

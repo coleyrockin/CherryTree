@@ -77,7 +77,7 @@ The Epilogue is the last thing anyone sees. It currently fades in with the same 
 A cherry-blossom petal SVG — the same silhouette as the WebGL hero particle, rendered at 32×32. Not a generic circle. Not the wordmark. The petal itself, in `#ef8bb0` on transparent. Generate the SVG manually from the hero shader's clip math; no external tools needed.
 
 ### 4b. OG / social card
-A single rendered petal in golden-hour light against `#f8ebe2` — 1200×630, centered composition, no text. The scene alone carries the identity. When someone shares the URL, what arrives in the preview is the experience distilled to one frame. Generated with sharp + a Three.js canvas render, exported to `public/assets/og.png`.
+A single rendered petal in golden-hour light against `#f8ebe2` — 1200×630, centered composition, no text. The scene alone carries the identity. When someone shares the URL, what arrives in the preview is the experience distilled to one frame. Generated with sharp, exported to `public/og-image.jpg` (shipped).
 
 ### 4c. Copy revisit
 Live with the current copy for two weeks, then re-read it cold. The editorial voice is close but a few lines are still reaching. Specifically: the Prologue subtitle and the Epilogue closing line need a pass. No timeline — this is an instinct check, not a task.

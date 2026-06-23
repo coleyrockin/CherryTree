@@ -213,8 +213,17 @@ html[data-motion="reduced"] .marquee-ribbon {
   .color-bloom,
   .color-bloom::after,
   .epilogue-bloom,
-  .scroll-hint-line {
+  .scroll-hint-line,
+  .sound-toggle,
+  .motion-toggle,
+  .scene-nav-dot {
     animation: none !important;
+  }
+
+  /* With chromaMorph stopped, hold the counter-color layer at its mid-blend so
+     the Color Field still reads as layered color (matches the data-motion path). */
+  .color-bloom::after {
+    opacity: 0.5;
   }
 }
 

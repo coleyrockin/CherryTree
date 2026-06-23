@@ -177,7 +177,7 @@ export const initAudioController = ({
         },
         onComplete: () => {
           target.oscillators.forEach((osc) => osc.stop());
-          target.context.close();
+          void target.context.close().catch(() => {});
         }
       });
       synth = null;
