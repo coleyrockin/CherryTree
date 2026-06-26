@@ -208,11 +208,9 @@ html[data-motion="reduced"] .marquee-ribbon {
 @media (prefers-reduced-motion: reduce) {
   .film-grain,
   .marquee-track,
-  .epilogue-petals,
-  .epilogue-petal,
+  .flake,
   .color-bloom,
   .color-bloom::after,
-  .epilogue-bloom,
   .scroll-hint-line,
   .sound-toggle,
   .motion-toggle,

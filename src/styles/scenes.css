@@ -545,82 +545,72 @@ html.is-scene-bright .sound-toggle {
 
 html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: none; }
 
+/* Winter close. The gallery opens at warm spring dawn; it ends on the same tree,
+   bare and frost-laced on a moonlit hill — the year turned all the way over. */
 .scene-epilogue {
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 42%, rgba(238, 168, 186, 0.38), rgba(238, 168, 186, 0) 58%),
-    radial-gradient(ellipse 100% 80% at 50% 100%, rgba(216, 148, 128, 0.26), rgba(216, 148, 128, 0) 60%),
-    linear-gradient(170deg, #f2ddd4 0%, #e8cfc3 52%, #ddbfb8 100%);
+  background: linear-gradient(180deg, #141d33 0%, #1a2438 58%, #243150 100%);
 }
 
-.epilogue-lockup {
-  position: relative;
-  z-index: 4;
-  text-align: center;
-  width: min(980px, 94vw);
-  margin-inline: auto;
-}
-
-/* No background vignette behind the lockup: a radial centered on the title
-   projects its upper/lower arc across the viewport as a horizontal shade band,
-   and because the lockup drifts (driftSlow) that band sweeps the scene. The
-   dark serif title already has ample contrast over the warm gradient, so it
-   needs no backing wash — a hair of text-shadow on the title does the framing
-   (see `.epilogue-title`) without any full-width artifact. */
-
-/* ── Epilogue decorative blooms ─── */
-
-.epilogue-bloom {
-  position: absolute;
-  border-radius: 50%;
-  pointer-events: none;
-  mix-blend-mode: soft-light;
-  opacity: 0;
-  filter: blur(6px);
+.scene-epilogue .scene-media {
   z-index: 1;
 }
 
-.epilogue-bloom-a {
-  width: 62%;
-  height: 72%;
-  left: -8%;
-  top: 8%;
-  background: radial-gradient(circle at 55% 50%,
-      rgba(216, 88, 138, 0.82),
-      rgba(216, 88, 138, 0) 66%);
+/* Bottom scrim so the closing words stay legible over the moonlit snow. */
+.scene-epilogue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(to top,
+      rgba(10, 14, 28, 0.74) 0%,
+      rgba(10, 14, 28, 0.34) 20%,
+      rgba(10, 14, 28, 0) 42%);
 }
 
-.epilogue-bloom-b {
-  width: 54%;
-  height: 66%;
-  right: -4%;
-  top: 3%;
-  background: radial-gradient(circle at 45% 45%,
-      rgba(234, 158, 74, 0.8),
-      rgba(234, 158, 74, 0) 64%);
+.epilogue-lockup {
+  /* Centered via auto margins, NOT translateX — the lockupDrift keyframe animates
+     `transform`, which would clobber a translateX(-50%) and shove the lockup off
+     to the right. */
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  bottom: clamp(8%, 12vh, 15%);
+  z-index: 5;
+  text-align: center;
+  width: min(900px, 92vw);
 }
 
-.epilogue-bloom-c {
-  width: 66%;
-  height: 60%;
-  left: 16%;
-  bottom: -10%;
-  background: radial-gradient(circle at 50% 55%,
-      rgba(242, 192, 158, 0.75),
-      rgba(242, 192, 158, 0) 62%);
+/* ── Falling snow ── */
+
+.snowfall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
 }
 
-.epilogue-lockup .epilogue-title {
-  margin: 0;
-  font-family: "Bodoni Moda", "Times New Roman", serif;
-  font-size: clamp(3rem, 9vw, 7.5rem);
-  font-weight: 500;
-  font-style: italic;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(49, 30, 33, 0.92);
-  text-shadow:
-    0 18px 45px rgba(255, 244, 234, 0.66),
-    0 30px 90px rgba(81, 44, 56, 0.22);
+.flake {
+  position: absolute;
+  top: -6%;
+  left: var(--l, 50%);
+  width: var(--s, 4px);
+  height: var(--s, 4px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #ffffff, rgba(226, 236, 248, 0.55) 70%, rgba(226, 236, 248, 0) 100%);
+  opacity: var(--o, 0.7);
+  filter: blur(var(--blur, 0.4px));
+  will-change: transform;
+  animation: snowFall var(--dur, 16s) linear var(--delay, 0s) infinite;
+}
+
+@keyframes snowFall {
+  0%   { transform: translate(0, -8vh); opacity: 0; }
+  8%   { opacity: var(--o, 0.7); }
+  92%  { opacity: var(--o, 0.7); }
+  100% { transform: translate(var(--sway, 20px), 118vh); opacity: 0; }
 }
 
 .epilogue-sign {
@@ -629,70 +619,11 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
   font-style: italic;
   font-size: clamp(0.85rem, 1.6vw, 1.05rem);
   letter-spacing: 0.35em;
-  color: rgba(49, 30, 33, 0.68);
+  color: rgba(222, 232, 246, 0.62);
 }
 
-/* Upward-drifting petals — real ellipse shapes, reverse-time rising */
-.epilogue-petals {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.epilogue-petal {
-  position: absolute;
-  border-radius: 66% 66% 60% 60% / 100% 100% 46% 46%;
-  opacity: var(--o, 0.68);
-  filter: blur(0.3px);
-  will-change: transform, opacity;
-  animation: epiloguePetalRise var(--dur, 28s) linear var(--delay, 0s) infinite;
-}
-
-@keyframes epiloguePetalRise {
-  0%   { transform: translate(0, 108vh) rotate(0deg); opacity: 0; }
-  9%   { opacity: var(--o, 0.68); }
-  91%  { opacity: var(--o, 0.68); }
-  100% { transform: translate(var(--sway, 22px), -18vh) rotate(-200deg); opacity: 0; }
-}
-
-.epilogue-petal--1 { left: 12%; width: 24px; height: 18px; background: linear-gradient(155deg, rgba(244,148,180,0.92), rgba(212,90,132,0.62)); --o:.72; --dur:26s; --delay:-2s;  --sway:24px; }
-.epilogue-petal--2 { left: 26%; width: 18px; height: 14px; background: linear-gradient(155deg, rgba(255,186,210,0.88), rgba(232,118,158,0.58)); --o:.62; --dur:32s; --delay:-11s; --sway:-20px; }
-.epilogue-petal--3 { left: 40%; width: 28px; height: 21px; background: linear-gradient(155deg, rgba(238,138,170,0.94), rgba(208,84,128,0.64)); --o:.76; --dur:24s; --delay:-18s; --sway:28px; }
-.epilogue-petal--4 { left: 54%; width: 20px; height: 15px; background: linear-gradient(155deg, rgba(255,178,204,0.86), rgba(228,112,152,0.56)); --o:.64; --dur:30s; --delay:-6s;  --sway:-26px; }
-.epilogue-petal--5 { left: 66%; width: 26px; height: 19px; background: linear-gradient(155deg, rgba(242,144,178,0.92), rgba(216,92,138,0.60)); --o:.74; --dur:28s; --delay:-22s; --sway:22px; }
-.epilogue-petal--6 { left: 78%; width: 22px; height: 17px; background: linear-gradient(155deg, rgba(252,172,200,0.90), rgba(224,108,150,0.58)); --o:.68; --dur:34s; --delay:-9s;  --sway:-18px; }
-.epilogue-petal--7 { left: 34%; width: 16px; height: 12px; background: linear-gradient(155deg, rgba(255,194,216,0.84), rgba(236,124,164,0.54)); --o:.58; --dur:36s; --delay:-29s; --sway:20px; }
-.epilogue-petal--8 { left: 88%; width: 24px; height: 18px; background: linear-gradient(155deg, rgba(240,140,174,0.92), rgba(210,88,132,0.62)); --o:.70; --dur:29s; --delay:-15s; --sway:-22px; }
-/* Second, denser tier: smaller + slower petals for depth and an airier, fuller
-   shower that reads as a closing release rather than a sparse debug state. */
-.epilogue-petal--9  { left: 6%;  width: 12px; height: 9px;  background: linear-gradient(155deg, rgba(255,190,212,0.82), rgba(232,120,160,0.5)); --o:.50; --dur:40s; --delay:-4s;  --sway:16px; }
-.epilogue-petal--10 { left: 18%; width: 10px; height: 8px;  background: linear-gradient(155deg, rgba(248,160,190,0.80), rgba(220,100,142,0.5)); --o:.46; --dur:44s; --delay:-25s; --sway:-14px; }
-.epilogue-petal--11 { left: 32%; width: 14px; height: 11px; background: linear-gradient(155deg, rgba(244,148,180,0.86), rgba(214,92,134,0.54)); --o:.56; --dur:36s; --delay:-13s; --sway:22px; }
-.epilogue-petal--12 { left: 46%; width: 9px;  height: 7px;  background: linear-gradient(155deg, rgba(255,196,218,0.78), rgba(236,126,166,0.48)); --o:.44; --dur:48s; --delay:-31s; --sway:-12px; }
-.epilogue-petal--13 { left: 58%; width: 13px; height: 10px; background: linear-gradient(155deg, rgba(242,144,178,0.86), rgba(216,92,138,0.54)); --o:.54; --dur:38s; --delay:-7s;  --sway:20px; }
-.epilogue-petal--14 { left: 70%; width: 11px; height: 8px;  background: linear-gradient(155deg, rgba(252,172,200,0.82), rgba(224,108,150,0.5)); --o:.48; --dur:42s; --delay:-19s; --sway:-18px; }
-.epilogue-petal--15 { left: 82%; width: 15px; height: 11px; background: linear-gradient(155deg, rgba(238,138,170,0.88), rgba(208,84,128,0.56)); --o:.58; --dur:34s; --delay:-27s; --sway:24px; }
-.epilogue-petal--16 { left: 92%; width: 10px; height: 8px;  background: linear-gradient(155deg, rgba(255,186,210,0.80), rgba(228,112,152,0.5)); --o:.46; --dur:46s; --delay:-10s; --sway:-16px; }
-.epilogue-petal--17 { left: 48%; width: 8px;  height: 6px;  background: linear-gradient(155deg, rgba(255,200,220,0.74), rgba(238,130,168,0.46)); --o:.40; --dur:50s; --delay:-22s; --sway:14px; }
-.epilogue-petal--18 { left: 72%; width: 12px; height: 9px;  background: linear-gradient(155deg, rgba(246,150,182,0.84), rgba(218,96,140,0.52)); --o:.52; --dur:37s; --delay:-15s; --sway:-20px; }
-
-html[data-motion="reduced"] .epilogue-petal { display: none; }
-
-.epilogue-rule {
-  border: none;
-  height: 1px;
-  width: 0;
-  margin: clamp(16px, 3vw, 32px) auto;
-  background: linear-gradient(90deg, transparent, var(--rose), transparent);
-  opacity: 0;
-}
-
-.epilogue-rule.is-drawn {
-  width: min(280px, 60vw);
-  opacity: 0.6;
-}
+/* Reduced motion: hold the snow still. */
+html[data-motion="reduced"] .snowfall { display: none; }
 
 .epilogue-subtitle {
   margin: 0.4em 0 0;
@@ -700,8 +631,8 @@ html[data-motion="reduced"] .epilogue-petal { display: none; }
   font-size: clamp(0.85rem, 1.8vw, 1.15rem);
   font-weight: 400;
   letter-spacing: 0.08em;
-  color: rgba(49, 30, 33, 0.6);
-  text-shadow: 0 2px 20px rgba(247, 233, 224, 0.6);
+  color: rgba(224, 233, 246, 0.84);
+  text-shadow: 0 2px 16px rgba(8, 12, 24, 0.55);
   /* Sentence case — "Every spring, again." (A duplicate block below used to
      leave text-transform:uppercase bleeding in.) Revealed by epilogueAnimations
      in full motion; reduced motion forces it visible via !important. */
@@ -913,11 +844,6 @@ html[data-motion="reduced"] .epilogue-subtitle {
 }
 
 @media (max-width: 560px) {
-  .epilogue-lockup .epilogue-title {
-    letter-spacing: 0.04em;
-    font-size: clamp(1.8rem, 10vw, 3.2rem);
-  }
-
   .scene-text-hero .scene-title {
     letter-spacing: 0.06em;
     font-size: clamp(2rem, 12vw, 4rem);
@@ -940,7 +866,6 @@ html[data-motion="reduced"] .epilogue-subtitle {
 
 @media (max-width: 410px) {
   .scene-text-hero .scene-title { letter-spacing: 0.04em; }
-  .epilogue-title { letter-spacing: 0.04em; }
   .scene-kicker { letter-spacing: 0.22em; }
   .triptych-panel img { min-height: 38vh; }
 }
@@ -985,11 +910,6 @@ html[data-motion="reduced"] .epilogue-subtitle {
 html[data-motion="reduced"] .scene-bloom .scene-media,
 html[data-motion="reduced"] .scene-stillness .scene-media {
   clip-path: none !important;
-}
-
-html[data-motion="reduced"] .epilogue-rule {
-  width: min(280px, 60vw);
-  opacity: 0.6;
 }
 
 /* ── Scroll hint ──────────────────────────────────────────── */

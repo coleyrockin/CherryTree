@@ -105,14 +105,15 @@ export const sceneManifest = Object.freeze([
     id: "epilogue",
     label: "Epilogue",
     numeral: "08",
-    type: "composite",
-    assets: ["epilogueGlow"],
+    type: "image",
+    assets: ["epilogueWinter"],
     motionPreset: "driftSlow",
-    heightVh: 140,
+    heightVh: 100,
     preload: false,
-    bgColor: "#e3cbc0",
-    tint: "#e48ca8",
-    ink: "#2d1e24",
-    grainTint: "rgba(78, 44, 55, 0.26)"
+    dark: true,
+    bgColor: "#1a2236",
+    tint: "#9fb6d6",
+    ink: "#e9f0fa",
+    grainTint: "rgba(150, 168, 200, 0.16)"
   }
 ]);
