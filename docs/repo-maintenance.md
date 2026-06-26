@@ -69,21 +69,26 @@ Options, in order of preference:
    `npm run optimize-assets`. Saves the most clone weight; adds a manual step.
 3. **Keep as-is** — simplest, but every clone pays the 14 MB.
 
-## Koi video re-encode opportunity
+## Koi video encoding (done)
 
-`koi.webm` (VP9) is 9.25 MB — ~64% heavier than the 5.6 MB HEVC `koi.mp4` for the
-same footage. It's lazy-loaded (`preload="none"`, hydrated on scroll approach), so
-it costs nothing at first paint, but a Chrome visitor who reaches the Koi scene
-downloads 9.25 MB. The `.mp4` also uses `hvc1` (HEVC), which only decodes on
-Apple hardware — an `avc1` (H.264) encode would be a broader fallback.
+The Koi background loop was 4K (3840×2160) — pure waste, since it renders
+`object-fit: cover` inside a viewport box. It's now 1080p in three formats, served
+in order of efficiency, all muted and lazy-hydrated on scroll approach:
 
-When the source edit is available:
+| File | Codec | Size | Served to |
+|---|---|---|---|
+| `koi-av1.mp4` | AV1 (`av01`) | ~2.1 MB | Chrome/Firefox/Edge, Safari 17+ |
+| `koi.webm` | VP9 | ~2.4 MB | Safari 14–16 and any VP9 browser |
+| `koi.mp4` | H.264 (`avc1`) | ~4.7 MB | last-resort fallback (legacy) |
+
+Down from a single 9.25 MB 4K VP9 + a 5.6 MB Apple-only HEVC `mp4`. Modern
+browsers now pull ~2 MB instead of 9.25 MB. Re-encode from the highest-quality
+source available (1080p, muted, seamless loop preserved):
 
 ```bash
-# Tighter VP9 (or try AV1 'av01' for ~30–50% better compression):
-ffmpeg -i koi-source.mov -c:v libvpx-vp9 -crf 38 -b:v 0 -an -vf scale=1920:-2 koi.webm
-# Broad-compatibility H.264 fallback instead of HEVC:
-ffmpeg -i koi-source.mov -c:v libx264 -crf 23 -preset slow -an -movflags +faststart koi.mp4
+ffmpeg -i koi-src -an -c:v libsvtav1 -crf 34 -preset 6 -vf scale=1920:1080:flags=lanczos koi-av1.mp4
+ffmpeg -i koi-src -an -c:v libvpx-vp9 -crf 36 -b:v 0 -row-mt 1 -vf scale=1920:1080:flags=lanczos koi.webm
+ffmpeg -i koi-src -an -c:v libx264 -crf 26 -preset slow -pix_fmt yuv420p -movflags +faststart -vf scale=1920:1080:flags=lanczos koi.mp4
 ```
 
 Target ~4–6 MB for the WebM. Verify the loop is seamless and quality holds for an
