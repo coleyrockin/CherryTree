@@ -41,9 +41,13 @@
     }
   }
   </script>
-  <!-- Self-hosted fonts (see src/styles/fonts.css). Preload the display serif used
-       by the preloader + hero so it's ready for the first meaningful paint. -->
+  <!-- Self-hosted fonts (see src/styles/fonts.css). Preload both families: the
+       display serif (preloader + hero titles) and the UI sans (body, subtitles,
+       the Motion/Sound toggles and editorial chrome shown at first paint) — so
+       neither swaps in late. Both are immutable-cached. -->
   <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/bodoni-moda-latin.woff2"
+    crossorigin="anonymous" />
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/plus-jakarta-sans-latin.woff2"
     crossorigin="anonymous" />
   <!-- LCP hero preload. Typed AVIF matches what <picture> serves to the vast
        majority of browsers, so the preload is the exact resource rendered (no
