@@ -44,6 +44,16 @@
   filter: saturate(1.08) contrast(1.04);
 }
 
+/* Soft vignette — reveals with the iris clip-path; keeps the bright sky/blossom
+   edges from bleeding flat to the frame (Bloom intentionally has no scene-matte). */
+.scene-bloom .scene-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 78% 74% at 50% 46%, rgba(18, 9, 14, 0) 58%, rgba(18, 9, 14, 0.22) 100%);
+}
+
 /* Kill the scene-matte completely on Bloom — it was the main color-muter */
 .scene-bloom .scene-matte {
   display: none;
@@ -62,7 +72,8 @@
   color: rgba(255, 248, 252, 0.92);
   text-shadow:
     0 1px 8px rgba(160, 50, 100, 0.5),
-    0 2px 14px rgba(22, 10, 20, 0.32);
+    0 2px 14px rgba(22, 10, 20, 0.32),
+    0 0 6px rgba(20, 9, 14, 0.4);
 }
 
 
@@ -75,6 +86,15 @@
 
 .scene-drift .scene-media {
   z-index: 1;
+}
+
+/* Corner vignette seats the bright vanishing point and adds graded depth. */
+.scene-drift .scene-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 82% 78% at 50% 44%, rgba(40, 16, 26, 0) 56%, rgba(40, 16, 26, 0.42) 100%);
 }
 
 .scene-drift .scene-media img {
@@ -120,7 +140,7 @@
     linear-gradient(190deg,
       rgba(254, 245, 237, 0.04) 0%,
       rgba(246, 215, 216, 0.18) 55%,
-      rgba(58, 26, 36, 0.32) 100%);
+      rgba(48, 20, 30, 0.46) 100%);
 }
 
 /* Text-only legibility halo for the white-title photo scenes. A soft, blurred
@@ -153,7 +173,8 @@
 .scene-triptych {
   background:
     linear-gradient(180deg, rgba(240, 224, 215, 0.82), rgba(232, 212, 205, 0.93)),
-    radial-gradient(circle at 15% 70%, rgba(100, 126, 85, 0.15), rgba(100, 126, 85, 0) 42%);
+    radial-gradient(circle at 12% 72%, rgba(100, 126, 85, 0.22), rgba(100, 126, 85, 0) 46%),
+    radial-gradient(circle at 88% 30%, rgba(108, 130, 92, 0.14), rgba(108, 130, 92, 0) 44%);
   padding: 8vh 0;
 }
 
@@ -172,10 +193,13 @@
   margin: 0;
   border-radius: clamp(20px, 2.2vw, 30px);
   overflow: hidden;
-  box-shadow: 0 30px 64px rgba(77, 46, 56, 0.16);
-  border: 1px solid rgba(88, 52, 62, 0.2);
-  background: rgba(249, 237, 228, 0.76);
-  backdrop-filter: blur(7px);
+  box-shadow:
+    0 1px 2px rgba(77, 46, 56, 0.12),
+    0 30px 64px rgba(77, 46, 56, 0.18);
+  border: 1px solid rgba(120, 86, 78, 0.16);
+  /* Solid load-state colour; the img covers it, so the old backdrop-filter blur
+     was only ever a 1px rounded-corner sliver — dropped for a free perf win. */
+  background: rgba(249, 237, 228, 0.9);
 }
 
 .triptych-panel img {
@@ -184,6 +208,8 @@
   min-height: 60vh;
   object-fit: cover;
   display: block;
+  /* One shared static grade so three stock shots read as one triptych. */
+  filter: saturate(0.94) contrast(1.02) brightness(1.01);
 }
 
 .scene-color {
@@ -212,12 +238,12 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(circle at 50% 48%, rgba(20, 10, 16, 0) 46%, rgba(33, 16, 22, 0.2) 100%);
+  background: radial-gradient(circle at 50% 48%, rgba(20, 10, 16, 0) 38%, rgba(28, 12, 20, 0.3) 82%, rgba(20, 8, 16, 0.4) 100%);
 }
 
 .color-bloom {
   position: absolute;
-  opacity: 0.8;
+  opacity: 0.84;
   transform-origin: center;
   will-change: transform;
 }
@@ -359,8 +385,8 @@ html[data-motion="reduced"] .color-bloom::after { opacity: 0.5; }
   pointer-events: none;
   z-index: 1;
   background:
-    radial-gradient(120% 120% at 50% 46%, rgba(0, 0, 0, 0) 38%, rgba(6, 14, 12, 0.5) 100%),
-    linear-gradient(180deg, rgba(6, 14, 12, 0.28) 0%, rgba(6, 14, 12, 0) 22%, rgba(6, 14, 12, 0) 78%, rgba(6, 14, 12, 0.34) 100%);
+    radial-gradient(120% 130% at 50% 42%, rgba(0, 0, 0, 0) 38%, rgba(4, 11, 10, 0.6) 100%),
+    linear-gradient(180deg, rgba(6, 14, 12, 0.28) 0%, rgba(6, 14, 12, 0) 22%, rgba(6, 14, 12, 0) 78%, rgba(6, 14, 12, 0.42) 100%);
 }
 
 /* Light text sits above the dark footage with a soft scrim for legibility.
@@ -376,16 +402,16 @@ html[data-motion="reduced"] .color-bloom::after { opacity: 0.5; }
   transform: translate(-50%, -50%);
   z-index: -1;
   pointer-events: none;
-  background: radial-gradient(ellipse at center, rgba(6, 12, 12, 0.66) 0%, rgba(6, 12, 12, 0.4) 46%, rgba(6, 12, 12, 0) 74%);
+  background: radial-gradient(ellipse at center, rgba(6, 12, 12, 0.74) 0%, rgba(6, 12, 12, 0.46) 46%, rgba(6, 12, 12, 0) 74%);
   filter: blur(28px);
 }
 
 /* Text colors carry their own shadow so they stay legible even over the
    brightest (near-white) koi, not just the dark water. */
 .scene-koi .scene-kicker {
-  color: rgba(255, 255, 255, 0.95);
-  border-color: rgba(255, 255, 255, 0.5);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
+  color: #f0b566;
+  border-color: rgba(240, 181, 102, 0.45);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
 }
 
 .scene-koi .scene-title {
@@ -500,7 +526,9 @@ html.is-scene-bright .sound-toggle {
 }
 
 .scene-stillness {
-  background: linear-gradient(180deg, #ead6cc 0%, #dfc4bb 100%);
+  /* Cooler mauve fog — the bridge into winter (slide 8). Same lightness band so
+     the dark-ink title/subtitle stay AA. */
+  background: linear-gradient(180deg, #e4d8de 0%, #d8c6cf 60%, #cdbcc6 100%);
 }
 
 .scene-stillness .scene-media {
@@ -510,6 +538,8 @@ html.is-scene-bright .sound-toggle {
 
 .scene-stillness .scene-media img {
   transform: scale(1.03);
+  /* Cool the green stock cast toward the wintry mauve fog. */
+  filter: saturate(0.82) contrast(1.04) brightness(1.02);
 }
 
 /* Atmospheric fog vignette — pulls depth from the edges, softens the image */
@@ -520,8 +550,8 @@ html.is-scene-bright .sound-toggle {
   z-index: 3;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 80% at 50% 46%, transparent 40%, rgba(234, 214, 204, 0.38) 100%),
-    linear-gradient(180deg, rgba(234, 214, 204, 0.22) 0%, transparent 18%, transparent 82%, rgba(218, 196, 186, 0.28) 100%);
+    radial-gradient(ellipse 90% 80% at 50% 46%, transparent 40%, rgba(228, 216, 222, 0.38) 100%),
+    linear-gradient(180deg, rgba(228, 216, 222, 0.22) 0%, transparent 18%, transparent 82%, rgba(205, 188, 198, 0.28) 100%);
 }
 
 /* Second slow-drift grain layer — adds movement depth in stillness */
@@ -555,17 +585,23 @@ html[data-motion="reduced"] .scene-stillness .scene-media::after { animation: no
   z-index: 1;
 }
 
-/* Bottom scrim so the closing words stay legible over the moonlit snow. */
+/* Cool, slightly deepened grade so the night reads cinematic rather than flat. */
+.scene-epilogue .scene-media img {
+  filter: contrast(1.06) saturate(1.05) brightness(0.96);
+}
+
+/* Edge + top vignette deepen the night and frame the moon-tree; bottom scrim
+   keeps the closing words legible. All static — one painted layer, no per-frame. */
 .scene-epilogue::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  background: linear-gradient(to top,
-      rgba(10, 14, 28, 0.74) 0%,
-      rgba(10, 14, 28, 0.34) 20%,
-      rgba(10, 14, 28, 0) 42%);
+  background:
+    radial-gradient(ellipse 92% 82% at 50% 44%, rgba(8, 11, 22, 0) 52%, rgba(8, 11, 22, 0.46) 100%),
+    linear-gradient(to bottom, rgba(10, 13, 26, 0.5) 0%, rgba(10, 13, 26, 0) 22%),
+    linear-gradient(to top, rgba(10, 14, 28, 0.78) 0%, rgba(10, 14, 28, 0.36) 20%, rgba(10, 14, 28, 0) 42%);
 }
 
 .epilogue-lockup {
