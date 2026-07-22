@@ -2,9 +2,7 @@
  * Floating side navigation dots driven by scroll position.
  */
 
-import { safeStorageGet, safeStorageSet } from "../utils/storage";
-
-const SHORTCUTS_STORAGE_KEY = "cherrytree.shortcuts.enabled";
+import { initKeyboardSceneNavigation } from "../utils/keyboardSceneNavigation";
 
 export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
   const nav = document.querySelector("[data-ct-scene-nav]");
@@ -93,26 +91,6 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
     cleanup.push(() => trigger.kill());
   });
 
-  // Keyboard navigation:
-  //   PageDown / J  — next scene
-  //   PageUp   / K  — previous scene
-  //   Home          — first scene
-  //   End           — last scene
-  //   1–8           — jump to scene index (clamped to manifest length)
-  // Arrow keys are deliberately left alone so users keep native fine-grained
-  // scrolling. Skipped when focus is in an editable field or a modifier is held.
-  //
-  // WCAG 2.1.4: single-character shortcuts (J/K/1–9) must be turn-off-able. They
-  // default on, persist, and toggle with "?" (announced via the live region).
-  // PageUp/PageDown/Home/End are navigation keys, exempt from 2.1.4, always live.
-  let shortcutsEnabled = safeStorageGet(SHORTCUTS_STORAGE_KEY) !== "false";
-
-  const isEditableTarget = (target) => {
-    if (!target || target.nodeType !== 1) return false;
-    if (target.matches("input, textarea, select")) return true;
-    return target.isContentEditable;
-  };
-
   const jumpToScene = (index) => {
     const clamped = Math.max(0, Math.min(manifest.length - 1, index));
     const scene = manifest[clamped];
@@ -146,62 +124,23 @@ export const initSceneNav = ({ manifest, gsap, ScrollTrigger, lenis }) => {
     return bestIndex;
   };
 
-  const onKeyDown = (event) => {
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) {
-      return;
-    }
-    if (isEditableTarget(event.target)) {
-      return;
-    }
-
-    // "?" toggles the single-key shortcuts on/off (the 2.1.4 turn-off mechanism).
-    if (event.key === "?") {
-      shortcutsEnabled = !shortcutsEnabled;
-      safeStorageSet(SHORTCUTS_STORAGE_KEY, String(shortcutsEnabled));
-      if (announceRegion) {
-        announceRegion.textContent = `Keyboard scene shortcuts ${shortcutsEnabled ? "on" : "off"}`;
+  cleanup.push(
+    initKeyboardSceneNavigation({
+      sceneCount: manifest.length,
+      getCurrentIndex: () => {
+        const activeIndex = Array.from(dots).findIndex((dot) =>
+          dot.hasAttribute("aria-current")
+        );
+        return activeIndex === -1 ? inferIndexFromScroll() : activeIndex;
+      },
+      navigateToIndex: jumpToScene,
+      announce: (message) => {
+        if (announceRegion) {
+          announceRegion.textContent = message;
+        }
       }
-      event.preventDefault();
-      return;
-    }
-
-    const activeIndex = Array.from(dots).findIndex((dot) =>
-      dot.hasAttribute("aria-current")
-    );
-    const currentIndex = activeIndex === -1 ? inferIndexFromScroll() : activeIndex;
-
-    // Single-character shortcuts (letters/digits) honor the turn-off; the
-    // PageUp/PageDown/Home/End navigation keys stay active regardless.
-    const isCharShortcut =
-      event.key === "j" || event.key === "J" ||
-      event.key === "k" || event.key === "K" ||
-      /^[1-9]$/.test(event.key);
-    if (isCharShortcut && !shortcutsEnabled) {
-      return;
-    }
-
-    let nextIndex = null;
-    if (event.key === "PageDown" || event.key === "j" || event.key === "J") {
-      nextIndex = currentIndex + 1;
-    } else if (event.key === "PageUp" || event.key === "k" || event.key === "K") {
-      nextIndex = currentIndex - 1;
-    } else if (event.key === "Home") {
-      nextIndex = 0;
-    } else if (event.key === "End") {
-      nextIndex = manifest.length - 1;
-    } else if (/^[1-9]$/.test(event.key)) {
-      const numeric = parseInt(event.key, 10) - 1;
-      if (numeric < manifest.length) nextIndex = numeric;
-    }
-
-    if (nextIndex === null) return;
-
-    event.preventDefault();
-    jumpToScene(nextIndex);
-  };
-
-  window.addEventListener("keydown", onKeyDown);
-  cleanup.push(() => window.removeEventListener("keydown", onKeyDown));
+    })
+  );
 
   // Hash-based deep linking. Capture the initial hash AT INIT so the
   // scroll-driven setActive can't overwrite it before our timer fires.

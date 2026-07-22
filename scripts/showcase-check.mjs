@@ -118,7 +118,7 @@ const checkPackageMetadata = () => {
     "package.json should include showcase-friendly keywords"
   );
 
-  ["check:showcase", "audit:prod", "validate"].forEach((script) => {
+  ["check:showcase", "audit:prod", "test:smoke", "validate"].forEach((script) => {
     check(Boolean(packageJson.scripts?.[script]), `package.json is missing script ${script}`);
   });
 
@@ -141,6 +141,8 @@ const checkSceneConsistency = () => {
   });
 
   check(readme.includes("eight scenes"), "README should describe eight scenes");
+  check(readme.includes("1080p koi-pond video"), "README should describe the current 1080p Koi video");
+  check(!readme.includes("4K koi-pond video"), "README should not describe the retired 4K Koi video");
   check(!manifest.description.includes("nine scenes"), "manifest should not describe nine scenes");
   check(manifest.description.includes("eight scenes"), "manifest should describe eight scenes");
 };

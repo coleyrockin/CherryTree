@@ -29,9 +29,9 @@ If you're studying scroll-driven animation patterns or building something simila
 | 03 | **Drift** | Wind-path photography, deep parallax |
 | 04 | **Triptych** | Three composite panels, split parallax |
 | 05 | **Color Field** | Three chromatic fields drifting simultaneously (Rothko-in-motion) |
-| 06 | **Koi** | Full-bleed 4K koi-pond video, lazy-loaded, dark chrome |
+| 06 | **Koi** | Full-bleed 1080p koi-pond video, lazy-loaded, dark chrome |
 | 07 | **Stillness** | Single still, film-dust grain overlay |
-| 08 | **Epilogue** | Ambient glow, closing title |
+| 08 | **Epilogue** | Lone moonlit tree, snowfall, and a quiet closing line |
 
 <table>
   <tr>
@@ -52,7 +52,7 @@ If you're studying scroll-driven animation patterns or building something simila
   </tr>
   <tr>
     <td><img src="./.github/preview/cherrytree-stillness.webp" alt="Stillness scene — single still with film-dust grain" /></td>
-    <td><img src="./.github/preview/cherrytree-epilogue.webp" alt="Epilogue scene — ambient glow and closing title" /></td>
+    <td><img src="./.github/preview/cherrytree-epilogue.webp" alt="Epilogue scene — lone moonlit tree with snowfall" /></td>
   </tr>
   <tr>
     <td align="center"><sub>07 — Stillness</sub></td>
@@ -74,7 +74,7 @@ npm run dev
 | `npm run dev` | Dev server at 127.0.0.1:5173 |
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Serve the production build locally |
-| `npm run validate` | Full gate: showcase checks + build + `npm audit` |
+| `npm run validate` | Full gate: showcase checks + production build + production dependency audit |
 | `npm run test:smoke` | Playwright smoke tests |
 | `npm run optimize-assets` | Regenerate image sets from source files |
 
@@ -92,7 +92,7 @@ Scroll to move through the gallery. Each scene has a URL hash (`/#bloom`, `/#koi
 
 **Audio:** The speaker toggle enables an ambient sound bed. It never autoplays. Preference persists across reloads.
 
-**Reduced motion:** A footer toggle switches between full and reduced motion without a page reload. Picks up your system preference (`prefers-reduced-motion`) by default.
+**Reduced motion:** The motion control switches between full and reduced motion without a page reload. It picks up your system preference (`prefers-reduced-motion`) by default.
 
 ## Tech Stack
 

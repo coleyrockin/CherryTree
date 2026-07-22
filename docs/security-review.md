@@ -1,113 +1,54 @@
-# CherryTree Security Best Practices Report
+# CherryTree Security Review
 
-> **Historical record — reflects the codebase as of the review date below and is
-> not maintained going forward.** For the vulnerability-disclosure policy see
-> [`SECURITY.md`](../SECURITY.md). Live security headers are enforced via
-> [`vercel.json`](../vercel.json). _Update note: the third-party font CSS called
-> out below has since been removed — fonts are now self-hosted._
+**Reviewed:** 2026-07-21
+**Scope:** browser source, static HTML/assets, Vite configuration, CI, deployment
+headers, and production dependencies.
 
-## Executive Summary
+CherryTree is a static Vite experience. It has no backend, authentication,
+database, upload endpoint, server-side API, or repository-managed secret
+boundary.
 
-CherryTree is a static Vite site built with vanilla browser JavaScript, Three.js, GSAP, Lenis, and a Node/Sharp asset optimization script. There is no backend, authentication, database, upload route, API route, or server-side secret boundary in this repository.
+## Findings
 
-No critical or high-severity best-practice failures were found. The remaining recommendations are defense-in-depth and future-proofing: keep Trusted Types in mind if future raw HTML sinks are introduced. (The earlier third-party-font recommendation has since been actioned — fonts are self-hosted.)
+No critical, high, medium, or low-severity security findings are open.
 
-`npm audit --json` was run with current registry access and reported 0 vulnerabilities across 103 dependencies.
+## Verified Controls
 
-## Scope And Stack Evidence
+- [`vercel.json`](../vercel.json) provides a restrictive header-delivered CSP,
+  HSTS, `nosniff`, frame protection, referrer policy, and a deny-by-default
+  permissions policy. The executable inline bootstrap in [`index.html`](../index.html)
+  is SHA-256 pinned; the policy does not allow `unsafe-eval`.
+- Runtime assets, fonts, media, and scripts are first-party. No remote script,
+  stylesheet, API, analytics, or font request is required at runtime.
+- The source scan found no `innerHTML`, `outerHTML`, `insertAdjacentHTML`,
+  `document.write`, `eval`, `new Function`, `postMessage`, dynamic script
+  injection, or URL redirect assignment. Dynamic labels use DOM APIs and
+  `textContent`.
+- `localStorage` holds only motion, audio, and keyboard-shortcut preferences;
+  the motion mode is allowlisted in [`src/main.js`](../src/main.js).
+- [`scripts/optimize-assets.mjs`](../scripts/optimize-assets.mjs) accepts a
+  short allowlist of raster formats and enforces Sharp's 50-megapixel input
+  limit before image processing.
+- Local Vite dev and preview servers bind to `127.0.0.1` by default. LAN or
+  tunnel access is explicit in [`vite.config.js`](../vite.config.js).
+- The CI workflow runs static showcase checks, a production build, the
+  production dependency audit, and browser smoke tests.
 
-- JavaScript ES modules and Vite: `package.json:5-10`
-- Browser runtime dependencies: `package.json:12-15`
-- Node/Sharp asset tooling: `package.json:17-19`, `scripts/optimize-assets.mjs:1-3`
-- Static HTML entrypoint: `index.html:1-51`
-- Vite dev/preview server config: `vite.config.js:14-24`
+## Validation
 
-Guidance used: OWASP Top Ten (2021) and general web frontend security best practices.
+- Static high-risk sink and secret scans: no actionable findings.
+- `npm run check:showcase`: passed.
+- `npm run build`: passed.
+- `npm audit`: 0 vulnerabilities.
+- `npm audit --omit=dev`: 0 vulnerabilities.
+- `npm run test:smoke`: passed after this review's navigation coverage update.
 
-## Critical Findings
+## Residual Risk
 
-None.
+`style-src 'unsafe-inline'` remains necessary for the authored inline style
+variables used by the static 404 page and scene effects. It is not exposed to
+untrusted content in the current static application. Any future CMS, markdown,
+or user-supplied content must retain the current DOM-safe rendering approach
+and should revisit a stricter style policy and Trusted Types.
 
-## High Findings
-
-None.
-
-## Medium Findings
-
-### SBP-001: Add a CSP and Trusted Types plan for production
-
-- Severity: Medium
-- Status: Fixed
-- Location: `index.html:25-38`, `index.html:47-50`, `index.html:296`, `vercel.json:1-24`
-- Rule: JS-CSP-001, JS-CSP-002, JS-TT-001
-- Evidence: `vercel.json` now ships a header-delivered CSP. The only executable inline script (the no-js→js classlist swap) is pinned by `'sha256-4kQO9Cu9+CG6W4TqXRcp/FyT0ez8jgpUssYPeytIJZA='`, and the policy avoids `unsafe-eval` / `unsafe-inline`.
-- Impact: This remains defense-in-depth for the current static site, but future DOM/content regressions now have browser-enforced guardrails.
-- Validation: `npm run build` passed after adding the header config; `vercel.json` parses as valid JSON; CSP inline allowances were checked against both `index.html` and `dist/index.html`.
-- 2026-05-28 hardening: removed a stale orphan hash (`'sha256-i9oAhtQaH0dZXNqHwY+w5xdjuzZaw24l/fWEyHD9pSI='`) that matched no inline script in either `index.html` or `dist/index.html`. Verified by recomputing SHA-256 over every inline `<script>` block in both files; the JSON-LD block is `type="application/ld+json"` (data, not governed by `script-src`) and needs no hash. Removing the orphan only tightens the policy and changes no live hash.
-- 2026-05-29 note: scene 06 ("Koi") added a full-bleed background `<video>` served from `public/assets/video/` (same-origin WebM/MP4). This is already covered by the existing `media-src 'self'` directive in `vercel.json` — no CSP change was needed. The sources load lazily via `koiVideo.js` (no inline script, no new hash).
-- False positive notes: Trusted Types enforcement is not enabled yet because the current app has no remaining raw HTML sink in source and the immediate fix is a deployable CSP baseline.
-
-## Low Findings
-
-### SBP-002: Third-party Google Fonts CSS is not pinned with integrity
-
-- Severity: Low
-- Status: Resolved (superseded) — fonts are now self-hosted; the third-party
-  Google Fonts dependency no longer exists, and the CSP drops the Google origins.
-- Location (historical): `index.html` Google Fonts `<link>` (since removed)
-- Rule: JS-SUPPLY-001, JS-SRI-001
-- Evidence (historical): The page loaded CSS from `https://fonts.googleapis.com/...` without `integrity`.
-- Resolution: The two font families are self-hosted as first-party WOFF2
-  (`public/assets/fonts/`, `src/styles/fonts.css`). `font-src`, `style-src`, and
-  `connect-src` are now `'self'` only — no external font origin remains, so SRI is
-  moot.
-- False positive notes: No remote third-party JavaScript was found.
-
-### SBP-003: `innerHTML` helper should stay trusted-markup-only
-
-- Severity: Low
-- Status: Fixed
-- Location: `src/utils/splitText.js:46-52`, `src/utils/splitText.js:63-69`, `src/experience/sceneNav.js:77-79`
-- Rule: JS-XSS-001
-- Evidence: `splitText` now treats inputs as trusted plain text and restores with `element.textContent`; `sceneNav` clears generated children with `list.replaceChildren()`.
-- Impact: The previous usage was fed by repository-authored static text, so this was not exploitable. The fix removes the reusable HTML sink pattern before future user/CMS/API content can accidentally flow through it.
-- Validation: `rg -n "innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function|setAttribute\(['\"]on" src index.html scripts vite.config.js` returned no matches, and `npm run build` passed.
-- False positive notes: No attacker-controlled source reached these sinks before the fix.
-
-### SBP-004: Dev and preview servers expose all interfaces and tunnel hosts by default
-
-- Severity: Low
-- Status: Fixed
-- Location: `vite.config.js:3-24`
-- Rule: secure development configuration
-- Evidence: `server.host` and `preview.host` now bind to `127.0.0.1` by default. LAN and tunnel exposure require `CHERRYTREE_EXPOSE_DEV_SERVER=true`; tunnel hosts and `CHERRYTREE_ALLOWED_HOSTS` are only applied in that opt-in mode.
-- Impact: This was a development footgun, not a production vulnerability. Default local runs no longer expose source/build artifacts on the LAN.
-- Validation: `npm run build` passed after the config change, and the README now documents the explicit opt-in command for LAN or tunnel testing.
-- False positive notes: No privileged dev API route or secret-serving route exists in this repo.
-
-### SBP-005: Sharp optimizer should be hardened before accepting untrusted images
-
-- Severity: Low
-- Status: Fixed
-- Location: `scripts/optimize-assets.mjs:6-17`, `scripts/optimize-assets.mjs:38-42`, `scripts/optimize-assets.mjs:48-58`
-- Rule: secure parser/tooling boundary
-- Evidence: The optimizer now uses `limitInputPixels: 50_000_000`, removes `{ unlimited: true }`, and accepts only raster web image formats currently expected by the project (`jpg`, `jpeg`, `png`, `webp`, `avif`).
-- Impact: Current inputs are still developer-controlled repository assets, but malformed or oversized image parsing now has an explicit pixel ceiling before the script is ever wired to automation.
-- Validation: `npm run optimize-assets` regenerated all current responsive image outputs with the new loader limits, and `npm run build` passed after the optimizer hardening.
-- False positive notes: No GitHub Actions workflow was found that processes untrusted images.
-
-## Positive Controls Observed
-
-- No `eval`, `new Function`, `document.write`, `insertAdjacentHTML`, `postMessage`, dynamic script injection, `window.location` redirect flow, or event-handler string assignment was found in source.
-- `localStorage` is used only for non-sensitive motion/audio preferences, and motion mode is allowlisted in `src/main.js:12-28`.
-- DOM labels and dynamic text generally use `textContent`, `createElement`, `appendChild`, and safe attribute setters.
-- No secrets were found in the checked repository files during the security scan run immediately before this report.
-- `npm audit --json` reported zero known vulnerabilities.
-
-## Recommended Fix Order
-
-1. Fixed: production CSP and baseline security headers are defined in `vercel.json`.
-2. Resolved: fonts are self-hosted (no third-party Google Fonts dependency); CSP `font-src`/`style-src`/`connect-src` are `'self'` only.
-3. Fixed: `splitText.js` is trusted-plain-text-only and scene nav clearing uses `replaceChildren()`.
-4. Fixed: tunnel-enabled Vite hosting is opt-in.
-5. Fixed: `scripts/optimize-assets.mjs` has explicit input format and pixel limits.
+For coordinated vulnerability reporting, see [`SECURITY.md`](../SECURITY.md).

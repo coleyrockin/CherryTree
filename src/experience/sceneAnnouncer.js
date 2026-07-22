@@ -12,6 +12,7 @@
  */
 
 import { pickHighestRatio } from "../utils/intersection";
+import { initKeyboardSceneNavigation } from "../utils/keyboardSceneNavigation";
 
 export const initSceneAnnouncer = ({ manifest }) => {
   const announceRegion = document.querySelector("[data-ct-scene-announce]");
@@ -71,6 +72,40 @@ export const initSceneAnnouncer = ({ manifest }) => {
     const match = scenes.find((entry) => entry.scene.id === id);
     if (match) match.el.scrollIntoView({ behavior: "auto", block: "start" });
   };
+
+  const inferIndexFromScroll = () => {
+    const midpoint = window.innerHeight / 2;
+    let bestIndex = 0;
+    let bestDistance = Infinity;
+
+    scenes.forEach(({ el }, index) => {
+      const rect = el.getBoundingClientRect();
+      const center = rect.top + rect.height / 2;
+      const distance = Math.abs(center - midpoint);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    return bestIndex;
+  };
+
+  cleanup.push(
+    initKeyboardSceneNavigation({
+      sceneCount: scenes.length,
+      getCurrentIndex: () => {
+        const activeIndex = scenes.findIndex(({ scene }) => scene.id === activeId);
+        return activeIndex === -1 ? inferIndexFromScroll() : activeIndex;
+      },
+      navigateToIndex: (index) => scrollToId(scenes[index]?.scene.id),
+      announce: (message) => {
+        if (announceRegion) {
+          announceRegion.textContent = message;
+        }
+      }
+    })
+  );
 
   const initialHash = window.location.hash.replace(/^#/, "");
   if (initialHash) {

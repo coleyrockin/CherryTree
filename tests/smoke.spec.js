@@ -8,6 +8,8 @@ import { test, expect } from "@playwright/test";
  *   b. All eight scenes are present in the DOM.
  *   c. With prefers-reduced-motion: reduce, the WebGL hero is suppressed
  *      and the static fallback image is in the DOM.
+ *   d. Keyboard scene navigation and the motion preference control remain
+ *      available in both full- and reduced-motion modes.
  *
  * NOTE: the eight scene IDs live in `data-ct-scene` and correspond to the
  * URL deep-link hashes — `prologue-webgl`, `bloom-wash`, `drift`, `triptych`,
@@ -59,6 +61,45 @@ test.describe("Cherry Tree smoke", () => {
     }
   });
 
+  test("keyboard navigation updates the full-motion scene state", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(() => !document.body.classList.contains("is-loading"), {
+      timeout: 10_000
+    });
+
+    await page.keyboard.press("PageDown");
+
+    await expect.poll(() => page.evaluate(() => window.location.hash), {
+      timeout: 5_000
+    }).toBe("#bloom-wash");
+    await expect(page).toHaveTitle("Bloom — Cherry Tree");
+    await expect(page.locator("[data-ct-scene-announce]")).toHaveText("Now viewing: Bloom");
+  });
+
+  test("motion control starts in system mode and records explicit choices", async ({ page }) => {
+    await page.goto("/#bloom-wash");
+    await page.waitForLoadState("networkidle");
+    await page.waitForFunction(() => !document.body.classList.contains("is-loading"), {
+      timeout: 10_000
+    });
+
+    const motionToggle = page.getByRole("button", { name: "Toggle motion mode" });
+    await expect(motionToggle.locator("[data-ct-motion-state]")).toHaveText("System");
+    await expect(motionToggle).toHaveAttribute("aria-pressed", "false");
+
+    await motionToggle.focus();
+    await page.keyboard.press("Enter");
+    await expect(motionToggle.locator("[data-ct-motion-state]")).toHaveText("Reduced");
+    await expect(motionToggle).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
+
+    await page.keyboard.press("Enter");
+    await expect(motionToggle.locator("[data-ct-motion-state]")).toHaveText("Full");
+    await expect(motionToggle).toHaveAttribute("aria-pressed", "false");
+    await expect(page.locator("html")).toHaveAttribute("data-motion", "full");
+  });
+
   test("reduced motion suppresses WebGL and keeps the static fallback", async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const page = await context.newPage();
@@ -75,20 +116,6 @@ test.describe("Cherry Tree smoke", () => {
       const heroScene = page.locator('[data-ct-scene="prologue-webgl"]');
       await expect(heroScene).toHaveClass(/is-webgl-fallback/);
 
-      // No WebGL context has been bound to the canvas.
-      const hasGlContext = await page.evaluate(() => {
-        const canvas = document.getElementById("hero-webgl");
-        if (!canvas) return false;
-        // After init has run, getContext("webgl2") returns null if no
-        // context was created and the type is incompatible.
-        return Boolean(canvas.getContext("webgl2") || canvas.getContext("webgl"));
-      });
-      // The check above will *create* a context if none exists, so we instead
-      // assert that the hero never asked for one — the host carries the class.
-      // (Kept above for diagnostic clarity in trace; assertion below is the
-      // authoritative one.)
-      expect(typeof hasGlContext).toBe("boolean");
-
       // The static fallback picture is in the DOM.
       const fallback = heroScene.locator("picture.scene-media-fallback");
       await expect(fallback).toHaveCount(1);
@@ -96,6 +123,12 @@ test.describe("Cherry Tree smoke", () => {
         "src",
         /prologue-fallback/
       );
+
+      await page.keyboard.press("PageDown");
+      await expect.poll(() => page.evaluate(() => window.location.hash), {
+        timeout: 5_000
+      }).toBe("#bloom-wash");
+      await expect(page.locator("[data-ct-scene-announce]")).toHaveText("Now viewing: Bloom");
     } finally {
       await context.close();
     }
